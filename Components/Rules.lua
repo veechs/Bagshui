@@ -38,6 +38,11 @@ local Rules = {
 	-- Rule evaluation session tracking -- see `Rules:SetItemAndCharacter()`.
 	currentSession = nil,
 
+	-- When an ad-hoc rule needs to be compiled, it will be cached in `lastRuleStringCompiled` so searches can be more efficient.
+	lastRuleString = "",
+	-- Compiled version of `lastRuleString`.
+	lastRuleStringCompiled = nil,
+
 	-- List of allowed argument types for error messages.
 	allowedArgumentTypes = "",
 
@@ -554,25 +559,48 @@ end
 ---@return string? errorMessage
 function Rules:Match(ruleFunctionOrExpression, item, character, session, isSearch)
 	self.errorMessage = nil
+
+	-- Wrap simple strings in `Name()` and strip `=` from the beginning of expressions.
 	if isSearch then
 		ruleFunctionOrExpression = self:CreateSearchRule(ruleFunctionOrExpression)
 	end
+
+	-- We cached the compiled version of this rule string.
+	if ruleFunctionOrExpression == self.lastRuleString and type(self.lastRuleStringCompiled) == "function" then
+		ruleFunctionOrExpression = self.lastRuleStringCompiled
+	end
+
+	-- Didn't get a usable input.
 	if type(ruleFunctionOrExpression) ~= "function" and type(ruleFunctionOrExpression) ~= "string" then
 		return false
 	end
+
+	-- Here's what we're working on.
 	self:SetItemAndCharacter(item, character, session)
+
 	---@type string|function?
 	local ruleFunction = ruleFunctionOrExpression
 	local errorMessage
+
+	-- Compile if needed.
 	if type(ruleFunctionOrExpression) ~= "function" then
-		ruleFunction, errorMessage = self:Compile(ruleFunctionOrExpression, isSearch)
+		ruleFunction, errorMessage = self:Compile(ruleFunctionOrExpression)
 	end
 	if type(ruleFunction) ~= "function" or errorMessage then
 		return false, errorMessage
 	end
+
+	-- Evaluate the rule.
 	setfenv(ruleFunction, self.environment)
 	local status, retVal = pcall(ruleFunction)
+
+	-- Return values.
 	if status and self.errorMessage == nil then
+		-- Cache the most recent rule compilation for quick reuse during searches.
+		if type(ruleFunctionOrExpression) == "string" then
+			self.lastRuleString = ruleFunctionOrExpression
+			self.lastRuleStringCompiled = ruleFunction
+		end
 		return retVal
 	else
 		return false, self.errorMessage or retVal
@@ -651,7 +679,7 @@ function Rules:CreateSearchRule(searchText)
 	if string.find(searchText, "^=") then
 		return (string.gsub(searchText, "^=", ""))
 	else
-		return string.format("name('%s')", string.gsub(searchText, "'", "\\'"))
+		return string.format("Name('%s')", string.gsub(searchText, "'", "\\'"))
 	end
 end
 
