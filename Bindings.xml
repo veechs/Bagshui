@@ -1,0 +1,36 @@
+<!--
+Bindings are localized in Localization:Init().
+- The localization key is extracted from the binding name: Bagshui_<LocalizationKey>
+- Localization occurs with the following priority:
+1. L[Binding_<LocalizationKey>]
+2. L[<LocalizationKey>]
+-->
+<Bindings>
+	<Binding name="Bagshui_Toggle_Bags" header="Bagshui">
+		Bagshui.components.Bags:Toggle()
+	</Binding>
+	<Binding name="Bagshui_Toggle_Bank" header="Bagshui">
+		Bagshui.components.Bank:Toggle()
+	</Binding>
+	<Binding name="Bagshui_Toggle_Keyring" header="Bagshui">
+		Bagshui.components.Keyring:Toggle()
+	</Binding>
+	<Binding name="Bagshui_Toggle_Catalog" header="Bagshui">
+		Bagshui.components.Catalog:Toggle()
+	</Binding>
+	<Binding name="Bagshui_Resort" header="Bagshui">
+		Bagshui:ResortAll()
+	</Binding>
+	<Binding name="Bagshui_Restack" header="Bagshui">
+		Bagshui:RestackAll()
+	</Binding>
+	<Binding name="Bagshui_Search_Bags" header="Bagshui">
+		Bagshui.components.Bags:Search()
+	</Binding>
+	<Binding name="Bagshui_Search_Bank" header="Bagshui">
+		Bagshui.components.Bank:Search()
+	</Binding>
+	<Binding name="Bagshui_Search_Catalog" header="Bagshui">
+		Bagshui.components.Catalog:Search()
+	</Binding>
+</Bindings>

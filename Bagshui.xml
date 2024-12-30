@@ -1,0 +1,165 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+<!--
+Order is important!
+Don't move things around unless you're sure it won't break anything.
+-->
+
+<!-- Libs -->
+<Include file="Libs\PeriodicTable.xml" />
+
+<!-- Core -->
+<Include file="Bagshui.lua" />
+<Include file="Components\Util.lua" />
+<Include file="Components\Bagshui.Output.lua" />
+<Include file="Components\Bagshui.Events.lua" />
+<Include file="Components\Bagshui.BlizzFixes.lua" />
+<Include file="Components\Bagshui.Cursor.lua" />
+<Include file="Components\Bagshui.Menus.lua" />
+<Include file="Components\Bagshui.Windows.lua" />
+<Include file="Config\ItemFixes.lua" />
+<Include file="Config\PeriodicTable.lua" />
+<Include file="Components\Hooks.lua" />
+<Include file="Components\Slash.lua" />
+<Include file="Components\Menus.lua" />
+<Include file="Components\ObjectList.lua" />
+<Include file="Components\GameInfo.lua" />
+<Include file="Components\About.lua" />
+<Include file="Components\API.lua" />
+
+<!-- Localization -->
+<Include file="Components\Localization.lua" />
+<Include file="Locale\Locales.xml" />
+
+<!-- Inventory Config - must come after Localization. -->
+<Include file="Config\Inventory.lua" />
+
+<!-- Settings - must come after Inventory Config. -->
+<Include file="Config\Settings.lua" />
+<Include file="Components\Settings.lua" />
+
+<!-- Compatibility - must come after Settings. -->
+<Include file="Components\Compat.lua" />
+
+<!-- Profiles - must come after Inventory Config and Settings. -->
+<Include file="Config\Profiles.lua" />
+<Include file="Components\Profiles.lua" />
+<Include file="Components\Profiles.Ui.lua" />
+
+<!-- UI -->
+<Include file="Components\Ui.lua" />
+<Include file="Components\Ui.Util.lua" />  <!-- Ui.Util MUST be loaded before other Ui files.-->
+<Include file="Components\Ui.Skin.lua" />
+<Include file="Components\Ui.Button.lua" />
+<Include file="Components\Ui.Dialog.lua" />
+<Include file="Components\Ui.EditBox.lua" />
+<Include file="Components\Ui.ItemButton.lua" />
+<Include file="Components\Ui.ScrollFrame.lua" />
+<Include file="Components\Ui.ScrollableList.lua" />
+<Include file="Components\Ui.ScrollableTextWindow.lua" />
+<Include file="Components\Ui.SearchBox.lua" />
+<Include file="Components\Ui.TextAndTextures.lua" />
+<Include file="Components\Ui.Window.lua" />
+<Include file="Components\ObjectManager.lua" />
+<!-- Core file that depends on Ui:CreateElementName(). -->
+<Include file="Components\Bagshui.Tooltips.lua" />
+
+<!-- UI Skinning - must load after UI. -->
+<Include file="Config\Skins.lua" />
+<Include file="Components\Skins.lua" />
+
+<!-- Item info must load after UI because it depends on ScrollableTextWindow. -->
+<Include file="Components\ItemInfo.lua" />
+
+<!-- Rules -->
+<Include file="Config\RuleFunctions.lua" />
+<Include file="Config\RuleFunctionTemplates.lua" />
+<Include file="Components\Rules.lua" />
+
+<!-- Categories -->
+<Include file="Config\Categories.lua" />
+<Include file="Components\Categories.lua" />
+<Include file="Components\Categories.Ui.lua" />
+
+<!-- Inventory class prototype -->
+<Include file="Components\Inventory.lua" />
+<Include file="Components\Inventory.Cache.lua" />
+<Include file="Components\Inventory.EditMode.lua" />
+<Include file="Components\Inventory.Layout.lua" />
+<Include file="Components\Inventory.Menus.lua" />
+<Include file="Components\Inventory.Menus.Settings.lua" />
+<Include file="Components\Inventory.Ui.lua" />
+<Include file="Components\Inventory.Ui.Group.lua" />
+<Include file="Components\Inventory.Ui.BagButton.lua" />
+<Include file="Components\Inventory.Ui.ItemButton.lua" />
+
+<!-- Sort Orders -->
+<Include file="Config\SortOrders.lua" />
+<Include file="Components\SortOrders.lua" />
+<Include file="Components\SortOrders.Ui.lua" />
+
+<!-- Other classes -->
+<Include file="Components\ActiveQuestItems.lua" />
+<Include file="Components\Character.lua" />
+<Include file="Components\CharacterData.lua" />
+<Include file="Components\Catalog.lua" />
+<Include file="Components\GameReport.lua" />
+<Include file="Components\LogWindow.lua" />
+<Include file="Components\Share.lua" />
+
+<!-- Inventory components -->
+<Include file="Components\Bags.lua" />
+<Include file="Components\Bank.lua" />
+<Include file="Components\Keyring.lua" />
+
+
+
+<!-- XML UI Stuff -->
+
+<!--
+Bag slot button template for Bags class.
+
+In theory it would be convenient to use Blizzard's BagSlotButtonTemplate for container slots
+in the Bags class (like we're able to do with BankItemButtonTemplate in the Bank class),
+but BagSlotButtonTemplate has a lot of action bar-y behaviors defined that we would have to override.
+It ends up being easier to create a slightly modified template based on PaperDollItemSlotButtonTemplate,
+which gives us most of the behaviors we want.
+		
+This is staying in XML instead of moving to pure Lua because it allows identical code in
+Bags and Bank (i.e. both can just specify a template).
+-->
+<CheckButton name="BagshuiBagsContainerTemplate" inherits="PaperDollItemSlotButtonTemplate" virtual="true">
+	<Frames>
+		<!--
+		PaperDollItemSlotButtonTemplate doesn't include the animation model.
+		Must be named this way so Blizzard code will work..
+		-->
+		<Model name="$parentItemAnim" inherits="ItemAnimTemplate">
+			<Anchors>
+				<Anchor point="BOTTOMRIGHT">
+					<Offset>
+						<AbsDimension x="-10" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</Model>
+	</Frames>
+	<!-- Named this way to match BankItemButtonBagTemplate. -->
+	<CheckedTexture name="$parentHighlightFrameTexture" alphaMode="ADD" file="Interface\Buttons\CheckButtonHilight"/>
+</CheckButton>
+
+<!-- Monospaced font for rule expression editor. -->
+<Font name="BagshuiMono" font="Interface\AddOns\Bagshui\Fonts\Inconsolata_Condensed-Regular.ttf" virtual="true">
+	<FontHeight>
+		<AbsValue val="13"/>
+	</FontHeight>
+	<Shadow>
+		<Offset>
+			<AbsDimension x="0.5" y="-0.5"/>
+		</Offset>
+		<Color r="0" g="0" b="0"/>
+	</Shadow>
+	<Color r="1" g="1" b="1"/>
+</Font>
+
+</Ui>

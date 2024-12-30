@@ -1,0 +1,6 @@
+## Interface: 11200
+## Title: !BagshuiDebug
+## Notes: Enable Bagshui debugging
+## Version: 1.0
+
+BagshuiDebug.lua

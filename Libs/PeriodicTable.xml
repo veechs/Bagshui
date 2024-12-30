@@ -1,0 +1,11 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Include file="PeriodicTable\Core\PTEmbed.lua" />
+	<Include file="PeriodicTable\Elements\AQ\PTEmbedElemAhnQiraj.lua" />
+	<Include file="PeriodicTable\Elements\EquipSets\PTEmbedElemEquipSets.lua" />
+	<Include file="PeriodicTable\Elements\Food\PTEmbedElemFood.lua" />
+	<Include file="PeriodicTable\Elements\Instance\PTEmbedElemInstance.lua" />
+	<Include file="PeriodicTable\Elements\Misc\PTEmbedElemMisc.lua" />
+	<Include file="PeriodicTable\Elements\Raid\PTEmbedElemRaid.lua" />
+	<Include file="PeriodicTable\Elements\Tradeskills\PTEmbedElemTradeskill.lua" />
+	<Include file="PeriodicTable\Elements\ZG\PTEmbedElemZulGurub.lua" />
+</Ui>
