@@ -641,6 +641,7 @@ function Character:FormatCharacterName(characterId, includeRealm)
 			type(characterInfo.class) == "string"
 			and (
 				_G.RAID_CLASS_COLORS[string.upper(characterInfo.class)]
+				and _G.RAID_CLASS_COLORS[string.upper(characterInfo.class)].colorStr
 				and ("|c" .. _G.RAID_CLASS_COLORS[string.upper(characterInfo.class)].colorStr)
 			)
 			or NORMAL_FONT_COLOR_CODE
