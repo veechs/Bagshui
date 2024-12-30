@@ -35,7 +35,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 3. Rename the resulting `Bagshui-main` folder to `Bagshui`.
 4. Move that folder to `[Path\To\WoW]\Interface\Addons`.
 5. Ensure the structure is `Interface\Addons\Bagshui\Bagshui.toc`.  
-   <sup>*Anything like the following **will not work**!*  
+   <sup>*These are all **wrong**:*  
     × `Bagshui-main\Bagshui.toc`  
     × `Bagshui\Bagshui\Bagshui.toc`  
 	 × `Bagshui\Bagshui-main\Bagshui.toc`
