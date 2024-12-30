@@ -44,7 +44,8 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 ## Documentation
 
-[Head over to the wiki](https://github.com/veechs/Bagshui/wiki).
+* [Wiki](https://github.com/veechs/Bagshui/wiki)
+* [Changelog](Changelog.md)
 
 
 ## Compatibility
@@ -63,7 +64,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 * Blizzard UI
 * [aux](https://github.com/gwetchen/aux-addon)
 * [Mail](https://github.com/EinBaum/Mail)
-* [Postal Returned](https://github.com/veechs/Bagshui/Postal-Returned) / Postal / CT_MailMod
+* [Postal Returned](https://github.com/veechs/Postal-Returned) / Postal / CT_MailMod
 
 </td>
 </tr>
