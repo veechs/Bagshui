@@ -118,13 +118,12 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 <tr>
 <td>
 
-### Turtle WoW Guild Bank
+### Turtle WoW
 
 </td>
 <td>
 
-* Right-click deposit should work, *in theory*.  
-  (If someone can test and [let me know](https://github.com/veechs/Bagshui/issues/1), it would be appreciated!)
+* **Guild Bank** right-click to deposit.
 
 </td>
 </tr>
