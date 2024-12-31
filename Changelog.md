@@ -1,5 +1,11 @@
 # Bagshui Changelog
 
+## 1.0.4 - 2024-12-31
+* [Window scale setting added](https://github.com/veechs/Bagshui/issues/4).
+* Adjust default categories (thanks to melba on Discord):
+  * Add Turtle WoW items to Teleport and decrease sequence number to run before Soulbound.
+  * Add missing Anti-Venoms to First Aid (formerly Bandages).
+
 ## 1.0.3 - 2024-12-30
 * Open All Bags key binding will now [toggle Bags to match default Blizzard behavior](https://github.com/veechs/Bagshui/issues/3).
 
