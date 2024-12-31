@@ -297,8 +297,10 @@ function Inventory:ItemButton_OnEnter(itemButton)
 				if firstBlankLine then
 					for line = firstBlankLine, _G.GameTooltip:NumLines() do
 						for _, lr in ipairs(BsHiddenTooltip.bagshuiData.textFieldsPerLine) do
-							ttTextFrame = _G["GameTooltipText" .. lr .. line]:SetText(nil)
-							ttTextFrame = _G["GameTooltipText" .. lr .. line]:Hide()
+							if _G["GameTooltipText" .. lr .. line] then
+								_G["GameTooltipText" .. lr .. line]:SetText(nil)
+								_G["GameTooltipText" .. lr .. line]:Hide()
+							end
 						end
 					end
 					_G.GameTooltipMoneyFrame:Hide()
