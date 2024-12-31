@@ -619,7 +619,7 @@ function Ui:ShineIconButton(button)
 
 	-- Create shine texture.
 	if not button.bagshuiData.shineFrame then
-		button.bagshuiData.shineFrame = CreateFrame("Frame", nil, button)
+		button.bagshuiData.shineFrame = _G.CreateFrame("Frame", nil, button)
 		button.bagshuiData.shineFrame:SetAllPoints(button)
 		button.bagshuiData.shineFrame:Hide()
 		button.bagshuiData.shineFrame.bagshuiData = {}
