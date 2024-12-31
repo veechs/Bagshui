@@ -786,7 +786,6 @@ function Util.GetContainerItemCooldown(bagNum, slotNum)
 
 	-- Fix for long cooldown issue to ensure we pass correct values downstream.
 	-- Most other addons have accounted for this, but just in case...
-	-- Based on 
 	-- Before restarting the GetTime() will always be greater than [start]
 	-- After the restart, [start] is technically always bigger because of the 2^32 offset thing
 	if cooldownStart > _G.GetTime() then

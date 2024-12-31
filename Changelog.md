@@ -1,5 +1,7 @@
 # Bagshui Changelog
 
+## 1.0.3 - 2024-12-30
+* Open All Bags key binding will now [toggle Bags to match default Blizzard behavior](https://github.com/veechs/Bagshui/issues/3).
 
 ## 1.0.2 - 2024-12-30
 * Prevent [nil colorStr error](https://github.com/veechs/Bagshui/issues/2).

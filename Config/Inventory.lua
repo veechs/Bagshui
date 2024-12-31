@@ -58,7 +58,7 @@ Bagshui.config.Inventory = {
 		},
 
 		apiFunctionsToHook = {
-			OpenAllBags = "OpenBag",
+			OpenAllBags = "ToggleBag",
 			OpenBackpack = "OpenBag",
 			OpenBag = "OpenBag",
 			CloseBackpack = "CloseBag",
@@ -73,6 +73,8 @@ Bagshui.config.Inventory = {
 		hookSettingTranslations = {
 			-- (Open|Close|Toggle)Backpack$ = Bag0.
 			["Backpack$"] = "hookBag0",
+			-- Letting the Backpack preference control OpenAllBags.
+			["^OpenAllBags$"] = "hookBag0",
 		},
 
 		openSound = "igBackPackOpen",
