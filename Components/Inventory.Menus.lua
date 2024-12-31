@@ -6,9 +6,6 @@
 Bagshui:AddComponent(function()
 local Inventory = Bagshui.prototypes.Inventory
 
--- It looks nicer to indent some menu values under headers (like the Edit Mode menu for groups).
-local MENU_SUBTITLE_INDENT = "    "
-
 -- Group menu for removing categories should not allow removing the default category (Uncategorized).
 local GROUP_CATEGORY_REMOVE_MENU_IDS_TO_DISABLE = { BS_DEFAULT_CATEGORY_ID }
 
@@ -332,7 +329,7 @@ function Inventory:InitMenus()
 
 			-- Categories indented sub-header.
 			{
-				text = MENU_SUBTITLE_INDENT .. L.Categories,
+				text = BS_MENU_SUBTITLE_INDENT .. L.Categories,
 				icon = BsUtil.GetFullTexturePath("Icons\\Category"),
 				isTitle = true,
 				notCheckable = true,
@@ -422,7 +419,7 @@ function Inventory:InitMenus()
 
 			-- Sorting indented sub-header.
 			{
-				text = MENU_SUBTITLE_INDENT .. L.Sorting,
+				text = BS_MENU_SUBTITLE_INDENT .. L.Sorting,
 				icon = BsUtil.GetFullTexturePath("Icons\\SortOrder"),
 				isTitle = true,
 				notCheckable = true,
@@ -800,7 +797,7 @@ function Inventory:InitMenus()
 
 			-- Indented subheader for item categories menu.
 			{
-				text = MENU_SUBTITLE_INDENT .. L.Categories,
+				text = BS_MENU_SUBTITLE_INDENT .. L.Categories,
 				isTitle = true,
 				notCheckable = true,
 			},

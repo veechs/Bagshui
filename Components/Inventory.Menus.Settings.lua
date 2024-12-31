@@ -85,8 +85,8 @@ function Inventory:FixSettingsMenuPosition(secondPass)
 			if
 				(BsUtil.GetFrameOffscreenAmount(menu, "x") ~= 0)
 				or (
-					menu:GetLeft() >= self.uiFrame:GetLeft()
-					and menu:GetRight() <= self.uiFrame:GetRight()
+					(menu:GetLeft() or 0) >= (self.uiFrame:GetLeft() or 0)
+					and (menu:GetRight() or 0) <= (self.uiFrame:GetRight() or 0)
 				)
 			then
 				self.lastSettingsAnchor = BsUtil.FlipAnchorPointComponent(self.lastSettingsAnchor, 2)
@@ -302,7 +302,7 @@ function Inventory:BuildSettingsMenuFromConfig(configTable, menuBaseTable, menuL
 									subMenu,
 									{
 										_bagshuiSettingName = settingInfo.name,
-										text = i,
+										text = type(settingInfo.valueDisplayFunc) == "function" and settingInfo.valueDisplayFunc(i) or i,
 										value = i,
 										tooltipTitle = menuItem.tooltipTitle,
 										tooltipText = menuItem.tooltipText,
@@ -408,7 +408,7 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 	menuItem.arg1.menuLevel = menuLevel
 
 	-- Figure out what the display text for the setting should be, when a `text`
-	-- property is available for the selected value.
+	-- property is available for the selected value within a list of choices.
 	local currentSettingFriendlyValue = currentSettingValue
 	if
 		settingInfo.choices
@@ -422,6 +422,11 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 				currentSettingFriendlyValue = choice.text or choice.value
 			end
 		end
+	end
+
+	-- Apply value display translation if available.
+	if type(settingInfo.valueDisplayFunc) == "function" then
+		currentSettingFriendlyValue = settingInfo.valueDisplayFunc(currentSettingFriendlyValue)
 	end
 
 	-- Process each type of setting into the appropriate menu item.
@@ -452,7 +457,8 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 		-- Determine whether this is INSIDE a submenu or whether an arrow to open the submenu is needed.
 		if menuItem.value and not menuItem.hasArrow then
 			-- Inside submenu -- checked/unchecked based on current value, change setting on click.
-			menuItem.checked = menuItem.value == currentSettingValue
+			-- Need to use tostring() here so we don't get caught by float nonsense where 1 somehow doesn't equal 1.
+			menuItem.checked = tostring(menuItem.value) == tostring(currentSettingValue)
 			menuItem.keepShownOnClick = false
 			menuItem.func = function()
 				Bagshui:CloseMenus(_G.UIDROPDOWNMENU_MENU_LEVEL, nil, true)

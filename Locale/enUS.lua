@@ -305,7 +305,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_About"] = "About Bagshui",
 ["Menu_Settings_Accessibility"] = "Accessibility",
 ["Menu_Settings_Advanced"] = "Advanced",
-["Menu_Settings_Anchoring"] = "Window Anchoring",
+["Menu_Settings_Anchoring"] = "Anchoring",
 ["Menu_Settings_Behaviors"] = "Behaviors",
 ["Menu_Settings_Badges"] = "Item Badges",
 ["Menu_Settings_ChangeTiming"] = "Stock Change Timers",
@@ -336,7 +336,6 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_StockBadgeColors"] = "Stock Colors",
 ["Menu_Settings_View"] = "View",
 ["Menu_Settings_Window"] = "Window",
-["Menu_Settings_WindowShortcuts"] = "Window Behaviors",
 
 -- Category Menu.
 ["Menu_Category_Move_TooltipText"] = "Pick up this category so it can be moved to a new group.",
@@ -1065,6 +1064,10 @@ BsLocalization:AddLocale("enUS", {
 
 ["windowMaxColumns"] = "Maximum Columns",
 ["windowMaxColumns_TooltipText"] = "Window width limit in number of items per row.",
+
+["windowScale"] = "Scale",
+["windowScale_TooltipTitle"] = "Window Scale",
+["windowScale_TooltipText"] = "Relative size of entire window.",
 
 ["windowUseSkinColors"] = "Use %s Colors",
 ["windowUseSkinColors_TooltipTitle"] = "%s Colors for Window",

@@ -358,7 +358,11 @@ Bagshui.config.Settings = {
 
 
 				{
-					menuTitle = L.Menu_Settings_Anchoring,
+					menuTitle = L.Menu_Settings_Window,
+				},
+
+				{
+					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Anchoring,
 				},
 
 				{
@@ -380,8 +384,31 @@ Bagshui.config.Settings = {
 					inventoryWindowUpdateOnChange = true,
 				},
 
+
 				{
-					menuTitle = L.Menu_Settings_WindowShortcuts,
+					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Size,
+				},
+
+				-- Scale of the entire window.
+				-- It might be nice to provide the ability to enter arbitrary
+				-- values, but that's going to take more work.
+				{
+					name = "windowScale",
+					scope = BS_SETTING_SCOPE.CHARACTER,
+					type = BS_SETTING_TYPE.NUMBER,
+					defaultValue = 1.0,
+					min = 0.5,
+					max = 2.05,
+					step = 0.05,
+					valueDisplayFunc = function(num)
+						return (num * 100) .. "%"
+					end,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+
+				{
+					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Behaviors,
 				},
 				{
 					name = "windowDoubleClickActions",
@@ -1062,19 +1089,6 @@ Bagshui.config.Settings = {
 			defaultValue = POSITION_CHOICES.LEFT_RIGHT[2].value,  -- "RIGHT"
 			type = BS_SETTING_TYPE.CHOICES,
 			choices = POSITION_CHOICES.LEFT_RIGHT,
-		},
-
-		-- Scale of the entire window.
-		-- Completely untested.
-		{
-			name = "windowScale",
-			scope = BS_SETTING_SCOPE.CHARACTER,
-			hidden = true,
-			type = BS_SETTING_TYPE.NUMBER,
-			defaultValue = 1.0,
-			min = 0,
-			max = 1,
-			step = 0.1
 		},
 
 		-- The right-click/Alt+click attach preferences are hidden because we rely

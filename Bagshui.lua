@@ -288,6 +288,11 @@ local bagshuiEnvironment = {
 	},
 
 
+	-- It looks nicer to indent some menu values under headers (like the Edit Mode menu for groups).
+	---@type string
+	BS_MENU_SUBTITLE_INDENT = "    ",
+
+
 	-- Empty item used to initialize inventory cache entries.
 	-- Values here can't be nil or Lua drops them.
 	-- ```

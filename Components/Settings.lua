@@ -239,6 +239,8 @@ end
 --- 	fakeTitle,
 --- 	---@type boolean? Suppress display of the submenu arrow.
 --- 	hideArrow,
+--- 	---@type function? Alter the value displayed in the UI without changing anything else.
+--- 	valueDisplayFunc,
 --- 	---
 --- 	--- * Behaviors *
 --- 	---@type function(settingName, settingsClassInstance)? -> boolean Return `true` to disable the setting.
