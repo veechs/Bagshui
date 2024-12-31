@@ -475,6 +475,7 @@ BsLocalization:AddLocale("enUS", {
 ["EmptySlots"] = "Empty Slots",
 ["Equipment"] = "Equipment",
 ["EquippedGear"] = "Equipped Gear",
+["FirstAid"] = "First Aid",
 ["Food"] = "Food",
 ["FoodBuffs"] = "Food Buffs",
 ["Gear"] = "Gear",

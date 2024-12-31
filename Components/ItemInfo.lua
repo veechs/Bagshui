@@ -115,12 +115,13 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 			itemEquipLocation,
 			itemTexture = _G.GetItemInfo(itemString or itemIdentifier)
 
-		-- Item identifier was just a number, so parse the item information out now that we have the itemString.
-		if not itemString then
+		-- Post-server query item identifier processing.
+		if not itemString and itemStringFromGetItemInfo then
+			-- The given itemIdentifier was just an ID, but now we have the itemString.
 			itemString, itemId, _, itemLinkWithoutRandomSuffix = self:ParseItemLink(itemStringFromGetItemInfo)
 		end
 
-		-- When GetItemInfo returns nil there's nothing more we can do
+		-- When GetItemInfo returns nil there's (almost) nothing more we can do.
 		if itemName == nil then
 			Bagshui:PrintDebug("GetItemInfo() returned nil - bailing")
 			return false

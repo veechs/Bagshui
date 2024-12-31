@@ -1080,11 +1080,6 @@ function ObjectEditor:InitUi()
 					selectable = true,
 					multiSelect = fieldProps.multiSelect,
 
-					-- No custom sorting currently available for editor widgets -- just sort by name or text.
-					entrySortFunc = function(itmA, itmB)
-						return (itmA.name or tostring(itmA)) < (itmB.name or tostring(itmB))
-					end,
-
 					-- Default buttons (custom ones added below).
 					buttons = {
 						-- Add

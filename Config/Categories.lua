@@ -373,10 +373,13 @@ Bagshui.config.Categories = {
 	{
 		id = "Teleports",
 		name = L.Teleports,
+		sequence = 87,  -- Must run before Soulbound because some of these are soulbound.
 		list = {
 			6948,  -- Hearthstone
 			18986,  -- Ultrasafe Transporter: Gadgetzan
 			18984,  -- Dimensional Ripper - Overlook
+			51313,  -- Portable Wormhole Generator: Orgrimmar (Turtle WoW)
+			61000,  -- Time-Worn Rune (Turtle WoW)
 		},
 	},
 
@@ -401,12 +404,12 @@ Bagshui.config.Categories = {
 	},
 
 
-	-- Bandage.
+	-- First Aid (Bandages, Anti-Venom).
 	-- Normally type: Consumable, subtype: Consumable
 	{
-		id = "Bandages",
-		name = L.Bandages,
-		rule = string.format('Subtype("%s") and Name("%s", "%s")', L.Consumables, L.NameIdentifier_Bandage, L.NameIdentifier_AntiVenom),
+		id = "Bandages",  -- Don't change this to FirstAid -- it would break existing Structures.
+		name = L.FirstAid,
+		rule = string.format('(Subtype("%s") and Name("%s", "%s")) or PeriodicTable("Consumable.Bandage", "Misc.Antivenom")', L.Consumables, L.NameIdentifier_Bandage, L.NameIdentifier_AntiVenom),
 	},
 
 

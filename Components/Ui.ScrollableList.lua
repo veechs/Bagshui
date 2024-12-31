@@ -767,9 +767,9 @@ function Ui:PopulateScrollableList(listFrame, entries, refresh, preserveSelectio
 	end
 
 	-- Refresh again if there were unknown items.
-	if listFrame.bagshuiData.hasUnknownItems then
+	if listFrame.bagshuiData.hasUnknownItems and not listFrame.bagshuiData.refreshAfterUnknownItems then
 		listFrame.bagshuiData.hasUnknownItems = false
-		listFrame.bagshuiData.refreshAfterUnknownItems = true  -- Setting a property instead of adding additional parameter since QueueClassCallback only supports 3 arguments and I don't feel ike adding more.
+		listFrame.bagshuiData.refreshAfterUnknownItems = true
 		Bagshui:QueueClassCallback(self, self.PopulateScrollableList, 0.5, false, listFrame, nil)
 		return
 	end
