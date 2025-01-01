@@ -115,11 +115,13 @@ function ActiveQuestItemManager:Update()
 					-- Parse and store the item information from the objective text, which is formatted as:
 					-- `<Item Name>: <Number Obtained>/<Total Needed>`
 					_, _, itemName, numObtained, numNeeded = string.find(objectiveText, "(.+): (%d+)/(%d+)")
-					self.items[itemName] = {
-						questName = questName,
-						needed = numNeeded,
-						obtained = numObtained,
-					}
+					if itemName ~= nil then
+						self.items[itemName] = {
+							questName = questName,
+							needed = numNeeded,
+							obtained = numObtained,
+						}
+					end
 				end
 			end
 		end
