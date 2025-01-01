@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.0.6 - 2025-01-01
+* Fix [Active Quest Item error](https://github.com/veechs/Bagshui/issues/6) (thanks @absir).
+
 ## 1.0.5 - 2024-12-31
 * Fix [tDF MinimapButtonBag tweaks](https://github.com/veechs/Bagshui/issues/5) (thanks Amon_RA).
 
