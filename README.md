@@ -21,6 +21,7 @@
 * [Colorblind mode](https://github.com/veechs/Bagshui/wiki/Accessibility#colorblind-mode) to help identify item quality and unusability.
 * Lots of little niceties like a Hearthstone button, pfUI skinning, and more.
 
+<sup>Plus, it's a great Vanilla alternative to Classic/Retail addons like AdiBags, ArkInventory, Baganator, BetterBags, and TBag.</sup>
 
 ## Installation
 
