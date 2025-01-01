@@ -819,6 +819,7 @@ function Bagshui:Init()
 
 	-- Bagshui itself needs these events. Other classes register their own events.
 	self:RegisterEvent("ADDON_LOADED")
+	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("BAGSHUI_UTIL_LOADED")
 	self:RegisterEvent("BAGSHUI_LOCALIZATION_LOADED")
 	self:RegisterEvent("PLAYER_LOGOUT")
@@ -994,6 +995,13 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 		end
 	end
 
+	if event == "PLAYER_LOGIN" then
+		-- Do compatibility check after everything else is definitely loaded.
+		if not self.startupCompatChecked then
+			self:QueueClassCallback(self, self.CheckCompat, 1)
+			self.startupCompatChecked = true
+		end
+	end
 
 	if event == "BAGSHUI_CORE_EVENT_FUNCTIONS_LOADED" then
 		-- Part of Init() is registering events so we can't run that until event functions are available.

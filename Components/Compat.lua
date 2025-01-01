@@ -212,9 +212,4 @@ function Bagshui:CheckOtherAddonSetting(
 end
 
 
-
--- Run compatibility check at startup.
-Bagshui:QueueClassCallback(Bagshui, Bagshui.CheckCompat, 0.5)
-
-
 end)
