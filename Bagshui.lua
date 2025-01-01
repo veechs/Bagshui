@@ -809,7 +809,7 @@ function Bagshui:Init()
 	}
 	self.eventFrame:SetScript("OnEvent", function()
 		-- Vanilla WoW "passes" event parameters via global variables.
-		self:OnEvent(_G.event, _G.arg1, _G.arg2)
+		self:OnEvent(_G.event, _G.arg1, _G.arg2, _G.arg3, _G.arg4)
 	end)
 	self.eventFrame:SetScript("OnUpdate", function()
 		-- Check the event queue on every frame.
