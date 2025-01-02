@@ -96,6 +96,10 @@ local Categories = Bagshui.prototypes.ObjectList:New({
 	errors = {},  -- Errors for all categories.
 	recentErrors = {},  -- Errors only stored until Categories:ClearErrors() is called.
 
+	-- There's some initialization that needs to happen after PLAYER_ENTERING_WORLD (see OnEvent),
+	-- but that event fires when zoning and we only want to do the stuff once.
+	finalInitComplete = false,
+
 	-- Debug.
 	debugResetOnLoad = false and BS_DEBUG,
 })
@@ -129,9 +133,6 @@ function Categories:Init()
 		}
 	)
 
-	-- Precompile all rules.
-	self:FinalizeAllRules()
-
 	-- Register events.
 	Bagshui:RegisterEvent("PLAYER_ENTERING_WORLD", self)
 	Bagshui:RegisterEvent("BAGSHUI_CATEGORIES_CACHE_LOAD", self)
@@ -153,9 +154,14 @@ function Categories:OnEvent(event, arg1)
 		return
 	end
 
-	-- After PLAYER_ENTERING_WORLD, wait 3 seconds and then load items into the local game cache.
-	if event == "PLAYER_ENTERING_WORLD" and not self.cacheLoadComplete then
+	-- After PLAYER_ENTERING_WORLD, wait a bit and finish loading.
+	if event == "PLAYER_ENTERING_WORLD" and not self.finalInitComplete then
+		-- Need to wait to finalize rules so 3rd party integrations can register first.
+		Bagshui:QueueClassCallback(self, self.FinalizeAllRules, 1)
+		-- Don't make the client too busy with server queries immediately.
 		Bagshui:QueueEvent("BAGSHUI_CATEGORIES_CACHE_LOAD", 3)
+		-- Make sure this only happens once.
+		self.finalInitComplete = true
 		return
 	end
 
@@ -172,7 +178,7 @@ end
 --- Ensure all items referenced in category item lists are in the local cache so that GetItemInfo() works.
 --- (There's too much of a delay to try and do this in real-time while editing a category).
 function Categories:LoadListItemsIntoGameCache()
-	if self.cacheLoadComplete then
+	if self.finalInitComplete then
 		return
 	end
 	for _, category in pairs(self.list) do
@@ -184,7 +190,6 @@ function Categories:LoadListItemsIntoGameCache()
 			self:ItemInfoCacheLoad(category.list)
 		end
 	end
-	self.cacheLoadComplete = true
 end
 
 

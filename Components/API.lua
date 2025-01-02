@@ -29,4 +29,21 @@ function Bagshui:AddRuleFunction(functionNames, ruleFunction, environmentVariabl
 end
 
 
+
+--- A change has occurred that requires Bagshui inventories to refresh.
+---@param delay number? Seconds to wait before starting the update. Useful if there are likely to be a series of events that require updates.
+---@param resortNeeded boolean? Light up the Reorganize toolbar icon if the inventory window is open. Pass `true` when a change has occurred that may require items to be re-categorized or resorted.
+---@param cacheUpdateNeeded boolean? Check all items for changes, but don't refresh them GetItemInfo() unless there's a major change.
+---@param fullCacheUpdateNeeded boolean? Force all item properties to be refreshed, including tooltips.
+function Bagshui:QueueInventoryUpdate(delay, resortNeeded, cacheUpdateNeeded, fullCacheUpdateNeeded)
+	for _, inventoryType in pairs(BS_INVENTORY_TYPE) do
+		self.components[inventoryType].resortNeeded = self.components[inventoryType].resortNeeded or resortNeeded
+		self.components[inventoryType].windowUpdateNeeded = self.components[inventoryType].windowUpdateNeeded or windowUpdateNeeded
+		self.components[inventoryType].cacheUpdateNeeded = self.components[inventoryType].cacheUpdateNeeded or cacheUpdateNeeded
+		self.components[inventoryType].forceFullCacheUpdate = self.components[inventoryType].forceFullCacheUpdate or fullCacheUpdateNeeded
+		self.components[inventoryType]:QueueUpdate(delay)
+	end
+end
+
+
 end)

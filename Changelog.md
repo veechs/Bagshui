@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.0.7 - 2025-01-01
+* Fixes to 3rd party [`Bagshui:AddRuleFunction()` API](https://github.com/veechs/Bagshui/wiki/Developers:-API) (i.e. it'll actually work now).
+
 ## 1.0.6 - 2025-01-01
 * Fix [Active Quest Item error](https://github.com/veechs/Bagshui/issues/6) (thanks @absir).
 
