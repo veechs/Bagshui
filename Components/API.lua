@@ -4,53 +4,77 @@
 Bagshui:LoadComponent(function()
 
 
---- Add a new rule function to Bagshui. A simple example is below. The parameters
---- use the same basic format as the built-in rule functions, so you can refer
+--- Add a new rule function to Bagshui. A simple example is below. `params`
+--- uses the same basic format as the built-in rule functions, so you can refer
 --- to Config\RuleFunctions.lua for more examples.
 ---
---- `functionNames` notes: For aliases, the first item in the array is the primary name, and all subsequent items are aliases.
+--- ## `params` values
+--- ```
+--- {
+--- 	-- If the function has no aliases, just pass its name as a string. 
+--- 	-- To provide aliases, pass a list of strings, where the first item is
+--- 	-- the primary name and all subsequent values are the aliases.
+--- 	---@type table|string
+--- 	functionNames,
 --- 
---- `ruleFunction` notes: The function must accept two parameters and return a boolean. Example:
+--- 	-- The rule function must accept two parameters and return a boolean.
+--- 	---@type function
+--- 	---@param rules table The Rules class, with rules.item being the current item under evaluation.
+--- 	---@param ruleArguments any[] List of all arguments provided by the user to the rule function.
+--- 	---@return boolean
+--- 	ruleFunction,
+--- 	
+--- 	-- (Optional but recommended) List of examples for use in the Category Editor
+--- 	-- rule function [Fx] menu.
+--- 	-- `code` is the menu text and what will be inserted in the editor;
+--- 	-- `description` will be in the tooltip.
+--- 	---@type { code: string, description: string }[]?
+--- 	ruleTemplates,
+--- 
+--- 	-- (Optional) List of variables to add to the rule environment.
+--- 	-- See the BagType rule in Config\RuleFunctions.lua for an example.
+--- 	---@type table<string,any>?
+--- 	environmentVariables,
+--- }
 --- ```
---- ---@param rules table # The Rules class, with rules.item being the current item under evaluation.
---- ---@param ruleArguments any[] # List of all arguments provided to the function.
---- ---@return boolean
---- function(rules, ruleArguments)
----   return rules:TestItemAttribute("bagNum", ruleArguments, "number")
---- end
---- ```
+--- 
 ---
---- `ruleTemplates` notes: `code` is the menu text and what will be inserted in the editor; `description` will be in the tooltip.
----
---- # Example
+--- ## Example
 --- ```
----	Bagshui:AddRuleFunction(
----		{
+---	Bagshui:AddRuleFunction({
+---		functionNames = {
 ---			"IsSolidStone",
 ---			"Stone"
 ---		},
----		function(rules, ruleArguments)
+---		ruleFunction = function(rules, ruleArguments)
 ---			if rules.item.name == "Solid Stone" then
 ---				return true
 ---			end
 ---
 ---			return false
 ---		end,
----		nil,
----		{
+---		ruleTemplates = {
 ---			{
 ---				code = 'IsSolidStone()',
 ---				description = 'Check if the item is Solid Stone.',
 ---			},
 ---		}
----	)
+---	})
 --- ```
----@param functionNames string|string[] If the function has no aliases, just pass its name as a string, or to provide aliases, pass a list of strings (see notes above).
----@param ruleFunction function The actual function (see notes above).
----@param environmentVariables table<string,string>? List of variables to add to the rule environment. Will usually be nil. See the BagType rule in Config\RuleFunctions.lua for an example.
----@param ruleTemplates { code: string, description: string }[]? List of examples for use in the Category Editor rule function menu (see notes above).
-function Bagshui:AddRuleFunction(functionNames, ruleFunction, environmentVariables, ruleTemplates)
-	BsRules:AddFunction(functionNames, ruleFunction, environmentVariables, ruleTemplates)
+---@param params table Parameters -- see function comments for details.
+function Bagshui:AddRuleFunction(params)
+	assert(type(params) == "table", "Bagshui:AddRuleFunction() - params must be a table.")
+	assert(type(params.functionNames) == "string" or type(params.functionNames) == "table", "Bagshui:AddRuleFunction() - params.functionNames is required and must be a string or a table.")
+	assert(type(params.ruleFunction) == "function", "Bagshui:AddRuleFunction() - params.ruleFunction is required and it must be a function.")
+	assert(params.environmentVariables == nil or type(params.environmentVariables) == "table", "Bagshui:AddRuleFunction() - params.environmentVariables must be a table.")
+	assert(params.ruleTemplates == nil or type(params.ruleTemplates) == "table", "Bagshui:AddRuleFunction() - params.ruleTemplates must be a table.")
+
+	BsRules:AddFunction(
+		params.functionNames,
+		params.ruleFunction,
+		params.environmentVariables,
+		params.ruleTemplates
+	)
 end
 
 
