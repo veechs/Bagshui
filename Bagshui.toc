@@ -2,7 +2,7 @@
 ## Title: Bagshui
 ## Notes: All-in-one autosorting inventory
 ## Author: veechs
-## Version: 1.0.7
+## Version: 1.0.8
 ## OptionalDeps: AtlasLoot, ItemRack, Outfitter, pfUI
 ## SavedVariables: BagshuiData
 
