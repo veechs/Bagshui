@@ -729,11 +729,14 @@ function Inventory:OnEvent(event, arg1, arg2)
 			-- Trigger a profile update when one of the active profiles has changed.
 			if self.settings["profile" .. profileType] == arg1 then
 				self:SetProfile(arg1, profileType)
+				if profileType == BS_PROFILE_TYPE.STRUCTURE then
+					self.forceResort = true  -- Required to avoid issues during UpdateWindow() since all groups may need to be reassessed.
+				end
 				self.windowUpdateNeeded = true
-				self:QueueUpdate(0.005)
-				return
+				self:QueueUpdate(0.05)
 			end
 		end
+		return
 	end
 
 

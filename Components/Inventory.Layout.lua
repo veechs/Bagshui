@@ -620,32 +620,37 @@ function Inventory:UpdateWindow()
 			totalItemsInRow = 0
 			for columnNum = rowGroupStart, rowGroupEnd, rowGroupStep do
 				local groupId = self.layout[rowNum][columnNum].groupId
-				hideGroup = false
 
-				-- Determine whether this group is visible and update hasHiddenGroups
-				-- to control whether the Show/Hide toolbar button is enabled.
-				if self.groups[groupId] and self.groups[groupId].hide then
-					hideGroup = true
-					self.hasHiddenGroups = true
-				end
+				if groupId then
+					hideGroup = false
 
-				-- Determine how many items are in each group in this row based on group visibility.
-				if not self.editMode and not self.showHidden and hideGroup then
-					-- Set the groupItemCounts for this group to 0 if it's not visible.
-					self.groupItemCounts[groupId] = 0
+					-- Determine whether this group is visible and update hasHiddenGroups
+					-- to control whether the Show/Hide toolbar button is enabled.
+					if self.groups[groupId] and self.groups[groupId].hide then
+						hideGroup = true
+						self.hasHiddenGroups = true
+					end
+
+					-- Determine how many items are in each group in this row based on group visibility.
+					if not self.editMode and not self.showHidden and hideGroup then
+						-- Set the groupItemCounts for this group to 0 if it's not visible.
+						self.groupItemCounts[groupId] = 0
+					else
+						self.groupItemCounts[groupId] = self:GetGroupItemCountForLayout(groupId)
+					end
+
+					-- Increment total for this row.
+					totalItemsInRow = totalItemsInRow + self.groupItemCounts[groupId]
+
+					-- Starting width for all groups is the number of items in the group.
+					self.groupWidthsInItems[groupId] = self.groupItemCounts[groupId]
+
+					-- groupWidthsInItems gets fudged for Edit Mode to make all groups visible, even if they're empty.
+					if self.groupWidthsInItems[groupId] == 0 and self.editMode then
+						self.groupWidthsInItems[groupId] = 1
+					end
 				else
-					self.groupItemCounts[groupId] = self:GetGroupItemCountForLayout(groupId)
-				end
-
-				-- Increment total for this row.
-				totalItemsInRow = totalItemsInRow + self.groupItemCounts[groupId]
-
-				-- Starting width for all groups is the number of items in the group.
-				self.groupWidthsInItems[groupId] = self.groupItemCounts[groupId]
-
-				-- groupWidthsInItems gets fudged for Edit Mode to make all groups visible, even if they're empty.
-				if self.groupWidthsInItems[groupId] == 0 and self.editMode then
-					self.groupWidthsInItems[groupId] = 1
+					Bagshui:PrintWarning("Inventory update call should have forced resort!")
 				end
 			end
 
