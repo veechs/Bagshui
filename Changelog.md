@@ -1,7 +1,7 @@
 # Bagshui Changelog
 
 ## 1.1 - 2025-01-01
-* Add `Transmog()` [rule function](https://github.com/veechs/Bagshui/wiki/Rules) stub to support Turtle transmog collection data via [Bagshui-Tmog](https://github.com/veechs/Bagshui-Tmog).
+* Add `Transmog()` [rule function](https://github.com/veechs/Bagshui/wiki/Rules) stub to support Turtle transmog collection data via [Bagshui-Tmog](https://github.com/veechs/Bagshui-Tmog) (thanks Tyrchast).
 * Internal rework of rule function management.
 * Refactor [3rd party API](https://github.com/veechs/Bagshui/wiki/Developers:-API).
 
