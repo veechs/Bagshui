@@ -1034,7 +1034,7 @@ function Inventory:UpdateWindow()
 				uiButtons.toolbar.hearthstone:Show()
 
 				-- Display cooldown.
-				local cooldownStart, cooldownDuration, isOnCooldown = BsUtil.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
+				local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
 				self.ui:SetIconButtonCooldown(uiButtons.toolbar.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
 
 			else

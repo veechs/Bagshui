@@ -597,8 +597,7 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 		local cooldownDuration = 0
 		local isOnCooldown = nil
 		if item.itemString ~= nil then
-			-- Using our GetContainerItemCooldown() wrapper for reasons explained in that function.
-			cooldownStart, cooldownDuration, isOnCooldown = BsUtil.GetContainerItemCooldown(item.bagNum, item.slotNum)
+			cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(item.bagNum, item.slotNum)
 		end
 
 		_G.CooldownFrame_SetTimer(buttonComponents.cooldown, cooldownStart, cooldownDuration, isOnCooldown)

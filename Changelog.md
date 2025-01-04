@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.1.1 - 2025-01-01
+* [Remove "long cooldown" workaround](https://github.com/veechs/Bagshui/issues/10) (special thanks to shagu).
+
 ## 1.1 - 2025-01-01
 * Add `Transmog()` [rule function](https://github.com/veechs/Bagshui/wiki/Rules) stub to support Turtle transmog collection data via [Bagshui-Tmog](https://github.com/veechs/Bagshui-Tmog) (thanks Tyrchast).
 * Internal rework of rule function management.

@@ -770,42 +770,6 @@ end
 
 
 
---#region WoW API
-
-
---- Wrapper for `GetContainerItemCooldown()` to work around the ["long cooldown" bug](https://github.com/Stanzilla/WoWUIBugs/issues/47).
---- All parameters and return values are the same as `GetContainerItemCooldown()`
----@param bagNum number
----@param slotNum number
----@return number? cooldownStart
----@return number? cooldownDuration
----@return number? isOnCooldown
-function Util.GetContainerItemCooldown(bagNum, slotNum)
-
-	local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(bagNum, slotNum)
-
-	-- Fix for long cooldown issue to ensure we pass correct values downstream.
-	-- Most other addons have accounted for this, but just in case...
-	-- Before restarting the GetTime() will always be greater than [start]
-	-- After the restart, [start] is technically always bigger because of the 2^32 offset thing
-	if cooldownStart > _G.GetTime() then
-		local time = _G.time()
-		cooldownStart =
-			-- Startup time
-			(time - _G.GetTime()) -
-			-- Cooldown time: just a simplification of: ((2^32) - (start * 1000)) / 1000
-			((2 ^ 32) / 1000 - cooldownStart)
-		cooldownDuration = (cooldownStart + cooldownDuration) - time
-	end
-
-	return cooldownStart, cooldownDuration, isOnCooldown
-end
-
-
---#endregion WoW API
-
-
-
 --#region Import/Export
 
 
