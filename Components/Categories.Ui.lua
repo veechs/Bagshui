@@ -214,7 +214,8 @@ function Categories:InitUi()
 	---@param sortedRuleFunctionTemplateNames string[] Ordered array of rule function template names.
 	---@param ruleFunctionTemplates table<string, table> List of `{ <function name> = { { template 1 }, { template N } }`.
 	---@param ruleFunctionTemplateExtraEntries table<string, table>? List of `{ <function name> = { { template 1 }, { template N } }` that will be added to the bottom of the template menu.
-	local function buildRuleFunctionMenu(ruleFunctionMenus, sortedRuleFunctionTemplateNames, ruleFunctionTemplates, ruleFunctionTemplateExtraEntries)
+	---@param ruleFunctionTemplateGenericDescriptions table<string, string> List of `{ <function name> = "Description"] }` Tooltip for the rule function's parent menu item.
+	local function buildRuleFunctionMenu(ruleFunctionMenus, sortedRuleFunctionTemplateNames, ruleFunctionTemplates, ruleFunctionTemplateExtraEntries, ruleFunctionTemplateGenericDescriptions)
 		BsUtil.TableClear(ruleFunctionMenus)
 		local ruleFunctionMenu
 
@@ -329,7 +330,7 @@ function Categories:InitUi()
 						table.insert(ruleFunctionMenu, {
 							text = functionName .. "(...)",
 							tooltipTitle = functionName .. "(...)",
-							tooltipText = (L_nil["RuleFunction_" .. functionName .. "_GenericDescription"] or "") .. (templates.aliasTooltipAddendum or ""),
+							tooltipText = (ruleFunctionTemplateGenericDescriptions[functionName] or "") .. (templates.aliasTooltipAddendum or ""),
 							hasArrow = true,
 							notCheckable = true,
 							value = {
@@ -359,7 +360,8 @@ function Categories:InitUi()
 		ruleFunctionMenus,
 		BsRules.sortedRuleFunctionTemplateNames,
 		BsRules.ruleFunctionTemplates,
-		BsRules.ruleFunctionTemplatesExtra
+		BsRules.ruleFunctionTemplatesExtra,
+		BsRules.ruleFunctionTemplateGenericDescriptions
 	)
 
 	for i, ruleFunctionMenu in ipairs(ruleFunctionMenus) do

@@ -1,10 +1,15 @@
 # Bagshui Changelog
 
+## 1.1 - 2025-01-01
+* Add `Transmog()` [rule function](https://github.com/veechs/Bagshui/wiki/Rules) stub to support Turtle transmog collection data via [Bagshui-Tmog](https://github.com/veechs/Bagshui-Tmog).
+* Internal rework of rule function management.
+* Refactor [3rd party API](https://github.com/veechs/Bagshui/wiki/Developers:-API).
+
 ## 1.0.8 - 2025-01-01
 * Fix [Profile Replace error](https://github.com/veechs/Bagshui/issues/9).
 
 ## 1.0.7 - 2025-01-01
-* Fixes to 3rd party [`Bagshui:AddRuleFunction()` API](https://github.com/veechs/Bagshui/wiki/Developers:-API) (i.e. it'll actually work now).
+* Fixes to [3rd party `Bagshui:AddRuleFunction()` API](https://github.com/veechs/Bagshui/wiki/Developers:-API) (i.e. it'll actually work now).
 
 ## 1.0.6 - 2025-01-01
 * Fix [Active Quest Item error](https://github.com/veechs/Bagshui/issues/6) (thanks @absir).

@@ -27,7 +27,8 @@
 
 ### Easy mode (recommended)
 
-Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
+Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).  
+<sup>Or any tool that supports Git.</sup>
 
 ### Manual
 
@@ -127,6 +128,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 <td>
 
 * **Guild Bank** right-click to deposit.
+* [`Transmog()`](https://github.com/veechs/Bagshui/wiki/Rules#available-rule-functions) collection queries.<br><sup>Requires [Tmog](https://github.com/Otari98/Tmog) and [Bagshui-Tmog](https://github.com/veechs/Bagshui-Tmog).
 
 </td>
 </tr>

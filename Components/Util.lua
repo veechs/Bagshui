@@ -659,7 +659,7 @@ end
 function Util.GetAnchorLeftRight(point)
 	return (
 		(point ~= "BOTTOM" and point ~= "TOP")
-		and (string.find(point, "RIGHT$") and "RIGHT" or "LEFT")
+		and (point and (string.find(point, "RIGHT$") and "RIGHT" or "LEFT"))
 		or ""
 	)
 end

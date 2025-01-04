@@ -26,13 +26,18 @@ local Rules = {
 	ruleFunctions = {},
 
 	-- Once the built-in rule functions have been loaded, don't allow them to
-	-- be overwritten by 3rd parties.
+	-- be overwritten by 3rd parties unless it's also in `replaceableRuleFunctions`.
 	builtInRuleFunctions = {},
 	builtinRulesLoaded = false,
+
+	-- Overwriting these built-in rule functions is allowed without even a warning.
+	-- Designed for "proxy" functions like `Outfit()` or `Wishlist()`.
+	replaceableRuleFunctions = {},
 
 	-- Rule function templates are used by the category editor to provide a list of all available functions.
 	ruleFunctionTemplates = {},
 	ruleFunctionTemplatesExtra = {},
+	ruleFunctionTemplateGenericDescriptions = {},
 	sortedRuleFunctionTemplateNames = {},
 
 	-- Rule evaluation session tracking -- see `Rules:SetItemAndCharacter()`.
@@ -71,6 +76,11 @@ function Rules:Init()
 
 	self:PrepareEnvironment()
 
+	-- Add generic environment variables.
+	for var, value in pairs(BS_RULE_ENVIRONMENT_VARIABLES) do
+		self.environment[var] = value
+	end
+
 	-- Build the list of allowed argument types for error messages.
 	for argumentType, _ in pairs(BS_RULE_ARGUMENT_TYPE) do
 		self.allowedArgumentTypes = self.allowedArgumentTypes .. BS_NEWLINE .. " - " .. string.lower(argumentType)
@@ -84,7 +94,6 @@ end
 
 
 --- Pull everything from Config\RuleFunctions.lua and Config\RuleFunctionTemplates.lua.
---- See those files for 
 function Rules:LoadBuiltinRuleFunctions()
 	for _, rule in ipairs(Bagshui.config.RuleFunctions) do
 		if not (type(rule.functionNames) == "table" and type(rule.functionNames[1]) == "string") then
@@ -92,13 +101,8 @@ function Rules:LoadBuiltinRuleFunctions()
 		elseif type(rule.ruleFunction) ~= "function" then
 			Bagshui:PrintError("Built-in rules must have a ruleFunction = function(rules, ruleArguments) property")
 		else
-			self:AddFunction(
-				rule.functionNames,
-				rule.ruleFunction,
-				rule.environmentVariables,
-				rule.templates or Bagshui.config.RuleFunctionTemplates[rule.functionNames[1]],
-				rule.hideFromUi
-			)
+			rule.templates = rule.templates or Bagshui.config.RuleFunctionTemplates[rule.functionNames[1]]
+			self:AddFunction(rule)
 		end
 	end
 end
@@ -106,11 +110,60 @@ end
 
 
 --- Create a new rule function, which is stored on the Rules class as Rule_FunctionName.
+--- `params` uses the same basic format as the built-in rule functions, so you can refer
+--- to Config\RuleFunctions.lua for more examples.
+---
+--- ## `params` values
+--- ```
+--- {
+--- 	-- If the function has no aliases, just pass its name as a string. 
+--- 	-- To provide aliases, pass a list of strings, where the first item is
+--- 	-- the primary name and all subsequent values are the aliases.
+--- 	---@type table|string
+--- 	functionNames,
 --- 
---- `functionNames` notes: For aliases, the first item in the array is the primary name,
---- (which becomes Rule_PrimaryName) and all subsequent items are aliases.
+--- 	-- The rule function must accept two parameters and return a boolean (see below).
+--- 	---@type function
+--- 	---@param rules table The Rules class, with rules.item being the current item under evaluation.
+--- 	---@param ruleArguments any[] List of all arguments provided by the user to the rule function.
+--- 	---@return boolean
+--- 	ruleFunction,
+--- 	
+--- 	-- (Optional but recommended) List of examples for use in the Category Editor
+--- 	-- rule function [Fx] menu. When not provided, `Rules:AddRuleExamplesFromLocalization()`
+---		-- will be used to attempt to populate it.
+--- 	-- `code` is the menu text and what will be inserted in the editor;
+--- 	-- `description` will be in the tooltip.
+--- 	---@type { code: string, description: string }[]?
+--- 	ruleTemplates,
 --- 
---- `ruleFunction` notes: The function must accept two parameters and return a boolean. Example:
+--- 	-- (Optional) List of variables to add to the rule environment.
+--- 	-- See the BagType rule in Config\RuleFunctions.lua for an example.
+--- 	---@type table<string,any>?
+--- 	environmentVariables,
+--- 
+--- 	-- (Optional) Don't display the function in the Category Editor rule function menu.
+--- 	---@type boolean?
+--- 	hideFromUi,
+--- 
+--- 	-- (Optional) Treat this function as a proxy or stub that can be overwritten
+--- 	-- by another rule function. Only relevant to built-ins.
+--- 	---@type boolean?
+--- 	replaceable,
+--- 
+--- 	-- (Optional) Don't add this function if false.
+--- 	---@type boolean|function?
+--- 	conditional,
+--- 
+--- 	-- (Optional) Array of strings that will be used, in the order given,
+---		-- to replace any %s placeholders in the templates pulled from localization.
+---
+--- 	---@type string[]
+--- 	ruleFunctionTemplateFormatStrings,
+--- }
+--- ```
+--- 
+--- ## `ruleFunction` example
 --- ```
 --- ---@param rules table # The Rules class, with rules.item and rules.character being the current objects under evaluation.
 --- ---@param ruleArguments any[] # List of all arguments provided to the function.
@@ -119,32 +172,72 @@ end
 ---   return rules:TestItemAttribute("bagNum", ruleArguments, "number")
 --- end
 --- ```
---- To return an error from a rule function, set the `rules.errorMessage` property to the error text and return `false`.
+--- ### How to return errors
+--- Set the `rules.errorMessage` property to the error text and return `false`.
 --- (This assumes your rule function's first parameter is named `rules`).  
 --- **DO NOT** rely on `error()` since some addons (\*cough\* pfUI) break its normal functionality.
----
---- `ruleTemplates` notes: `code` is the menu text and what will be inserted in the editor; `description` will be in the tooltip.
---- When not provided, `Rules:AddRuleExamplesFromLocalization()` will be called.
----@param functionNames string|string[] If the function has no aliases, just pass its name as a string, or to provide aliases, pass a list of strings (see notes above).
----@param ruleFunction function The actual function (see notes above).
----@param environmentVariables table<string,string>? List of variables to add to the rule environment. See the BagType rule in Config\RuleFunctions.lua for an example.
----@param ruleTemplates { code: string, description: string }[]? List of examples for use in the Category Editor rule function menu (see notes above).
----@param hideFromUi boolean?
-function Rules:AddFunction(functionNames, ruleFunction, environmentVariables, ruleTemplates, hideFromUi)
-	assert(functionNames, "Rules:AddFunction() - functionNames is required")
-	assert(type(ruleFunction) == "function", "Rules:AddFunction() - ruleFunction must be a function")
+---@param params table Parameters -- see function comments for details.
+function Rules:AddFunction(params)
+	assert(type(params) == "table", "Rules:AddFunction() - params must be a table.")
+	assert(type(params.functionNames) == "string" or type(params.functionNames) == "table", "Rules:AddFunction() - params.functionNames is required and must be a string or a table.")
+	assert(type(params.ruleFunction) == "function", "Rules:AddFunction() - params.ruleFunction is required and it must be a function.")
+	assert(params.environmentVariables == nil or type(params.environmentVariables) == "table", "Rules:AddFunction() - params.environmentVariables must be a table.")
+	assert(params.ruleTemplates == nil or type(params.ruleTemplates) == "table", "Rules:AddFunction() - params.ruleTemplates must be a table.")
+
+	-- Support for overwriting aliases hasn't been added, so reject it for now.
+	if params.replaceable and type(params.functionNames) == "table" and table.getn(params.functionNames) > 1 then
+		Bagshui:PrintWarning("Aliases for stub functions are currently not supported. Please pass " .. tostring(params.functionNames[1]) .. " the only value in `functionNames` property table.")
+		return
+	end
+
+	-- Ensure rule functions with conditions should be added.
+	if
+		(
+			type(params.conditional) == "function"
+			and not params.conditional()
+		)
+		or params.conditional == false
+	then
+		return
+	end
+
+	-- This function's API changed from individual parameters to a table so
+	-- these could be cleaned up later.
+
+	local functionNames = params.functionNames
+	local ruleFunction = params.ruleFunction
+	local environmentVariables = params.environmentVariables
+	local ruleTemplates = params.ruleTemplates
+	local hideFromUi = params.hideFromUi
 
 	-- We'll accept a string as the function name but let's turn it into a table to make things consistent.
 	if type(functionNames) == "string" then
 		functionNames = { functionNames }
 	end
 
-	-- If for some reason a rule function's name is provided as "Rule_name", strip off the "Rule_" prefix.
-	local _, primaryName = self:GetRuleFunctionNames(functionNames[1])
-
 	-- Create the function and add to environment.
-	---@diagnostic disable-next-line: assign-type-mismatch
-	if not self:AddEnvironmentFunction(ruleFunction, primaryName) then
+	-- The first name that doesn't fail will become the primary name of the function.
+	local primaryName
+
+	-- This will be used to find example templates from localization in the case
+	-- where an alternate primary name needs to be chosen.
+	local desiredPrimaryName = functionNames[1]
+
+	-- Track where the list of aliases starts.
+	local firstAlias
+
+	for i = 1, table.getn(functionNames) do
+		---@diagnostic disable-next-line: assign-type-mismatch
+		if self:AddEnvironmentFunction(ruleFunction, functionNames[i], nil, params.replaceable) then
+			primaryName = functionNames[i]
+			firstAlias = i + 1
+			break
+		end
+	end
+
+	-- We didn't find an acceptable name and the function hasn't been loaded,
+	-- so there's nothing more to do.
+	if not primaryName then
 		return
 	end
 
@@ -152,8 +245,8 @@ function Rules:AddFunction(functionNames, ruleFunction, environmentVariables, ru
 	-- reference the function as called. If we just used pointers, then a call to n()
 	-- would result in error messages about Name(), which could be confusing.
 	local aliasTooltipAddendum = ""
-	for i = 2, table.getn(functionNames) do
-		self:AddEnvironmentFunction(ruleFunction, primaryName, functionNames[i])
+	for i = firstAlias, table.getn(functionNames) do
+		self:AddEnvironmentFunction(ruleFunction, primaryName, functionNames[i], params.replaceable)
 		aliasTooltipAddendum = aliasTooltipAddendum .. BS_NEWLINE .. functionNames[i] .. "()"
 	end
 
@@ -185,7 +278,7 @@ function Rules:AddFunction(functionNames, ruleFunction, environmentVariables, ru
 			-- Templates were not provided directly, so try to load from localization.
 			self.ruleFunctionTemplates[primaryName] = {}
 
-			self:AddRuleExamplesFromLocalization(primaryName, self.ruleFunctionTemplates)
+			self:AddRuleExamplesFromLocalization(primaryName, self.ruleFunctionTemplates, nil, desiredPrimaryName, params.ruleFunctionTemplateFormatStrings)
 
 			-- If nothing was available, ensure there's at least one template entry
 			-- of just the function name.
@@ -201,7 +294,7 @@ function Rules:AddFunction(functionNames, ruleFunction, environmentVariables, ru
 
 		-- Check for supplemental examples and add them to the end of the list.
 		-- (These are `RuleFunction_<PrimaryName>_ExampleExtraN` / `RuleFunction_<PrimaryName>_ExampleDescriptionExtraN`.)
-		self:AddRuleExamplesFromLocalization(primaryName, self.ruleFunctionTemplatesExtra, "Extra")
+		self:AddRuleExamplesFromLocalization(primaryName, self.ruleFunctionTemplatesExtra, "Extra", desiredPrimaryName, params.ruleFunctionTemplateFormatStrings)
 
 		-- Add alias info to rule function examples.
 		if type(self.ruleFunctionTemplates[primaryName]) == "table" then
@@ -231,8 +324,10 @@ function Rules:AddFunction(functionNames, ruleFunction, environmentVariables, ru
 		end
 
 		-- Add to sorted list of rule function names so menus can be built in order.
-		table.insert(self.sortedRuleFunctionTemplateNames, primaryName)
-		table.sort(self.sortedRuleFunctionTemplateNames)
+		if not BsUtil.TableContainsValue(self.sortedRuleFunctionTemplateNames, primaryName) then
+			table.insert(self.sortedRuleFunctionTemplateNames, primaryName)
+			table.sort(self.sortedRuleFunctionTemplateNames)
+		end
 
 	end
 
@@ -240,7 +335,7 @@ end
 
 
 
---- Rules can have up to 20 examples added from localization, configured via:
+--- Rules can have up to 20 examples added from localization (Locale folder), configured via:
 --- * `RuleFunction_<PrimaryFunctionName>_ExampleN`
 --- * `RuleFunction_<PrimaryFunctionName>_ExampleDescriptionN`
 ---
@@ -251,25 +346,71 @@ end
 --- 
 --- The presence of a `RuleFunction_<PrimaryFunctionName>_GenericDescription`
 --- will set the tooltip for the parent menu item that opens the submenu.
----
---- See Locale\enUs.lua for examples.
----@param ruleFunctionName string
----@param ruleFunctionTemplates table?
+---@param ruleFunctionName string Key to search for in localization.
+---@param ruleFunctionTemplates table? If not provided, just get the count of examples.
 ---@param exampleSuffix string? "Extra" to get extra items.
----@return number exampleCount Number of 
-function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTemplates, exampleSuffix)
+---@param desiredRuleFunctionName? string Use this to search for examples instead of `ruleFunctionName`, then switch the code examples from this to `ruleFunctionName`.
+---@param exampleDescriptionFormatStrings table? Up to 5 strings that will be used as %s replacements in the rule example description.
+---@return number exampleCount Number of examples that were added.
+function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTemplates, exampleSuffix, desiredRuleFunctionName, exampleDescriptionFormatStrings)
+	if type(ruleFunctionName) ~= "string" then
+		return 0
+	end
+
 	exampleSuffix = exampleSuffix or ""
 	local exampleCount = 0
 
+	local functionNameForLocalization = desiredRuleFunctionName or ruleFunctionName
+
+	-- Determine the generic description of this rule function that will be used
+	-- in the tooltip for the parent menu item in the Category Editor rule function menu.
+	if exampleSuffix == "" then
+		local genericDescription = L_nil["RuleFunction_" .. functionNameForLocalization .. "_GenericDescription"]
+		if type(exampleDescriptionFormatStrings) == "table" and genericDescription then
+			genericDescription = string.format(
+				genericDescription,
+				exampleDescriptionFormatStrings[1] or "",
+				exampleDescriptionFormatStrings[2] or "",
+				exampleDescriptionFormatStrings[3] or "",
+				exampleDescriptionFormatStrings[4] or "",
+				exampleDescriptionFormatStrings[5] or ""
+			)
+		end
+
+		self.ruleFunctionTemplateGenericDescriptions[ruleFunctionName] = genericDescription
+	end
+
+	-- Pull all the available examples from localization.
 	for i = 1, 20 do
-		local code = L_nil["RuleFunction_" .. ruleFunctionName .. "_Example" .. exampleSuffix .. i]
+		local code = L_nil["RuleFunction_" .. functionNameForLocalization .. "_Example" .. exampleSuffix .. i]
 		if not code then
 			break
 		end
 
 		exampleCount = exampleCount + 1
 
+		-- This check is to allow calling the function to just get the count of examples.
 		if ruleFunctionTemplates then
+			local exampleDescription = L_nil["RuleFunction_" .. functionNameForLocalization .. "_ExampleDescription" .. exampleSuffix .. i]
+
+			-- Update description with format strings.
+			if type(exampleDescriptionFormatStrings) == "table" and exampleDescription then
+				exampleDescription = string.format(
+					exampleDescription,
+					exampleDescriptionFormatStrings[1] or "",
+					exampleDescriptionFormatStrings[2] or "",
+					exampleDescriptionFormatStrings[3] or "",
+					exampleDescriptionFormatStrings[4] or "",
+					exampleDescriptionFormatStrings[5] or ""
+				)
+			end
+
+
+			-- This rule function couldn't be loaded under its original name so the code needs to change.
+			if desiredRuleFunctionName ~= ruleFunctionName and desiredRuleFunctionName ~= nil then
+				code = (string.gsub(code, desiredRuleFunctionName .. "%(", ruleFunctionName .. "("))
+			end
+
 			if not ruleFunctionTemplates[ruleFunctionName] then
 				ruleFunctionTemplates[ruleFunctionName] = {}
 			end
@@ -277,7 +418,7 @@ function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTem
 				ruleFunctionTemplates[ruleFunctionName],
 				{
 					code = code,
-					description = L_nil["RuleFunction_" .. ruleFunctionName .. "_ExampleDescription" .. exampleSuffix .. i],
+					description = exampleDescription,
 				}
 			)
 		end
@@ -798,26 +939,41 @@ end
 ---@param ruleFunction function Function that will be called (see `Rules:AddFunction()` notes).
 ---@param primaryName string Name by which this function is primarily known.
 ---@param alias string? Alias to associate with the function, if any.
+---@param replaceable boolean? See `replaceable` parameter of `Rules:AddFunction()`.
 ---@return boolean added True if the function was added.
-function Rules:AddEnvironmentFunction(ruleFunction, primaryName, alias)
+function Rules:AddEnvironmentFunction(ruleFunction, primaryName, alias, replaceable)
 	primaryName = self:GetExistingRuleFunctionName(primaryName)
 	alias = self:GetExistingRuleFunctionName(alias or primaryName)
 
 	-- Ensure we have the names formatted correctly.
 	local classFunctionName, ruleFunctionName = self:GetRuleFunctionNames(primaryName, alias)
 
+	-- Need a trigger to know when we're going to replace an existing function.
+	local overwrite = false
+
 	-- Warn on overwriting an existing rule function (or fail if a 3rd party tries to overwrite).
 	if self.ruleFunctions[ruleFunctionName] then
-		if self.builtinRulesLoaded and self.builtInRuleFunctions[string.lower(ruleFunctionName)] then
+
+		if
+			self.builtInRuleFunctions[string.lower(ruleFunctionName)]
+			and self.replaceableRuleFunctions[string.lower(ruleFunctionName)]
+		then
+			overwrite = true
+			-- Only allow built-in stub functions to be overwritten once.
+			self.replaceableRuleFunctions[string.lower(ruleFunctionName)] = nil
+
+		elseif self.builtInRuleFunctions[string.lower(ruleFunctionName)] then
+			-- Denied!
 			Bagshui:PrintWarning(string.format(L.Warning_BuiltinRuleFunctionCollision, ruleFunctionName))
 			return false
 		else
+			-- This is a 3rd party rule function -- allow overwriting with a warning.
 			Bagshui:PrintWarning(string.format(L.Warning_RuleFunctionOverwrite, ruleFunctionName))
 		end
 	end
 
 	-- Create primary function that lives on the rules class if it doesn't exist yet.
-	if not self[classFunctionName] then
+	if not self[classFunctionName] or overwrite then
 		---@diagnostic disable-next-line: assign-type-mismatch
 		self[classFunctionName] = ruleFunction
 	end
@@ -828,6 +984,9 @@ function Rules:AddEnvironmentFunction(ruleFunction, primaryName, alias)
 	-- Need to know which rules are built-in for accurate warning messages.
 	if not self.builtinRulesLoaded then
 		self.builtInRuleFunctions[string.lower(ruleFunctionName)] = true
+		if replaceable then
+			self.replaceableRuleFunctions[string.lower(ruleFunctionName)] = true
+		end
 	end
 
 	-- This is the actual function that exists within the rule environment. It's simply a wrapper that collects arguments,

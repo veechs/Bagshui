@@ -686,8 +686,10 @@ BsLocalization:AddLocale("enUS", {
 
 ["RuleFunction_EquipLocation_GenericDescription"] = "Check if the item can be equipped in the specified slot.",
 ["RuleFunction_EquipLocation_ExampleDescription"] = "Check if the item can be equipped in the %s slot.",
-["RuleFunction_EquipLocation_ExampleExtra1"] = 'EquipLocation("Slot1", "Slot2", "SlotN")',
-["RuleFunction_EquipLocation_ExampleDescriptionExtra1"] = "Check if the item can be equipped in any of the specified slots.",
+["RuleFunction_EquipLocation_ExampleExtra1"] = 'EquipLocation()',
+["RuleFunction_EquipLocation_ExampleDescriptionExtra1"] = "Check if the item is equippable.",
+["RuleFunction_EquipLocation_ExampleExtra2"] = 'EquipLocation("Slot1", "Slot2", "SlotN")',
+["RuleFunction_EquipLocation_ExampleDescriptionExtra2"] = "Check if the item can be equipped in any of the specified slots.",
 
 ["RuleFunction_Equipped_Example1"] = 'Equipped()',
 ["RuleFunction_Equipped_ExampleDescription1"] = "Check if the item has been equipped (useful to match gear that is not soulbound)." .. GRAY_FONT_COLOR_CODE .. BS_NEWLINE .. "You can also pass the same parameters as EquipLocation() to only match a specific inventory slot." .. FONT_COLOR_CODE_CLOSE,
@@ -733,13 +735,13 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_NameExact_ExampleExtra1"] = 'NameExact("string1", "string2", "stringN")',
 ["RuleFunction_NameExact_ExampleDescriptionExtra1"] = "Check if the item name exactly matches any of the specified strings.",
 
-["RuleFunction_Outfit_GenericDescription"] = "Check if the item is part of an Outfitter or ItemRack outfit.",
+["RuleFunction_Outfit_GenericDescription"] = "Check if the item is part of an outfit in %s.",
 ["RuleFunction_Outfit_Example1"] = 'Outfit()',
-["RuleFunction_Outfit_ExampleDescription1"] = "Check if the item is part of any Outfitter or ItemRack outfit.",
+["RuleFunction_Outfit_ExampleDescription1"] = "Check if the item is part of an outfit in %s.",
 ["RuleFunction_Outfit_Example2"] = 'Outfit("Outfit Name")',
-["RuleFunction_Outfit_ExampleDescription2"] = "Check if the item is part of the specified Outfitter or ItemRack outfit.",
+["RuleFunction_Outfit_ExampleDescription2"] = "Check if the item is part of the specified outfit in %s.",
 ["RuleFunction_Outfit_ExampleExtra1"] = 'Outfit("outfit1", "outfit2", "outfitN")',
-["RuleFunction_Outfit_ExampleDescriptionExtra1"] = "Check if the item is part of any of the specified Outfitter or ItemRack outfits.",
+["RuleFunction_Outfit_ExampleDescriptionExtra1"] = "Check if the item is part of any of the specified outfits in %s.",
 
 ["RuleFunction_PeriodicTable_GenericDescription"] = "Check if the item belongs to a PeriodicTable set.!!RuleFunction_PT_CaseSensitiveParameters!!",
 ["RuleFunction_PeriodicTable_ExampleDescription"] = "Check if the item belongs to the '%s' PeriodicTable set.!!RuleFunction_PT_CaseSensitiveParameters!!",
@@ -789,6 +791,14 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Tooltip_ExampleExtra1"] = 'Tooltip("string1", "string2", "stringN")',
 ["RuleFunction_Tooltip_ExampleDescriptionExtra1"] = "Check if the tooltip contains any of the specified strings.!!RuleFunction_LuaStringPatternsSupported!!",
 
+["RuleFunction_Transmog_GenericDescription"] = "Check if the item is in your transmog collection or is eligible to be transmogged.",
+["RuleFunction_Transmog_Example1"] = 'Transmog()',
+["RuleFunction_Transmog_ExampleDescription1"] = 'Check if the item is in your transmog collection.',
+["RuleFunction_Transmog_Example2"] = 'Transmog(Eligible)',
+["RuleFunction_Transmog_ExampleDescription2"] = 'Check if the item eligible to be transmogged.',
+["RuleFunction_Transmog_Example3"] = 'Transmog(Eligible) and not Transmog()',
+["RuleFunction_Transmog_ExampleDescription3"] = 'Check if the item is transmoggable but has not yet been added to your collection.',
+
 ["RuleFunction_Type_GenericDescription"] = "Check if the item is of the specified type.",
 ["RuleFunction_Type_ExampleDescription"] = "Check if the item's type is '%s'.",
 ["RuleFunction_Type_ExampleExtra1"] = 'Type("type1", "type2", "typeN")',
@@ -798,7 +808,7 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Usable_ExampleDescription1"] = "Check if the item is usable by the current character based on level, skills, and professions.",
 
 ["RuleFunction_Wishlist_Example1"] = 'Wishlist()',
-["RuleFunction_Wishlist_ExampleDescription1"] = "Check if the item is on the AtlasLoot wishlist.",
+["RuleFunction_Wishlist_ExampleDescription1"] = "Check if the item is on the %s wishlist.",
 
 
 -- ### Tips/Help ###
@@ -808,6 +818,8 @@ BsLocalization:AddLocale("enUS", {
 -- ### Errors/Warnings ###
 
 ["Error"] = "Error",
+["Error_AddonDependency_Generic"] = "An additional addon is required to enable this rule function (refer to the Rules page on the Bagshui wiki).",
+["Error_AddonDependency_Generic_FunctionName"] = "An additional addon is required to enable the use of %s (refer to the Rules page on the Bagshui wiki).",
 ["Error_AddonDependency"] = "%s is not installed or enabled.",
 ["Error_CategoryEvaluation"] = "%s: %s",  -- "<Category Name>: <Error Message>"
 ["Error_DuplicateName"] = "There is already a %s named %s.",  -- "There is already a <Object Type> named <Name>."

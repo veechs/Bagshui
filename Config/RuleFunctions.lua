@@ -370,36 +370,39 @@ Bagshui.config.RuleFunctions = {
 	},
 
 
-	-- Part of an Outfitter/ItemRack set.
+	-- Outfit() stub -- needs to be replaced by another function.
+	-- Stubs current
 	{
 		functionNames = {
 			"Outfit",
 		},
 		ruleFunction = function(rules, ruleArguments)
-			if not rules.item.itemLink then
-				return false
-			end
-
-			if _G.IsAddOnLoaded("Outfitter") then
-				return rules:Rule_Outfit_Outfitter(ruleArguments)
-
-			elseif _G.IsAddOnLoaded("ItemRack") then
-				return rules:Rule_Outfit_ItemRack(ruleArguments)
-
-			end
-
-			rules.errorMessage = string.format(L.Error_AddonDependency, "Outfitter/ItemRack")
+			rules.errorMessage = string.format(L.Error_AddonDependency_Generic_FunctionName, "Outfit()")
 			return false
 		end,
-		-- Templates come from localization.
+		replaceable = true,
+		ruleTemplates = {
+			{
+				code = GRAY_FONT_COLOR_CODE .. "Outfit()" .. FONT_COLOR_CODE_CLOSE,
+				description = RED_FONT_COLOR_CODE .. L.Error_AddonDependency_Generic .. FONT_COLOR_CODE_CLOSE
+			}
+		},
+		-- Templates are defined in localization.
+		-- Replacement function should supply `ruleFunctionTemplateFormatStrings`;
+		-- (see ItemRack just below for an example).
 	},
 
 
-	-- ItemRack set (hidden -- Outfit() is the user-facing function).
+	-- ItemRack set.
 	{
 		functionNames = {
+			"Outfit",
+			"ItemRack",
 			"Outfit_ItemRack",
 		},
+		conditional = function()
+			return _G.IsAddOnLoaded("ItemRack")
+		end,
 		ruleFunction = function(rules, ruleArguments)
 			if not _G.IsAddOnLoaded("ItemRack") then
 				rules.errorMessage = string.format(L.Error_AddonDependency, "ItemRack")
@@ -455,11 +458,6 @@ Bagshui.config.RuleFunctions = {
 				return false
 			end
 
-			local yes = rules.item.id == 22632
-			if yes then
-				Bs:PrintDebug(itemRackItemId)
-			end
-
 			local matchAny = (table.getn(ruleArguments) == 0)
 
 			for outfitName, outfitItems in pairs(itemRackOutfits) do
@@ -483,15 +481,23 @@ Bagshui.config.RuleFunctions = {
 			return false
 
 		end,
-		hideFromUi = true
+		-- Templates come from localization and need a substitution string.
+		ruleFunctionTemplateFormatStrings = {
+			"ItemRack"
+		}
 	},
 
 
-	-- Outfitter set (hidden -- Outfit() is the user-facing function).
+	-- Outfitter set.
 	{
 		functionNames = {
+			"Outfit",
+			"Outfitter",
 			"Outfit_Outfitter",
 		},
+		conditional = function()
+			return _G.IsAddOnLoaded("Outfitter")
+		end,
 		ruleFunction = function(rules, ruleArguments)
 			if not _G.IsAddOnLoaded("Outfitter") then
 				rules.errorMessage = string.format(L.Error_AddonDependency, "Outfitter")
@@ -602,7 +608,10 @@ Bagshui.config.RuleFunctions = {
 			return false
 
 		end,
-		hideFromUi = true
+		-- Templates come from localization and need a substitution string.
+		ruleFunctionTemplateFormatStrings = {
+			"Outfitter"
+		}
 	},
 
 
@@ -774,6 +783,23 @@ Bagshui.config.RuleFunctions = {
 		-- Templates come from localization.
 	},
 
+	-- Transmog() stub.
+	{
+		functionNames = {
+			"Transmog",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			rules.errorMessage = string.format(L.Error_AddonDependency_Generic_FunctionName, "Transmog()")
+			return false
+		end,
+		ruleTemplates = {
+			{
+				code = GRAY_FONT_COLOR_CODE .. "Transmog()" .. FONT_COLOR_CODE_CLOSE,
+				description = RED_FONT_COLOR_CODE .. L.Error_AddonDependency_Generic .. FONT_COLOR_CODE_CLOSE
+			}
+		},
+		replaceable = true,
+	},
 
 	-- Item type match.
 	{
@@ -822,34 +848,39 @@ Bagshui.config.RuleFunctions = {
 	},
 
 
-	-- On the AtlasLoot wishlist.
+	-- Wishlist() stub.
 	{
 		functionNames = {
 			"Wishlist",
-			"Wish",
 		},
 		ruleFunction = function(rules, ruleArguments)
-			if not rules.item.itemLink then
-				return false
-			end
-
-			if _G.IsAddOnLoaded("AtlasLoot") and _G.AtlasLootCharDB then
-				return rules:Rule_Wishlist_AtlasLoot(ruleArguments)
-
-			end
-
-			rules.errorMessage = string.format(L.Error_AddonDependency, "AtlasLoot")
+			rules.errorMessage = string.format(L.Error_AddonDependency_Generic_FunctionName, "Wishlist()")
 			return false
 		end,
-		-- Templates come from localization.
+		ruleTemplates = {
+			{
+				code = GRAY_FONT_COLOR_CODE .. "Wishlist()" .. FONT_COLOR_CODE_CLOSE,
+				description = RED_FONT_COLOR_CODE .. L.Error_AddonDependency_Generic .. FONT_COLOR_CODE_CLOSE
+			}
+		},
+		replaceable = true,
+		-- Templates are defined in localization.
+		-- Replacement function should supply `ruleFunctionTemplateFormatStrings`;
+		-- (see ItemRack just below for an example).
 	},
 
 
-	-- AtlasLoot wishlist (hidden -- Wishlist() is the user-facing function).
+	-- AtlasLoot wishlist -- replaces Wishlist() when AtlasLoot is available.
 	{
 		functionNames = {
+			"Wishlist",
+			"AtlasLootWish",
 			"Wishlist_AtlasLoot",
+			"Wish",
 		},
+		conditional = function()
+			return _G.IsAddOnLoaded("AtlasLoot")
+		end,
 		ruleFunction = function(rules, ruleArguments)
 			if not _G.IsAddOnLoaded("AtlasLoot") then
 				rules.errorMessage = string.format(L.Error_AddonDependency, "AtlasLoot")
@@ -896,7 +927,10 @@ Bagshui.config.RuleFunctions = {
 			return false
 
 		end,
-		hideFromUi = true
+		-- Templates come from localization and need a substitution string.
+		ruleFunctionTemplateFormatStrings = {
+			"AtlasLoot"
+		}
 	},
 
 }

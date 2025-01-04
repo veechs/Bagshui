@@ -69,12 +69,7 @@ function Bagshui:AddRuleFunction(params)
 	assert(params.environmentVariables == nil or type(params.environmentVariables) == "table", "Bagshui:AddRuleFunction() - params.environmentVariables must be a table.")
 	assert(params.ruleTemplates == nil or type(params.ruleTemplates) == "table", "Bagshui:AddRuleFunction() - params.ruleTemplates must be a table.")
 
-	BsRules:AddFunction(
-		params.functionNames,
-		params.ruleFunction,
-		params.environmentVariables,
-		params.ruleTemplates
-	)
+	BsRules:AddFunction(params)
 end
 
 

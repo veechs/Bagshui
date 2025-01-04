@@ -498,6 +498,18 @@ local bagshuiEnvironment = {
 	},
 
 
+	---@enum BS_RULE_ENVIRONMENT_VARIABLES
+	-- Variables that are pre-populated into the Rule evaluation environment.
+	-- Rule functions can add their own as well.
+	---@type table<string, string>
+	BS_RULE_ENVIRONMENT_VARIABLES = {
+		Active = "~Active~",
+		Eligible = "~Eligible~",
+		Inactive = "~Inactive~",
+		Ineligible = "~Ineligible~",
+	},
+
+
 	---@enum BS_RULE_ARGUMENT_TYPE
 	-- Define what argument types are accepted by the `validArgumentTypes` parameter of `Rules:TestItemAttribute()`.
 	-- - Keys are one or more Lua types **in UPPERCASE** separated by commas with **no spaces**.
