@@ -163,7 +163,10 @@ function Inventory:ItemButton_OnEnter(itemButton)
 
 
 	-- Turn off the Bagshui tooltip hint once Alt is held.
-	if not self.settings.hint_bagshuiTooltip and _G.IsAltKeyDown() then
+	if
+		not self.settings.hint_bagshuiTooltip
+		and _G.IsAltKeyDown()
+	then
 		self.settings.hint_bagshuiTooltip = true
 	end
 
@@ -180,7 +183,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 		(BS_INVENTORY_TRUNCATE_TOOLTIPS_EDIT_MODE and self.editMode)
 		or (BS_INVENTORY_TRUNCATE_TOOLTIPS_INFO_MODE and _G.IsAltKeyDown())
 	)
-	-- - Empty slots get a tooltip too.
+	-- Empty slots deserve a tooltip too sometimes.
 	local displayTooltipForEmptySlots = (_G.IsAltKeyDown() or self.editMode)
 
 	-- When Alt is held in Edit Mode, swap from the Category tooltip to the Item tooltip.
@@ -192,7 +195,8 @@ function Inventory:ItemButton_OnEnter(itemButton)
 	local tooltipOffset = BsSkin.tooltipExtraOffset
 	_G.GameTooltip:SetOwner(
 		this,
-		-- Using ANCHOR_PRESERVE here for Edit Mode so pfUI doesn't mess with the position.
+		-- Using ANCHOR_PRESERVE here for Edit Mode instead of ANCHOR_NONE
+		-- so pfUI doesn't mess with the position.
 		"ANCHOR_" .. (self.editMode and "PRESERVE" or gameTooltipAnchorPoint),
 		-tooltipOffset,
 		tooltipOffset
@@ -354,7 +358,14 @@ function Inventory:ItemButton_OnEnter(itemButton)
 
 
 	-- Bagshui Info Tooltip
-	if self.editMode or _G.IsAltKeyDown() then
+	if
+		self.editMode
+		or _G.IsAltKeyDown()
+		or (
+			BsSettings.showInfoTooltipsWithoutAlt
+			and not _G.IsShiftKeyDown()
+		)
+	then
 
 		-- 4th parameter: Always place the info tooltip under GameTooltip in edit mode.
 		Bagshui:SetInfoTooltipPosition(this, true, self.editMode)
@@ -378,40 +389,44 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					-- Inventory counts.
 					spacerNeeded = BsCatalog:AddTooltipInfo(item.itemString, BsInfoTooltip)
 
-					-- Active quest info.
-					if Bagshui.activeQuestItems[item.name] then
+					-- Only show more in-depth info when Alt is held, even if showInfoTooltipsWithoutAlt is on.
+					if _G.IsAltKeyDown() then
+
+						-- Active quest info.
+						if Bagshui.activeQuestItems[item.name] then
+							if spacerNeeded then
+								self:AddBagshuiInfoTooltipLine(" ")
+							end
+							self:AddBagshuiInfoTooltipLine(tostring(Bagshui.activeQuestItems[item.name].obtained or "?") .. "/" .. tostring(Bagshui.activeQuestItems[item.name].needed or "?"), string.format(L.Symbol_Colon, L.ItemPropFriendly_activeQuest))
+							spacerNeeded = true
+						end
+
+						-- Stock state.
+						if
+							(item.bagshuiDate or 0) > 0
+							and item.bagshuiStockState ~= nil
+							and item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE
+						then
+							if spacerNeeded then
+								self:AddBagshuiInfoTooltipLine(" ")
+							end
+							self:AddBagshuiInfoTooltipLine(L["Stock_" .. item.bagshuiStockState], string.format(L.Symbol_Colon, L.StockState))
+							self:AddBagshuiInfoTooltipLine(BsUtil.FormatTimeRemainingString(_G.time() - item.bagshuiDate), string.format(L.Symbol_Colon, L.StockLastChange))
+							spacerNeeded = true
+						end
+
+						-- Assigned category and bag name.
 						if spacerNeeded then
 							self:AddBagshuiInfoTooltipLine(" ")
 						end
-						self:AddBagshuiInfoTooltipLine(tostring(Bagshui.activeQuestItems[item.name].obtained or "?") .. "/" .. tostring(Bagshui.activeQuestItems[item.name].needed or "?"), string.format(L.Symbol_Colon, L.ItemPropFriendly_activeQuest))
-						spacerNeeded = true
-					end
+						self:AddBagshuiInfoTooltipLine((BsCategories:GetName(item.bagshuiCategoryId) or L.Error_ItemCategoryUnknown), string.format(L.Symbol_Colon, L.Category), false)
+						self:AddBagshuiInfoTooltipLine((self.containers[item.bagNum].name or L.Unknown), string.format(L.Symbol_Colon, L.Bag))
 
-					-- Stock state.
-					if
-						(item.bagshuiDate or 0) > 0
-						and item.bagshuiStockState ~= nil
-						and item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE
-					then
-						if spacerNeeded then
-							self:AddBagshuiInfoTooltipLine(" ")
-						end
-						self:AddBagshuiInfoTooltipLine(L["Stock_" .. item.bagshuiStockState], string.format(L.Symbol_Colon, L.StockState))
-						self:AddBagshuiInfoTooltipLine(BsUtil.FormatTimeRemainingString(_G.time() - item.bagshuiDate), string.format(L.Symbol_Colon, L.StockLastChange))
-						spacerNeeded = true
-					end
-
-					-- Assigned category and bag name.
-					if spacerNeeded then
+						-- Instructions.
 						self:AddBagshuiInfoTooltipLine(" ")
+						self:AddBagshuiInfoTooltipLine(L.AltRightClick, string.format(L.Symbol_Colon, string.format(L.Suffix_Menu, L.Item)))
+						self:AddBagshuiInfoTooltipLine(L.HoldControlAlt, string.format(L.Symbol_Colon, L.MoreInformation))
 					end
-					self:AddBagshuiInfoTooltipLine((BsCategories:GetName(item.bagshuiCategoryId) or L.Error_ItemCategoryUnknown), string.format(L.Symbol_Colon, L.Category), false)
-					self:AddBagshuiInfoTooltipLine((self.containers[item.bagNum].name or L.Unknown), string.format(L.Symbol_Colon, L.Bag))
-
-					-- Instructions.
-					self:AddBagshuiInfoTooltipLine(" ")
-					self:AddBagshuiInfoTooltipLine(L.AltRightClick, string.format(L.Symbol_Colon, string.format(L.Suffix_Menu, L.Item)))
-					self:AddBagshuiInfoTooltipLine(L.HoldControlAlt, string.format(L.Symbol_Colon, L.MoreInformation))
 				end
 
 			end

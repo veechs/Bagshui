@@ -105,13 +105,19 @@ end
 
 local hookSettings = {
 	{
-		menuTitle = L.Menu_Settings_Tooltips,
+		menuTitle = L.Menu_Settings_InfoTooltip,
 	},
 	{
 		name = "globalInfoTooltips",
 		scope = BS_SETTING_SCOPE.ACCOUNT,
 		type = BS_SETTING_TYPE.BOOL,
 		defaultValue = true,
+	},
+	{
+		name = "showInfoTooltipsWithoutAlt",
+		scope = BS_SETTING_SCOPE.ACCOUNT,
+		type = BS_SETTING_TYPE.BOOL,
+		defaultValue = false,
 	},
 	{
 		menuTitle = L.Menu_Settings_ToggleBagsWith,
@@ -416,6 +422,7 @@ Bagshui.config.Settings = {
 					type = BS_SETTING_TYPE.BOOL,
 					defaultValue = false,
 				},
+
 			},
 		},
 

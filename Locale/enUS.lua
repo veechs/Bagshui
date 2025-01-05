@@ -319,6 +319,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_GroupDefaults"] = "Group Defaults",
 ["Menu_Settings_Groups"] = "Groups",
 ["Menu_Settings_Hooks_Suffix"] = "%s Hooks",  -- %s = Inventory type.
+["Menu_Settings_InfoTooltip"] = "Info Tooltip",
 ["Menu_Settings_Integration"] = "Integration",
 ["Menu_Settings_Interface"] = "Interface",
 ["Menu_Settings_ItemSlots"] = "Item Slots",
@@ -927,9 +928,9 @@ BsLocalization:AddLocale("enUS", {
 ["windowDoubleClickActions"] = "Double-Click Toggles",
 ["windowDoubleClickActions_TooltipText"] = "Double-click a blank part of the inventory window to show/hide all toolbars." .. BS_NEWLINE .. "Alt+double-click to toggle position lock.",
 
-["globalInfoTooltips"] = "Item Info",
+["globalInfoTooltips"] = "Everywhere",
 ["globalInfoTooltips_TooltipTitle"] = "Hook All Item Tooltips ",
-["globalInfoTooltips_TooltipText"] = "Show Bagshui Info Tooltip when Alt is held anywhere (i.e. Character window, chat links, etc.).",
+["globalInfoTooltips_TooltipText"] = "Show Bagshui Info Tooltip with Catalog counts when Alt is held anywhere (i.e. Character window, chat links, etc.).",
 
 ["groupBackgroundDefault"] = "Background",
 ["groupBackgroundDefault_TooltipTitle"] = "Default Group Background Color",
@@ -1025,6 +1026,9 @@ BsLocalization:AddLocale("enUS", {
 
 ["showHearthstone"] = "Hearthstone Button",
 ["showHearthstone_TooltipText"] = "Show the hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["showInfoTooltipsWithoutAlt"] = "Show Without Alt",
+["showInfoTooltipsWithoutAlt_TooltipText"] = "Always display the Bagshui Info Tooltip (hold Shift to temporarily hide it).",
 
 ["showLogWindow_TooltipText"] = "Open the Bagshui log window.",
 

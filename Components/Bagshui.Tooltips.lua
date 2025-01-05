@@ -484,6 +484,7 @@ function Bagshui:ManageInfoTooltip(tooltip)
 			(
 				_G.IsAltKeyDown()
 				or tooltip.bagshuiData.showInfoTooltipWithoutAlt
+				or BsSettings.showInfoTooltipsWithoutAlt
 	 		)
 			and not _G.IsShiftKeyDown()
 		then
