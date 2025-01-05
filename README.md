@@ -25,7 +25,7 @@
 
 ## Documentation
 
-* [Wiki](https://github.com/veechs/Bagshui/wiki), including [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)
+* [Wiki](https://github.com/veechs/Bagshui/wiki) + [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)
 * [Version history](Changelog.md)
 
 ## Installation
