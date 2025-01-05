@@ -271,7 +271,7 @@ BsLocalization:AddLocale("enUS", {
 ["Toolbar_Search_TooltipTitle"] = "Search",
 ["Toolbar_Search_TooltipText"] = "Filter the contents of your %s." .. BS_NEWLINE .. "Press Shift+Enter while searching to open the Catalog.",  -- %s = Inventory type.
 ["Toolbar_Resort_TooltipTitle"] = "Organize",
-["Toolbar_Resort_TooltipText"] = "Re-sort and categorize.",
+["Toolbar_Resort_TooltipText"] = "Categorize and sort.",
 ["Toolbar_Restack_TooltipTitle"] = "Restack",
 ["Toolbar_Restack_TooltipText"] = "Consolidate stackable items.",
 ["Toolbar_HighlightChanges_TooltipTitle"] = "Highlight Changes",
@@ -331,6 +331,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Profile"] = "Profile",
 ["Menu_Settings_Size"] = "Sizing",
 ["Menu_Settings_Tinting"] = "Item Tinting",
+["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
 ["Menu_Settings_Tooltips"] = "Tooltips",
 ["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
@@ -925,7 +926,10 @@ BsLocalization:AddLocale("enUS", {
 ["defaultProfileStructure_TooltipTitle"] = "Default Structure Profile",
 ["defaultProfileStructure_TooltipText"] = "Profile to use for new characters.",
 
-["windowDoubleClickActions"] = "Double-Click Toggles",
+["disableAutomaticResort"] = "Manual Reorganization",
+["disableAutomaticResort_TooltipText"] = "Don't categorize and sort items when the inventory window is closed and reopened." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "This is NOT the same as setting the default sort order to Manual." .. FONT_COLOR_CODE_CLOSE,
+
+["windowDoubleClickActions"] = "Double-Click",
 ["windowDoubleClickActions_TooltipText"] = "Double-click a blank part of the inventory window to show/hide all toolbars." .. BS_NEWLINE .. "Alt+double-click to toggle position lock.",
 
 ["globalInfoTooltips"] = "Everywhere",

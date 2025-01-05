@@ -990,7 +990,10 @@ function Inventory:UiFrame_OnShow()
 	-- Because Update() is called from the UI frame's OnShow function, self:Visible() becomes true
 	-- before CategorizeAndSort() executes. Normally, CategorizeAndSort() bails if self:Visible() is true,
 	-- so forceResort is set to true to ensure inventory is properly sorted whenever the window is opened.
-	self.forceResort = true
+	-- Of course, we don't want this to happen when automatic resorting is off.
+	if not self.settings.disableAutomaticResort then
+		self.forceResort = true
+	end
 	self.resortNeeded = true
 	self.inventoryUpdateAllowed = true
 	self.cacheUpdateNeeded = true

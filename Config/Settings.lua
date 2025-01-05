@@ -362,6 +362,16 @@ Bagshui.config.Settings = {
 					end,
 				},
 
+				{
+					menuTitle = L.Menu_Settings_Behaviors,
+				},
+				{
+					name = "disableAutomaticResort",
+					scope = BS_SETTING_SCOPE.CHARACTER,
+					type = BS_SETTING_TYPE.BOOL,
+					defaultValue = false,
+				},
+
 
 				{
 					menuTitle = L.Menu_Settings_Window,
@@ -414,7 +424,7 @@ Bagshui.config.Settings = {
 
 
 				{
-					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Behaviors,
+					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Toggles,
 				},
 				{
 					name = "windowDoubleClickActions",

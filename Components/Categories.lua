@@ -276,6 +276,9 @@ function Categories:FinalizeAllRules()
 	for categoryId, _ in pairs(self.list) do
 		self:FinalizeCategoryRules(categoryId, true)
 	end
+	-- Need to reset recent errors to avoid the error indicator from showing up
+	-- in the Inventory window regardless of errors in the current Structure.
+	self:ClearErrors()
 end
 
 
