@@ -11,10 +11,10 @@
 
 * Single window inventory for Bags, Bank, and Keyring.
 * [Customizable layout and design](https://github.com/veechs/Bagshui/wiki/Profiles) with automatic grouping and sorting.
-* Categorization via [rules](https://github.com/veechs/Bagshui/wiki/Rules) and item lists.
+* [Categorization](https://github.com/veechs/Bagshui/wiki/Categories) via [rules](https://github.com/veechs/Bagshui/wiki/Rules) and item lists.
 * Per-inventory and account-wide [search](https://github.com/veechs/Bagshui/wiki/Searching).
-* Identification of [profession reagents and crafted items](https://github.com/veechs/Bagshui/wiki/Professions).<br><sup>Updated when the crafting window is opened.</sup>
 * Offline viewing of any character’s inventory and [item counts in tooltips](https://github.com/veechs/Bagshui/wiki/Item-Information#info-tooltip).
+* Identification of [profession reagents and crafted items](https://github.com/veechs/Bagshui/wiki/Professions).<br><sup>Updated when the crafting window is opened.</sup>
 * Color tinting of unusable items.
 * Badges to indicate stock changes, quality, quest items, and unusability.
 * Empty slot stacking and custom graphics for profession bag slots.
@@ -22,6 +22,11 @@
 * Lots of little niceties like a Hearthstone button, pfUI skinning, and more.
 
 <sup>Plus, it's a great Vanilla alternative to Classic/Retail addons like AdiBags, ArkInventory, Baganator, BetterBags, and TBag.</sup>
+
+## Documentation
+
+* [Wiki](https://github.com/veechs/Bagshui/wiki), including [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)
+* [Version history](Changelog.md)
 
 ## Installation
 
@@ -42,12 +47,6 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
     × `Bagshui\Bagshui\Bagshui.toc`  
 	 × `Bagshui\Bagshui-main\Bagshui.toc`
    </sup>
-
-
-## Documentation
-
-* [Wiki](https://github.com/veechs/Bagshui/wiki)
-* [Changelog](Changelog.md)
 
 
 ## Compatibility
