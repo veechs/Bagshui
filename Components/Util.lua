@@ -760,7 +760,7 @@ end
 
 
 --- Dialogs with a text box should clear their text when hidden because some built-in
---- ones (like DELETE_GOOD_ITEM) don't do it OnShow.
+--- ones (like `DELETE_GOOD_ITEM`) don't do it OnShow.
 function Util.StaticPopupDialogs_ClearTextOnHide()
 	_G[_G.this:GetName().."EditBox"]:SetText("")
 end

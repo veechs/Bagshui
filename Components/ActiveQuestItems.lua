@@ -82,7 +82,7 @@ end
 function ActiveQuestItemManager:Update()
 
 	-- In theory we could keep a list of the items we've actually seen and remove the ones
-	-- we don't see, but erasing its is easier. (Can always change if it causes problems).
+	-- we don't see, but erasing it is easier. (Can always change if it's not performant enough).
 	BsUtil.TableClear(self.items)
 
 	local questName, isHeader, objectiveText, itemType, itemName, numNeeded, numObtained

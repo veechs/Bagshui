@@ -19,7 +19,7 @@ local _G = _G or getfenv()
 local bagshuiEnvironment = {
 	-- Pull basic information into the environment.
 
-	BS_VERSION = "",  -- Intentionally empty; will be filled from Bagshui.toc by Bagshui:AddonLoaded()
+	BS_VERSION = "",  -- Intentionally empty; will be filled from Bagshui.toc by `Bagshui:AddonLoaded()`.
 
 	-- Increment to wipe SavedVariables.
 	BS_DATA_VERSION = 1,
@@ -58,7 +58,9 @@ local bagshuiEnvironment = {
 	BS_DEFAULT_SORT_ORDER_ID = "Default",
 
 	-- Default profiles used at first login and for fallback if the configured default profile is unavailable.
+	-- ```
 	-- { [BS_PROFILE_TYPE value] = "ProfileId" }
+	-- ```
 	---@type table<BS_PROFILE_TYPE, string>
 	BS_DEFAULT_PROFILE = {
 		Structure = "Bagshui",

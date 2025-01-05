@@ -16,7 +16,7 @@ BsLocalization:AddLocale("enUS", {
 ["Warrior"] = "Warrior",
 
 -- Item classes and subclasses that can't be automatically localized because they're not
--- returned from GetAuctionItemClasses() / GetAuctionItemSubClasses().
+-- returned from `GetAuctionItemClasses()` / `GetAuctionItemSubClasses()`.
 ["Devices"] = "Devices",
 ["Explosives"] = "Explosives",
 ["Junk"] = "Junk",
@@ -27,7 +27,7 @@ BsLocalization:AddLocale("enUS", {
 ["Trade Goods"] = "Trade Goods",
 
 -- Skill types.
--- Must cover all keys in LOCALIZED_TO_EN_SKILL_ID and IGNORE_SKILL_CATEGORY.
+-- Must cover all keys in `LOCALIZED_TO_EN_SKILL_ID` and `IGNORE_SKILL_CATEGORY`.
 ["Class Skills"] = "Class Skills",
 ["Professions"] = "Professions",
 ["Secondary Skills"] = "Secondary Skills",
@@ -36,7 +36,7 @@ BsLocalization:AddLocale("enUS", {
 ["Languages"] = "Languages",
 
 -- Skills.
--- Must cover any skill that the game can return from GetSkillLineInfo().
+-- Must cover any skill that the game can return from `GetSkillLineInfo()`.
 ["Axes"] = "Axes",
 ["Dual Wield"] = "Dual Wield",
 ["Fishing"] = "Fishing",
@@ -46,7 +46,7 @@ BsLocalization:AddLocale("enUS", {
 ["Shield"] = "Shield",
 
 -- Professions that have their own bag types.
--- Referenced in GameInfo.lua to build the professionsToBags table.
+-- Referenced in GameInfo.lua to build the `professionsToBags` table.
 ["Enchanting"] = "Enchanting",
 ["Herbalism"] = "Herbalism",
 
@@ -215,12 +215,12 @@ BsLocalization:AddLocale("enUS", {
 ["Slash_Help"] = "%s commands:",
 ["Slash_Help_Postscript"] = "For a list of subcommands, append Help to the command.",
 
--- Key bindings (other than Inventory class names; those are handled in Inventory:New()).
+-- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 ["Binding_Resort"] = "Organize All",
 ["Binding_Restack"] = "Restack All",
 
 -- Item properties to friendly names as `ItemPropFriendly_<propertyName>`.
--- Anything non-private in BS_ITEM_SKELETON or BS_REALTIME_ITEM_INFO_PROPERTIES must be present.
+-- Anything non-private in `BS_ITEM_SKELETON` or `BS_REALTIME_ITEM_INFO_PROPERTIES` must be present.
 ["ItemPropFriendly_activeQuest"] = "Active Quest Item",
 ["ItemPropFriendly_baseName"] = "Base Name",
 ["ItemPropFriendly_bagNum"] = "Bag Number",
@@ -420,7 +420,7 @@ BsLocalization:AddLocale("enUS", {
 -- in their names or tooltips.
 -- Using [[bracket quoting]] to avoid the need for any Lua pattern escapes (like \.).
 -- Any Lua patterns must be wrapped in slashes per the normal Bagshui string
--- handling rules (see TooltipIdentifier_PotionHealth for an example).
+-- handling rules (see `TooltipIdentifier_PotionHealth` for an example).
 ["NameIdentifier_AntiVenom"] = [[Anti-Venom]],
 ["NameIdentifier_Bandage"] = [[Bandage]],
 ["NameIdentifier_Elixir"] = [[Elixir]],
@@ -639,13 +639,13 @@ BsLocalization:AddLocale("enUS", {
 
 
 -- ### Rule Function Templates ###
--- See `Rules:AddRuleExamplesFromLocalization() for details.
+-- See `Rules:AddRuleExamplesFromLocalization()` for details.
 
 -- Shared values for rule function !!placeholders!! that will be replaced when the localization is loaded.
 ["RuleFunction_LuaStringPatternsSupported"] = BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. 'Use Lua string patterns by "/wrapping with slashes/".' .. FONT_COLOR_CODE_CLOSE,
 ["RuleFunction_PT_CaseSensitiveParameters"] = BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. "Set names are case-sensitive." .. FONT_COLOR_CODE_CLOSE,
 
--- DO NOT Localize rule function names (ActiveQuest(), BindsOnEquip(), etc. as they are NOT localized in the rule environment).
+-- DO NOT Localize rule function names (`ActiveQuest()`, `BindsOnEquip()`, etc. as they are NOT localized in the rule environment).
 
 ["RuleFunction_ActiveQuest_Example1"] = 'ActiveQuest()',
 ["RuleFunction_ActiveQuest_ExampleDescription1"] = "Check if the item is a quest objective in the current character's quest log.",

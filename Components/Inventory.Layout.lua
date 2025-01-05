@@ -64,7 +64,7 @@ end
 
 
 --- Refresh only item slot colors without all the overhead of calculating the window layout.
---- High-performance -- much better than UpdateWindow()/ForceUpdateWindow(), so it should be used for
+--- High-performance -- much better than `UpdateWindow()`/`ForceUpdateWindow()`, so it should be used for
 --- changing highlights or opacity (searching, bag bar mouseover, Edit Mode highlighting, etc.).
 function Inventory:UpdateItemSlotColors()
 	for _, button in ipairs(self.ui.buttons.itemSlots) do

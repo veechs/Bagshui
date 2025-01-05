@@ -13,7 +13,8 @@ local function ItemButton_OnEnter(targetItemButton, fromEntryFrame, refreshToolt
 	local this = targetItemButton or _G.this
 	this.bagshuiData.mouseIsOver = true
 
-	-- The itemString or item MUST be set on the Bagshui info table of the button for the tooltip to appear.
+	-- The `itemString` or an `item` table populated by `ItemInfo:Get()` MUST be
+	-- set on the `bagshuiData` table of the button for the tooltip to appear.
 	local itemString = this.bagshuiData.itemString or this.bagshuiData.item and this.bagshuiData.item.itemString
 	if type(itemString) == "string" and string.find(itemString, "^item:") then
 
@@ -23,9 +24,10 @@ local function ItemButton_OnEnter(targetItemButton, fromEntryFrame, refreshToolt
 		else
 			_G.GameTooltip:SetOwner(this, this.bagshuiData.tooltipAnchor or "ANCHOR_TOPLEFT")
 		end
-		-- Pass along to Bagshui:HookTooltip().
+		-- Pass along to `Bagshui:HookTooltip()`.
 		_G.GameTooltip.bagshuiData.showInfoTooltipWithoutAlt = this.bagshuiData and this.bagshuiData.showBagshuiInfoWithoutAlt
 
+		-- There's a custom tooltip position.
 		if
 			not this.bagshuiData.tooltipAnchorDefault
 			and (

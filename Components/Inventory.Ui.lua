@@ -9,12 +9,12 @@ local Inventory = Bagshui.prototypes.Inventory
 --- Set up everything related to the UI that needs to be done at startup.
 function Inventory:InitUi()
 
-	-- Instance of the InventoryUi class specific to this Inventory class instance.
-	-- InventoryUi is built up in the Inventory.Ui.*.lua files.
+	-- Instance of the `InventoryUi` class specific to this Inventory class instance.
+	-- `InventoryUi` is built up in the Inventory.Ui.*.lua files.
 	self.ui = Bagshui.prototypes.InventoryUi:New(self)
 	local ui = self.ui
 
-	-- Fill self.toolbarAndMainMenuItems so it can be iterated to build the toolbar and menus.
+	-- Fill `self.toolbarAndMainMenuItems` so it can be iterated to build the toolbar and menus.
 	self:PopulateToolbarAndMainMenuItems()
 
 	-- Tables to store UI object references.
@@ -52,7 +52,6 @@ function Inventory:InitUi()
 		end
 	end)
 
-	-- Show/Hide have their own functions  into 
 	local oldOnShow = uiFrame:GetScript("OnShow")
 	uiFrame:SetScript("OnShow", function()
 		self:UiFrame_OnShow()

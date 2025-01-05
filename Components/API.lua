@@ -74,7 +74,7 @@ end
 
 
 
---- A change has occurred that requires Bagshui inventories to refresh.
+--- Notify Bagshui that a change has occurred which requires inventories to refresh.
 ---@param delay number? Seconds to wait before starting the update. Useful if there are likely to be a series of events that require updates.
 ---@param resortNeeded boolean? Light up the Reorganize toolbar icon if the inventory window is open. Pass `true` when a change has occurred that may require items to be re-categorized or resorted.
 ---@param cacheUpdateNeeded boolean? Check all items for changes, but don't refresh them GetItemInfo() unless there's a major change.

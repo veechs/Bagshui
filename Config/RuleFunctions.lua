@@ -832,6 +832,7 @@ Bagshui.config.RuleFunctions = {
 	-- Gray items.
 	-- It would be possible to extend this with more intelligent junk identification
 	-- in the future by tapping into data from other addons.
+	-- To turn this into a stub, alias support for stubs would need to be added.
 	{
 		functionNames = {
 			"Trash",

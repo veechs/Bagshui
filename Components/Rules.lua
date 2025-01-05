@@ -12,8 +12,8 @@ local Rules = {
 
 	-- Input and output for rule evaluation.
 
-	item = nil,  -- Populated by Rules:SetItemAndCharacter().
-	character = nil,  -- Populated by Rules:SetItemAndCharacter().
+	item = nil,  -- Populated by `Rules:SetItemAndCharacter()`.
+	character = nil,  -- Populated by `Rules:SetItemAndCharacter()`.
 	---@type string?
 	-- Rule functions should use this (as `rules.errorMessage`, assuming the first parameter accepted is being named `rules`) to return errors.
 	errorMessage = nil,

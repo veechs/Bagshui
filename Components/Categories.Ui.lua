@@ -264,7 +264,7 @@ function Categories:InitUi()
 										editBox = nil,
 									},
 								},
-								-- This is a stupid hack to get the data we need across to insertRuleFunctionTemplate().
+								-- Stupid hack to get the data we need across to `insertRuleFunctionTemplate()`.
 								arg2 = {
 									extra = true,
 									code = template.code

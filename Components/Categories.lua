@@ -89,15 +89,16 @@ local Categories = Bagshui.prototypes.ObjectList:New({
 	-- Default category ID when Categories:Categorize() can't find a match.
 	defaultCategory = BS_DEFAULT_CATEGORY_ID,
 
-	-- "Compiled" rules i.e. rule expressions run through loadstring().
+	-- "Compiled" rules i.e. rule expressions run through `loadstring()`.
 	finalizedCategoryRules = {},
 
 	-- Error tracking.
 	errors = {},  -- Errors for all categories.
-	recentErrors = {},  -- Errors only stored until Categories:ClearErrors() is called.
+	recentErrors = {},  -- Errors only stored until `Categories:ClearErrors()` is called.
 
-	-- There's some initialization that needs to happen after PLAYER_ENTERING_WORLD (see OnEvent),
-	-- but that event fires when zoning and we only want to do the stuff once.
+	-- There's some initialization that needs to happen on `PLAYER_ENTERING_WORLD`
+	-- (see `Categories:OnEvent()`), but that event fires when zoning and we
+	-- only want to do the stuff once.
 	finalInitComplete = false,
 
 	-- Debug.

@@ -44,10 +44,10 @@ local MONEY_EVENTS = {
 }
 
 
--- The comments below refer to currentCharacterInfo, which is a pointer to
--- Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO].
+-- The comments below refer to `currentCharacterInfo`, which is a pointer to
+-- `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
 
--- Array of property names for currentCharacterInfo whose values are tables.
+-- Array of property names for `currentCharacterInfo` whose values are tables.
 local CHARACTER_INFO_TABLES = {
 	"skills",
 	"spells",
@@ -57,8 +57,8 @@ local CHARACTER_INFO_TABLES = {
 	"equipped",
 }
 
--- Array of important property names and dummy values for currentCharacterInfo.
--- See comment above the initial call to Character:UpdateInfo() at the end of
+-- Array of important property names and dummy values for `currentCharacterInfo`.
+-- See comment above the initial call to `Character:UpdateInfo()` at the end of
 -- this file for more information.
 local CHARACTER_INFO_MINIMUM_PROPERTIES = {
 	class = "",
@@ -72,6 +72,7 @@ local CHARACTER_INFO_MINIMUM_PROPERTIES = {
 	money = 0,
 	race = "",
 }
+
 
 -- The game only gives skill categories as localized strings, so this is a way
 -- of making internal references locale-independent.
@@ -90,11 +91,11 @@ local IGNORE_SKILL_CATEGORY = {
 
 
 
--- Bagshui.currentCharacterData table is guaranteed to be initialized by
--- Bagshui:AddonLoaded() so we don't need to check it.
+-- `Bagshui.currentCharacterData` table is guaranteed to be initialized by
+-- `Bagshui:AddonLoaded()` so we don't need to check it.
 local currentCharacterInfo = Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]
 
--- Ensure key tables exist in Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO].
+-- Ensure key tables exist in `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
 for _, tableName in ipairs(CHARACTER_INFO_TABLES) do
 	if not currentCharacterInfo[tableName] then
 		currentCharacterInfo[tableName] = {}
@@ -103,7 +104,7 @@ end
 
 -- Ensure skill tables exist.
 -- 1.12 doesn't give any sort of IDs for skill types, only localized names, but
--- we're dealing with that via LOCALIZED_TO_EN_SKILL_ID.
+-- we're dealing with that via `LOCALIZED_TO_EN_SKILL_ID`.
 for _, skillName in pairs(LOCALIZED_TO_EN_SKILL_ID) do
 	if not currentCharacterInfo.skills[skillName] then
 		currentCharacterInfo.skills[skillName] = {}
@@ -114,7 +115,7 @@ end
 
 -- Build Character class.
 local Character = {
-	info = currentCharacterInfo,  -- Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO].
+	info = currentCharacterInfo,  -- `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
 	inventorySlots = {},  -- List of all inventory slots, including bags, and their localized names.
 	bagSlots = {},  -- Bag slot IDs so `Character:UpdateGear()` can differentiate.
 	startupRetries = 0,  -- When character info is nil, we'll retry a few times.
