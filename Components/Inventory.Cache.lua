@@ -845,11 +845,12 @@ function Inventory:ProcessRestackQueue()
 		local oldTargetDate = target.bagshuiDate or 0
 
 		-- Do the actual move.
-		-- Intentionally calling the game's PickupContainerItem instead of Bagshui:PickupItem
-		-- because it's immediately picked up and put down, and we don't need to invoke
-		-- ContainerFrameItemButton_OnClick() either. As an extra safety measure, force all
+		-- Intentionally calling the game's `PickupContainerItem()` instead of `Bagshui:PickupItem()`
+		-- because it's immediately picked up and put down, and we don't need (or want) to invoke
+		-- `ContainerFrameItemButton_OnClick()` either. As an extra safety measure, force all
 		-- modifier keys to return false for the duration of the move since some addons
-		-- hook PickupContainerItem() and change its behavior when a modifier is pressed.
+		-- hook `PickupContainerItem()` and change its behavior when a modifier is pressed.
+
 		local oldIsAltKeyDown = _G.IsAltKeyDown
 		local oldIsControlKeyDown = _G.IsControlKeyDown
 		local oldIsShiftKeyDown = _G.IsShiftKeyDown
