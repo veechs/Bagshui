@@ -886,7 +886,7 @@ function Inventory:InitMenus()
 									table.insert(template.list, itemAndGroupId.item.id)
 									BsCategories:NewObject(
 										template,
-										-- onFirstSave function
+										-- onFirstSave callback.
 										function(categoryId)
 											if string.len(categoryId or "") > 0 and string.len(itemAndGroupId.groupId or "") > 0 then
 												self:AssignCategoryToGroup(categoryId, itemAndGroupId.groupId, true)

@@ -998,6 +998,8 @@ function ObjectEditor:InitUi()
 				if type(self.onFirstSave) == "function" then
 					self.onFirstSave(self.objectId)
 				end
+				-- Only fire once. It needs to be set again to repeat.
+				self.onFirstSave = nil
 			end
 		end,
 	})
@@ -1354,7 +1356,10 @@ function ObjectEditor:Load(objectId, duplicate, template, refresh, onFirstSave)
 
 	-- Store information for future use.
 	self.objectId = objectId  -- Needed when checking for editor reuse.
-	self.onFirstSave = onFirstSave  -- Consumed by the OnClick for the Save toolbar button.
+	-- Don't clear an existing `onFirstSave` -- that will be done in the Save toolbar button OnClick.
+	if onFirstSave then
+		self.onFirstSave = onFirstSave  -- Consumed by the OnClick for the Save toolbar button.
+	end
 
 	-- Grab existing object info.
 	local objectInfo = self.manager:GetObjectInfo(objectId)
