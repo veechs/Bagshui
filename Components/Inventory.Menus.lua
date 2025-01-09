@@ -855,7 +855,7 @@ function Inventory:InitMenus()
 				_bagshuiMenuItemId = "ItemDirectCategoryAssignment",
 				text = L.Menu_Item_AssignToCategory,
 				tooltipTitle = L.Menu_Item_AssignToCategory_TooltipTitle,
-				tooltipText = L.Menu_Item_AssignToCategory_TooltipText,
+				tooltipText = L.Menu_Item_AssignToCategory_TooltipText .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. L.Menu_Item_AssignToCategory_Hint_CustomOnly .. FONT_COLOR_CODE_CLOSE,
 				value = {
 					autoSplitMenuType = BS_AUTO_SPLIT_MENU_TYPE.CATEGORIES,
 					func = function(itemAndGroupId, categoryId)
@@ -879,6 +879,7 @@ function Inventory:InitMenus()
 					autoSplitMenuExtraItems = {
 						{
 							text = string.format(L.Symbol_Ellipsis, L.New),
+							tooltipText = L.Menu_Item_AssignToCategory_CreateNew_TooltipText .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. L.Menu_Item_AssignToCategory_Hint_CustomOnly .. FONT_COLOR_CODE_CLOSE,
 							checked = false,
 							value = {
 								func = function(itemAndGroupId, _)

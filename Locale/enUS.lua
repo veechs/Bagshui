@@ -379,6 +379,8 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Item_AssignToCategory"] = "Direct Assignment",
 ["Menu_Item_AssignToCategory_TooltipTitle"] = "Direct Category Assignment",
 ["Menu_Item_AssignToCategory_TooltipText"] = "Assign this item's ID to one or more custom categories (as opposed to using rule functions).",
+["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "Assign the item to a new custom category.",
+["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "Built-in Categories are read-only - see FAQ on the Bagshui Wiki for reasoning.",
 ["Menu_Item_Information_TooltipTitle"] = "Item Information",
 ["Menu_Item_Information_TooltipText"] = "View details about this item's properties and access the Item Information window.",
 ["Menu_Item_Information_Submenu_TooltipText"] = "Click to open the Item Information window.",
@@ -443,6 +445,9 @@ BsLocalization:AddLocale("enUS", {
 ["NameIdentifier_TurtleWoWGlyph"] = [[Glyph]],  -- Used along with type('Key') to identify Turtle WoW glyphs.
 ["NameIdentifier_Weightstone"] = [[Weightstone]],
 ["NameIdentifier_WizardOil"] = [[Wizard Oil]],
+
+["NameIdentifier_Recipe_BottomHalf"] = [[Bottom Half]],
+["NameIdentifier_Recipe_TopHalf"] = [[Top Half]],
 
 ["TooltipIdentifier_Buff_AlsoIncreases"] = [[also increases your]],
 ["TooltipIdentifier_Buff_WellFed"] = [[well fed]],
