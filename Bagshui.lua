@@ -294,8 +294,9 @@ local bagshuiEnvironment = {
 	---@type string
 	BS_MENU_SUBTITLE_INDENT = "    ",
 
-	-- Need to adjust this by the scale so it behaves as expected.
-	BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD = BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD / _G.UIParent:GetScale(),
+	-- When checking whether a window with a saved position might be offscreen,
+	-- how close to the edge does it need to be?
+	BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD = 15,
 
 	-- Empty item used to initialize inventory cache entries.
 	-- Values here can't be nil or Lua drops them.
@@ -874,6 +875,9 @@ function Bagshui:Init()
 			self.environment.BS_FONT_COLOR[name] = "|cff" .. hex
 		end
 	end
+
+	-- Need to adjust this by the scale so it behaves as expected.
+	BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD = BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD / _G.UIParent:GetScale()
 
 end
 
