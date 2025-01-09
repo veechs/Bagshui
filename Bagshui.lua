@@ -294,6 +294,8 @@ local bagshuiEnvironment = {
 	---@type string
 	BS_MENU_SUBTITLE_INDENT = "    ",
 
+	-- Need to adjust this by the scale so it behaves as expected.
+	BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD = BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD / _G.UIParent:GetScale(),
 
 	-- Empty item used to initialize inventory cache entries.
 	-- Values here can't be nil or Lua drops them.
