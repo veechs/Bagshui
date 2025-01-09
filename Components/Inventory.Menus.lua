@@ -992,6 +992,7 @@ function Inventory:InitMenus()
 					-- Item: Disable the Move menu for empty slots since they can't be directly assigned to a category, only via a rule function.
 					menuItem.disabled = not isMeaningfulItemId
 					menuItem.arg1 = item
+					menuItem._bagshuiHide = not self.editMode
 
 				elseif menuItem._bagshuiMenuItemId == "ItemDirectCategoryAssignment" then
 					-- Item: Disable the Direct Assignment menu for empty slots since they can't be directly assigned to a category, only via a rule function.
@@ -1004,8 +1005,14 @@ function Inventory:InitMenus()
 					menuItem.value.idsToOmit = directAssignmentCategoryIds and BsCategories.filteredIdLists.builtin or nil
 				end
 
-				-- Item: Toggle Direct Category Assignment Only Mode (for when an item is picked up in Edit Mode and dropped on a group).
-				if menuItem._bagshuiMenuItemId ~= "ItemNameTitle" and menuItem._bagshuiMenuItemId ~= "ItemDirectCategoryAssignment" and not item._bagshuiCategoryConfigTrigger then
+				-- Item: Hide everything other than Direct Assignment
+				-- when an item is picked up in Edit Mode and dropped on a group.
+				if
+					menuItem._bagshuiHide == false  -- Don't force anything to be shown that is already hidden.
+					and menuItem._bagshuiMenuItemId ~= "ItemNameTitle"
+					and menuItem._bagshuiMenuItemId ~= "ItemDirectCategoryAssignment"
+					and not item._bagshuiCategoryConfigTrigger
+				then
 					menuItem._bagshuiHide = (directAssignmentCategoryIds ~= nil)
 				end
 
