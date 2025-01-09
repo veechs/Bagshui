@@ -534,7 +534,13 @@ end
 
 
 
-
+--- Shared function for profession-related tooltips.
+---@param self table Tooltip.
+---@param type "Craft"|"TradeSkill" Profession type - used to decide what downstream functions to call.
+---@param skill string Profession name (passed through from the `:Set*()` function).
+---@param slot number Item slot (passed through from the `:Set*()` function).
+---@param subtype string? If the hooked function ends in something other than "Item", specify that here.
+---@return unknown
 local function hookTooltip_SetProfessionItem(self, type, skill, slot, subtype)
 	if slot then
 		self.bagshuiData.lastItemString = BsItemInfo:ParseItemLink(_G["Get" .. type .. "ReagentItemLink"](skill, slot))
