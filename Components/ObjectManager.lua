@@ -329,7 +329,7 @@ function ObjectManager:Open()
 	end
 
 	-- Populate the object list.
-	self:UpdateList()
+	self:UpdateList(false)
 
 	-- Display the UI.
 	self.uiFrame:SetPoint("CENTER", 0, 0)
@@ -574,8 +574,10 @@ end
 
 
 --- Load/refresh the object list.
-function ObjectManager:UpdateList()
-	self.ui:PopulateScrollableList(self.ui.listFrame, self:GetObjectList())
+---@param preserveSearch boolean? Keep any entered search text (default: true).
+function ObjectManager:UpdateList(preserveSearch)
+	preserveSearch = type(preserveSearch) ~= "boolean" and true or preserveSearch
+	self.ui:PopulateScrollableList(self.ui.listFrame, self:GetObjectList(), nil, nil, preserveSearch)
 end
 
 

@@ -636,11 +636,12 @@ end
 ---@param entries table? Array of list entry values.
 ---@param refresh boolean? When `entries` is nil, don't clear the list and just refresh it.
 ---@param preserveSelection boolean? Don't de-select the currently selected list entry.
-function Ui:PopulateScrollableList(listFrame, entries, refresh, preserveSelection)
+---@param preserveSearch boolean? Don't clear search text.
+function Ui:PopulateScrollableList(listFrame, entries, refresh, preserveSelection, preserveSearch)
 	assert(listFrame.bagshuiData.scrollableListType, "Ui:PopulateScrollableList(): Given listFrame is not a scrollable list")
 
 	-- Clear search text.
-	if listFrame.bagshuiData.searchBox then
+	if listFrame.bagshuiData.searchBox and not preserveSearch then
 		listFrame.bagshuiData.searchBox:SetText("")
 	end
 
@@ -748,7 +749,7 @@ function Ui:PopulateScrollableList(listFrame, entries, refresh, preserveSelectio
 	end
 
 	-- Make frames visible in the UI.
-	self:ShowScrollableListEntries(listFrame)
+	self:ShowScrollableListEntries(listFrame, (listFrame.bagshuiData.searchBox and listFrame.bagshuiData.searchBox.bagshuiData.searchText))
 
 	-- Update selection and button states.
 	self:SetScrollableListSelection(listFrame, (preserveSelection and listFrame.bagshuiData.lastSelection or nil))
