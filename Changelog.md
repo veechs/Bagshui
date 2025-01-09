@@ -1,6 +1,6 @@
 # Bagshui Changelog
 
-## 1.2.2 - 2025-01-08
+## 1.2.2a - 2025-01-08
 * [Windows that try to go for an adventure off the screen](https://github.com/veechs/Bagshui/issues/18) should now be brought back. `/bagshui Bags ResetPosition` (or `Bank`) has also been made available in case manual intervention is required.
 
 ## 1.2.1 - 2025-01-06
