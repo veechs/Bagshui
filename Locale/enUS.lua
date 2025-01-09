@@ -161,6 +161,7 @@ BsLocalization:AddLocale("enUS", {
 ["Rename"] = "Rename",
 ["Replace"] = "Replace",
 ["Report"] = "Report",
+["ResetPosition"] = "Reset Position",
 ["Right"] = "Right",
 ["RightClick"] = "Right-Click",
 ["Row"] = "Row",
@@ -872,6 +873,9 @@ BsLocalization:AddLocale("enUS", {
 ["SettingReset_LogStart"] = "%s reset",
 ["SettingReset_InvalidValue"] = "invalid value",
 ["SettingReset_Outdated"] = "outdated",
+
+["SettingReset_WindowPositionAuto"] = "Window position reset because it was offscreen.",
+["SettingReset_WindowPositionManual"] = "Window position reset.",
 
 
 

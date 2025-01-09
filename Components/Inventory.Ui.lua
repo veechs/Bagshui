@@ -1172,7 +1172,9 @@ end
 
 
 --- Keep the window in the right place.
-function Inventory:FixWindowPosition()
+---@param noRescueAttempts boolean? Don't call `Inventory:RescueWindow()`.
+function Inventory:FixWindowPosition(noRescueAttempts)
+
 	-- As soon as a frame is dragged, its anchor changes to TOPLEFT, which leads to undesirable behavior
 	-- when the frame is resized. We have to reset the anchor and position to keep things happy.
 	self.uiFrame:ClearAllPoints()
@@ -1186,6 +1188,50 @@ function Inventory:FixWindowPosition()
 
 	-- Ensure the Settings menu is in the right spot.
 	self:FixSettingsMenuPosition()
+
+	-- Make sure the window is onscreen.
+	if not noRescueAttempts then
+		self:RescueWindow()
+	end
+end
+
+
+
+--- Get the window back on the screen if it goes wandering.
+---@param requested boolean? User-requested reset. Don't check, just do it.
+function Inventory:RescueWindow(requested)
+	-- Can't check if the frame isn't positioned.
+	if not self.uiFrame:GetTop() then
+		return
+	end
+
+	local rescued = false
+
+	-- These two could be collapsed to one shared function but it doesn't seem worth it.
+
+	if
+		requested
+		or self.uiFrame:GetTop() / _G.UIParent:GetEffectiveScale() <= _G.UIParent:GetBottom() / _G.UIParent:GetScale() + BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+		or self.uiFrame:GetBottom() / _G.UIParent:GetEffectiveScale() >= _G.UIParent:GetTop() / _G.UIParent:GetScale() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+	then
+		self.settings:SetDefaults(true, nil, nil, "windowAnchorYOffset", true)
+		rescued = true
+	end
+
+	if
+		requested
+		or self.uiFrame:GetRight() / _G.UIParent:GetEffectiveScale() <= _G.UIParent:GetLeft() / _G.UIParent:GetScale() + BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+		or self.uiFrame:GetLeft() / _G.UIParent:GetEffectiveScale() >= _G.UIParent:GetRight() / _G.UIParent:GetScale() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+	then
+		self.settings:SetDefaults(true, nil, nil, "windowAnchorXOffset", true)
+		rescued = true
+	end
+
+	-- Apply the new position.
+	if rescued then
+		Bagshui:Print(requested and L.SettingReset_WindowPositionManual or L.SettingReset_WindowPositionAuto, self.inventoryTypeLocalized)
+		self:FixWindowPosition(true)
+	end
 end
 
 

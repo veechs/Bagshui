@@ -515,7 +515,8 @@ end
 ---@param scope BS_SETTING_SCOPE? Only reset settings matching this scope.
 ---@param omitScope BS_SETTING_SCOPE? Only reset settings NOT matching this scope.
 ---@param limitToSetting string? Reset only the specified setting (scope-based filtering still applies).
-function Settings:SetDefaults(forceReset, scope, omitScope, limitToSetting)
+---@param silent boolean? Don't print a message when settings are changed.
+function Settings:SetDefaults(forceReset, scope, omitScope, limitToSetting, silent)
 	--Bagshui:PrintDebug(string.format("SetDefaults() forceReset=%s scope=%s omitScope=%s", tostring(forceReset), tostring(scope), tostring(omitScope)))
 
 	local qualifiedSettingName, currentVersion, newVersion, currentValue, newValue, changeReason
@@ -599,7 +600,7 @@ function Settings:SetDefaults(forceReset, scope, omitScope, limitToSetting)
 						self:Set(settingName, newValue, true, true)
 
 						-- Logging.
-						if currentValue ~= nil then
+						if not silent and currentValue ~= nil then
 							qualifiedSettingName = tostring((settingInfo.scope ~= BS_SETTING_SCOPE.INVENTORY) and settingInfo.scope or self._inventoryType) .. "." .. settingName
 							-- "<Setting> reset [<reason>] '<old value>' => '<new value>'"
 							Bagshui:PrintInfo(string.format(

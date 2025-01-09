@@ -82,7 +82,7 @@ function Slash:AddOpenCloseHandler(handlerName, classObj, extraVerbs, extraHandl
 	end
 	if type(extraVerbs) == "table" then
 		for _, verb in ipairs(extraVerbs) do
-			table.insert(handlerList, verb)
+			table.insert(handlerList, (string.gsub(verb, "%s+", "")))
 		end
 	end
 

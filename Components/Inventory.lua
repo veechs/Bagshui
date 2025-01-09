@@ -475,11 +475,17 @@ function Inventory:New(newPropsOrInventoryType)
 		end
 	end
 
-	-- Register slash command handler with Settings as an additional verb.
-	BsSlash:AddOpenCloseHandler(classObj.inventoryType, classObj, {L.Settings}, function(tokens)
+	-- Register slash command handler with additional verbs.
+	BsSlash:AddOpenCloseHandler(classObj.inventoryType, classObj, {L.Settings, L.ResetPosition}, function(tokens)
 		if BsUtil.MatchLocalizedOrNon(tokens[2], "settings") then
 			classObj:Open()
 			classObj.menus:OpenMenu("Settings")
+			return true
+		end
+
+		if BsUtil.MatchLocalizedOrNon(tokens[2], "resetposition") then
+			classObj:Open()
+			classObj:RescueWindow(true)
 			return true
 		end
 	end)
