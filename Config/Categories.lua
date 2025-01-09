@@ -282,8 +282,16 @@ Bagshui.config.Categories = {
 		-- 1. The Food and Drink categories use tooltips for identification. When a recipe
 		--    has the crafting result in its tooltip, the Food/Drink rule can incorrectly match the recipe.
 		-- 2. Weapon Buffs are identified by their names, which also match the recipe names.
+		-- 3. The "Top/Bottom Half of Advanced..." pieces need to be captured.
 		sequence = 66,
-		rule = string.format('Type("%s")', L.Recipe),
+		rule = string.format(
+			'Type("%s")\nor\n(\n  Name("/^%s/", "/^%s/")\n  and Subtype("%s", "%s")\n)',
+			L.Recipe,
+			L.NameIdentifier_Recipe_TopHalf,
+			L.NameIdentifier_Recipe_BottomHalf,
+			L.Junk,
+			L.Quest
+		),
 	},
 
 
