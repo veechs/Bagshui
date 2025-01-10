@@ -1,15 +1,17 @@
 # Credits
 
 ## Heritage
-Bagshui would not exist without the EngInventory/EngBags developers and maintainers, including (but probably not limited to) Engival, Requital, Hador, UniRing, [Lars Kiesow](https://github.com/lkiesow), [AHHH_REPTAR](https://github.com/ahhh-reptar), [LaYt](https://github.com/laytya), and [Baroque](https://github.com/Brqje).
+Bagshui started life as a rewrite of EngBags and therefore would not exist without the EngInventory/EngBags developers and maintainers, including (but probably not limited to) Engival, Requital, Hador, UniRing, [Lars Kiesow](https://github.com/lkiesow), [AHHH_REPTAR](https://github.com/ahhh-reptar), [LaYt](https://github.com/laytya), and [Baroque](https://github.com/Brqje).
 
-## Special Thanks
+## Special Mentions
 
-* The lack of [Arkayenro](https://github.com/arkayenro)'s [ArkInventory](https://www.curseforge.com/wow/addons/ark-inventory) on Vanilla catalyzed Bagshui's development (and heavily influenced its look & feel and categorization system).
+* The lack of [Arkayenro](https://github.com/arkayenro)'s [ArkInventory](https://www.curseforge.com/wow/addons/ark-inventory) on Vanilla catalyzed Bagshui's development (and heavily influenced its look & feel and rules system).
 
 * balakethelock's [SuperWoW](https://github.com/balakethelock/SuperWoW) inspired Bagshui's native item charges support (and is used if installed instead of parsing tooltips).
 
-* My long-suffering alpha tester, for putting up with me spending more time developing Bagshui than actually playing the game. 🩷
+* My long-suffering alpha tester, who put up with me spending more time developing Bagshui than actually playing the game. 🩷
+
+* Everyone who has reported bugs or provided feedback to make Bagshui better. 💞
 
 ## Code
 
