@@ -413,6 +413,12 @@ function Inventory:UpdateWindow()
 		Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline = nil
 	end
 
+	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
+	if not self.hasChanges and self.highlightChanges then
+		self.highlightChanges = false
+	end
+
+
 	-- Always update window colors.
 
 	self.windowColor = self.settings.windowBackground
