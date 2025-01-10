@@ -3,12 +3,20 @@
 ## Heritage
 Bagshui would not exist without the EngInventory/EngBags developers and maintainers, including (but probably not limited to) Engival, Requital, Hador, UniRing, [Lars Kiesow](https://github.com/lkiesow), [AHHH_REPTAR](https://github.com/ahhh-reptar), [LaYt](https://github.com/laytya), and [Baroque](https://github.com/Brqje).
 
-Special thanks to [Arkayenro](https://github.com/arkayenro)'s [ArkInventory](https://www.curseforge.com/wow/addons/ark-inventory) for catalyzing Bagshui's development and inspiring its look & feel and categorization system.
+## Special Thanks
 
-## Libraries
+* The lack of [Arkayenro](https://github.com/arkayenro)'s [ArkInventory](https://www.curseforge.com/wow/addons/ark-inventory) on Vanilla catalyzed Bagshui's development (and heavily influenced its look & feel and categorization system).
+
+* balakethelock's [SuperWoW](https://github.com/balakethelock/SuperWoW) inspired Bagshui's native item charges support (and is used if installed instead of parsing tooltips).
+
+* My long-suffering alpha tester, for putting up with me spending more time developing Bagshui than actually playing the game. 🩷
+
+## Code
+
+### Libraries
 * PeriodicTable by [Tekkub](https://github.com/TekNoLogic)
 
-## Other Code
+### Reuse
 * Active quest item detection based on [QuestItem](https://github.com/wow-vanilla-addons/QuestItem) by Shagoth.
 * Item borders use code from [ShaguTweaks](https://github.com/shagu/ShaguTweaks) `AddBorder()` by Shagu and [ShaguTweaks-Mods](https://github.com/GryllsAddons/ShaguTweaks-mods) `AddTexture()` by Grylls.
 * Unusable item tinting based on logic from [EquipColor](https://github.com/mrrosh/EquipColor) by Mr_Rosh.
@@ -26,13 +34,14 @@ Special thanks to [Arkayenro](https://github.com/arkayenro)'s [ArkInventory](htt
 ## Docs and tools
 * [BLPNG Converter](https://www.wowinterface.com/downloads/info22128-BLPNGConverter.html)
 * [Vanilla](https://github.com/AtheneGenesis/Vanilla_enUS_FrameXML) and [Turtle WoW](https://github.com/refaim/Turtle-WoW-UI-Source/) FrameXML source.
-* Everyone who has ever contributed to the [Warcraft Wiki](https://warcraft.wiki.gg/index.php?title=World_of_Warcraft_API&oldid=567429).
+* Everyone who has ever contributed to the [Warcraft Wiki](https://warcraft.wiki.gg/index.php?title=World_of_Warcraft_API&oldid=567429) (and to [this page about tables and garbage collection](https://warcraft.wiki.gg/wiki/HOWTO:_Use_Tables_Without_Generating_Extra_Garbage) in particular).
+* Basically everything [shagu](https://github.com/shagu) has written, which at times served as de facto documentation.
 
-## Miscellaneous
 
-* balakethelock's [SuperWoW](https://github.com/balakethelock/SuperWoW) inspired Bagshui's native item charges support (and is used if installed instead of parsing tooltips).
+## Assets
 
-## Icons
+### Icons
+
 * [Archive](https://www.flaticon.com/free-icon/archive_10486727) - [See Icons - Flaticon](https://www.flaticon.com/authors/see-icons)
 * backpack-f - [jam](https://github.com/michaelampr/jam/)
 * [Category](https://icons8.com/icon/JIaAkFry4yiV/category) - [Icons8](https://icons8.com)
@@ -48,6 +57,6 @@ Special thanks to [Arkayenro](https://github.com/arkayenro)'s [ArkInventory](htt
 * [Setting](https://www.flaticon.com/free-icon/setting_9333993) - [Tanah Basah - Flaticon](https://www.flaticon.com/authors/tanah-basah)
 * Various from [Fork Awesome](https://github.com/ForkAwesome/Fork-Awesome)
 
-## Fonts
+### Fonts
 * [Bagnard Sans](https://github.com/sebsan/Bagnard-Sans)
 * [Inconsolata Condensed](https://github.com/googlefonts/Inconsolata)
