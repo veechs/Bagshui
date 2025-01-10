@@ -1281,8 +1281,10 @@ end
 function Menus:BuildAutoSplitSubmenuRangeTexts(startItemName, endItemName, previousStartText, textLengthStart)
 	local submenuTextCharCount = textLengthStart or 0
 	local startText, endText
+	local tries = 0
 
 	repeat
+		tries = tries + 1
 		submenuTextCharCount = submenuTextCharCount + 1
 
 		-- The first entry needs to take into account what we figured out during the previous loop to avoid
@@ -1295,9 +1297,12 @@ function Menus:BuildAutoSplitSubmenuRangeTexts(startItemName, endItemName, previ
 		endText = BsUtil.Utf8Sub(endItemName, 1, submenuTextCharCount)
 
 		-- Remove punctuation from ends of strings if it doesn't make them the same.
-		if startText ~= endText then
-			local startWithoutTrailingPunctuation = string.gsub(startText, "%W+$", "")
-			local endWithoutTrailingPunctuation = string.gsub(endText, "%W+$", "")
+		if
+			startText ~= endText
+		then
+			-- Don't strip punctuation if the string is ALL punctuation.
+			local startWithoutTrailingPunctuation = not string.find(startText, "^%p+$") and string.gsub(startText, "%W+$", "") or startText
+			local endWithoutTrailingPunctuation = not string.find(endText, "^%p+$") and string.gsub(endText, "%W+$", "") or endText
 			if startWithoutTrailingPunctuation ~= endWithoutTrailingPunctuation then
 				startText = startWithoutTrailingPunctuation
 				endText = endWithoutTrailingPunctuation
@@ -1310,14 +1315,16 @@ function Menus:BuildAutoSplitSubmenuRangeTexts(startItemName, endItemName, previ
 			-- Ensure endText isn't just the beginning of startText
 			and not string.find(startText, "^" .. string.gsub(endText, "(%W)", "%%%1"))
 			-- Ensure items don't end with punctuation where possible
-			and string.find(startText, "[^%p]$")
-			and string.find(endText, "[^%p]$")
+			and (string.find(startText, "[^%p]$") or string.find(startText, "^%p+$"))
+			and (string.find(endText, "[^%p]$") or string.find(endText, "^%p+$"))
 		)
 		or
 		(
 			startText == startItemName
 			and endText == endItemName
 		)
+		-- Safeguard: Prevent an infinite loop.
+		or tries >= 500
 	)
 	return startText, endText
 end
