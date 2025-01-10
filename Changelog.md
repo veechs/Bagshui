@@ -1,5 +1,11 @@
 # Bagshui Changelog
 
+## 1.2.3 - 2025-01-09
+* Catalog won't [annoyingly clear your search text when it shouldn't](https://github.com/veechs/Bagshui/issues/24) (thanks [@tippfelher](https://github.com/tippfelher)).
+* [Turn off Highlight Changes when there's nothing left to highlight](https://github.com/veechs/Bagshui/issues/19) (thanks [@Distrattos](https://github.com/Distrattos)).<br><sup>There's some interplay between Bags and Keyring around this that still needs to be resolved but I don't think anyone uses Keyring enough to *really* care.</sup>
+* Tweak Recipes category to include Top Half/Bottom Half Advanced Volumes (thanks Melo)
+* Try to make it clear during Direct Assignment in Edit Mode that a [custom Category is required](https://github.com/veechs/Bagshui/wiki/FAQ#why-cant-i-edit-built-in-objects).
+
 ## 1.2.2a - 2025-01-08
 * [Windows that try to go for an adventure off the screen](https://github.com/veechs/Bagshui/issues/18) should now be brought back. `/bagshui Bags ResetPosition` (or `Bank`) has also been made available in case manual intervention is required.
 
