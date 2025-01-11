@@ -26,7 +26,8 @@
 
 <summary>Recommended if you like…</summary>
 
-AdiBags, ArkInventory, Baganator, Baggins, BetterBags, EngInventory/EngBags, TBag. And with [“OneBagshui”](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-switch-to-the-onebag-style-layout): Bagnon, Combuctor, Inventorian, LiteBag, OneBag3, SUCC-bag.
+AdiBags, ArkInventory, Baganator, Baggins, BetterBags, EngInventory/EngBags, TBag.  
+And with “[OneBagshui](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-switch-to-the-onebag-style-layout)”: Bagnon, Combuctor, Inventorian, LiteBag, OneBag3, SUCC-bag.
 
 </details>
 
