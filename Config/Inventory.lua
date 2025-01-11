@@ -42,6 +42,10 @@ Bagshui.config.Inventory = {
 			bindingKey = "TOGGLEBACKPACK",
 		},
 
+		-- Using this in the item slot button's OnEnter increases compatibility
+		-- with tooltip addons (CompareStats and anything else GFW_ based are notable examples).
+		itemSlotTooltipFunction = "ContainerFrameItemButton_OnEnter",
+
 		events = {
 			-- Open/close with Mail frame.
 			MAIL_SHOW = "Open",
@@ -117,6 +121,10 @@ Bagshui.config.Inventory = {
 
 		getInventorySlotFunction = _G.BankButtonIDToInvSlotID,
 
+		-- Bank doesn't need a tooltipFunction because it directly calls
+		-- GameTooltip:SetInventoryItem() in its OnEnter script, so there's
+		-- nothing else addons could be hooking.
+
 		events = {
 			BANKFRAME_CLOSED = "Close",
 			BANKFRAME_OPENED = "Open",
@@ -148,6 +156,9 @@ Bagshui.config.Inventory = {
 		},
 
 		getInventorySlotFunction = _G.KeyRingButtonIDToInvSlotID,
+
+		-- See comment in Bags config for reasoning.
+		itemSlotTooltipFunction = "ContainerFrameItemButton_OnEnter",
 
 		apiFunctionsToHook = {
 			ToggleKeyRing = "ToggleKeyring",

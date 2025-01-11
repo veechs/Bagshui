@@ -115,26 +115,26 @@ end
 --- OnEnter mostly handles tooltip stuff.
 ---@param itemButton table? Item slot button widget.
 function Inventory:ItemButton_OnEnter(itemButton)
-	local this = itemButton or _G.this
+	itemButton = itemButton or _G.this
 
 	-- Cases when nothing should happen.
 	if
 		-- OnEnter still fires even if mouse events are disabled so we need to avoid doing anything when we're in that state.
-		not this:IsMouseEnabled()
+		not itemButton:IsMouseEnabled()
 		-- Don't pop up tooltips or do anything else when a menu is open.
 		or self.menus:IsMenuOpen()
 	then
 		return
 	end
 
-	local buttonInfo = this.bagshuiData
-	local item = this.bagshuiData.item or self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
+	local buttonInfo = itemButton.bagshuiData
+	local item = itemButton.bagshuiData.item or self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
 
 	-- Update IDs so ContainerFrameItemButton_OnEnter() will work.
 	-- Disabled because we're currently not actually calling ContainerFrameItemButton_OnEnter,
 	-- but this could probably be added in the future if it's found to be necessary for compatibility
 	-- with other addons.
-	-- self:UpdateItemButtonIDs(this, item)
+	self:UpdateItemButtonIDs(itemButton, item)
 
 	-- Record that the mouse has moved over this button (used by OnUpdate to determine
 	-- whether the tooltip should be shown when the Edit Mode cursor puts down an item).
@@ -191,10 +191,10 @@ function Inventory:ItemButton_OnEnter(itemButton)
 
 	-- GameTooltip normally anchors to item frame, but in Edit Mode it attaches to the group frame.
 	local gameTooltipAnchorPoint = BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint)
-	local tooltipAnchorFrame = self.editMode and this:GetParent() or this
+	local tooltipAnchorFrame = self.editMode and itemButton:GetParent() or itemButton
 	local tooltipOffset = BsSkin.tooltipExtraOffset
 	_G.GameTooltip:SetOwner(
-		this,
+		itemButton,
 		-- Using ANCHOR_PRESERVE here for Edit Mode instead of ANCHOR_NONE
 		-- so pfUI doesn't mess with the position.
 		"ANCHOR_" .. (self.editMode and "PRESERVE" or gameTooltipAnchorPoint),
@@ -211,8 +211,13 @@ function Inventory:ItemButton_OnEnter(itemButton)
 		)
 	end
 
+	-- When true, the class instance had a `itemSlotTooltipFunction` defined
+	-- and we need to reapply our preferred tooltip position.
+	local setTooltipPositionAgain = false
 
-	-- Populate GameTooltip with Item or Category information.
+
+	-- Populate GameTooltip with Item or Edit Mode information, as appropriate.
+
 	if not self.editMode or editModeShowItemTooltip then
 		-- Item tooltip outside Edit Mode, or if Alt is held in Edit Mode.
 
@@ -257,8 +262,38 @@ function Inventory:ItemButton_OnEnter(itemButton)
 			-- These will be populated with the return values of ItemInfo:LoadTooltip().
 			local hasCooldown, repairCost
 
-			-- Get the tooltip.
+			-- Populate the tooltip.
+			-- There doesn't seem to be a way to get hasCooldown/repairCost without
+			-- loading the tooltip, so we have to call this even if there's an
+			-- itemSlotTooltipFunction that's going to load it again.
 			hasCooldown, repairCost = BsItemInfo:LoadTooltip(_G.GameTooltip, item, self)
+
+			-- This class instance has a custom tooltip loading function.
+			-- Spoiler: It's probably ContainerFrameItemButton_OnEnter().
+			-- (itemSlotTooltipFunction is the function name, not the actual function
+			-- see declaration in Inventory.lua for reasoning.)
+			if
+				not self.editMode  -- Not calling in Edit Mode so we cut out some hooks and have a little more control.
+				and not truncateTooltip  -- Also, we don't need extra stuff if we're just going to truncate anyway.
+				and self.itemSlotTooltipFunction
+				and type(_G[self.itemSlotTooltipFunction]) == "function"
+			then
+				-- Ugh, this is stupid, but the GFW tooltip hooking code doesn't
+				-- have `ContainerFrameItemButton_OnEnter()`'s button parameter,
+				-- so the Blizzard function ends up pulling the global `this`
+				-- instead of the passed parameter. When `Inventory:ItemSlotAndGroupMouseOverCheck()`
+				-- calls us, global `this` isn't the item slot button and
+				-- `ContainerFrameItemButton_OnEnter()`'s call to `GetRight()`
+				-- returns nil, throwing an error. We can work around their bug by
+				-- temporarily changing the value of global `this`, then restoring it.
+				local oldGlobalThis = _G.this
+				_G.this = itemButton
+				_G[self.itemSlotTooltipFunction](itemButton)
+				_G.this = oldGlobalThis
+				-- `ContainerFrameItemButton_OnEnter()` will change the tooltip position
+				-- to something that ignores our custom offsets, so we need to fix that.
+				setTooltipPositionAgain = true
+			end
 
 			-- There are situations where we may want to truncate the tooltip
 			-- at the first empty line to leave more room for the Bagshui tooltip.
@@ -326,7 +361,6 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					_G.GameTooltip:AddLine(_G.TEXT(_G.REPAIR_COST), 1, 1, 1)
 					_G.SetTooltipMoney(_G.GameTooltip, repairCost)
 
-
 				elseif self.ui:IsFrameVisible(_G.MerchantFrame) then
 					-- At merchant.
 					_G.ShowContainerSellCursor(item.bagNum, item.slotNum)
@@ -368,7 +402,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 	then
 
 		-- 4th parameter: Always place the info tooltip under GameTooltip in edit mode.
-		Bagshui:SetInfoTooltipPosition(this, true, self.editMode)
+		Bagshui:SetInfoTooltipPosition(itemButton, true, self.editMode)
 
 		if not self.editMode then
 
@@ -473,7 +507,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 
 	elseif not self.settings.hint_bagshuiTooltip then
 		-- Show tip about holding alt to display Bagshui info tooltip.
-		Bagshui:SetInfoTooltipPosition(this, true)
+		Bagshui:SetInfoTooltipPosition(itemButton, true)
 		self:AddBagshuiInfoTooltipLine(L.HoldAlt, string.format(L.Symbol_Colon, L.BagshuiTooltipIntro))
 
 	else
@@ -482,14 +516,14 @@ function Inventory:ItemButton_OnEnter(itemButton)
 	end
 
 	-- Normal tooltip.
-	if _G.GameTooltip:NumLines() > 0 then
+	if _G.GameTooltip:NumLines() > 0 or _G.GameTooltip:IsVisible() then
 		-- Quality color tooltip borders (currently a hidden setting).
 		if
 			self.settings.qualityColorTooltipBorders
 			and type(buttonInfo.qualityColor) == "table"
 			and item.quality > -1
-			and this.bagshuiData.buttonComponents
-			and this.bagshuiData.buttonComponents.border
+			and itemButton.bagshuiData.buttonComponents
+			and itemButton.bagshuiData.buttonComponents.border
 		then
 			_G.GameTooltip:SetBackdropBorderColor(
 				buttonInfo.qualityColor.r,
@@ -497,6 +531,20 @@ function Inventory:ItemButton_OnEnter(itemButton)
 				buttonInfo.qualityColor.b
 			)
 		end
+
+		-- Need to reapply customized tooltip position.
+		-- See setTooltipPositionAgain declaration for details.
+		if setTooltipPositionAgain then
+			_G.GameTooltip:ClearAllPoints()
+			_G.GameTooltip:SetPoint(
+				"BOTTOM" .. BsUtil.FlipAnchorPoint(gameTooltipAnchorPoint),
+				tooltipAnchorFrame,
+				"TOP" .. gameTooltipAnchorPoint,
+				-tooltipOffset,
+				tooltipOffset
+			)
+		end
+
 		_G.GameTooltip:Show()
 	else
 		_G.GameTooltip:Hide()
@@ -557,7 +605,7 @@ end
 
 --- OnLeave: Reset everything and hide the tooltip.
 function Inventory:ItemButton_OnLeave()
-	local this = _G.this
+	local itemButton = _G.this
 
 	-- Clear Edit Mode category highlighting.
 	if self.editState.cursorItemType ~= BS_INVENTORY_OBJECT_TYPE.CATEGORY or self.editState.cursorItem == nil then
@@ -568,19 +616,19 @@ function Inventory:ItemButton_OnLeave()
 	end
 
 	-- Reset tracking properties.
-	this.bagshuiData.tooltipCooldownUpdate = nil
-	this.bagshuiData.altKeyDown = nil
-	this.bagshuiData.controlKeyDown = nil
-	this.bagshuiData.shiftKeyDown = nil
+	itemButton.bagshuiData.tooltipCooldownUpdate = nil
+	itemButton.bagshuiData.altKeyDown = nil
+	itemButton.bagshuiData.controlKeyDown = nil
+	itemButton.bagshuiData.shiftKeyDown = nil
 
 	-- Record that the mouse has left this button (used by OnUpdate to determine
 	-- whether the tooltip should be shown when the Edit Mode cursor puts down an item).
 	-- This is used instead of MouseIsOver() because that function returns true
 	-- even when the frame is behind other frames.
-	this.bagshuiData.mouseIsOver = false
+	itemButton.bagshuiData.mouseIsOver = false
 
 	-- Hide the main tooltip.
-	if _G.GameTooltip:IsOwned(this) then
+	if _G.GameTooltip:IsOwned(itemButton) then
 		_G.GameTooltip:Hide()
 		-- Go back to the normal cursor unless the Edit Mode cursor is holding something.
 		if not BsCursorTooltip:IsVisible() then
@@ -589,7 +637,7 @@ function Inventory:ItemButton_OnLeave()
 	end
 
 	-- Hide our tooltip.
-	if BsInfoTooltip:IsOwned(this) then
+	if BsInfoTooltip:IsOwned(itemButton) then
 		BsInfoTooltip:Hide()
 	end
 
@@ -705,13 +753,13 @@ end
 ---@param mouseButton string
 ---@param isDrag number|nil|boolean
 function Inventory:ItemButton_OnClick(mouseButton, isDrag)
-	local this = _G.this
+	local itemButton = _G.this
 
-	local buttonInfo = this.bagshuiData
+	local buttonInfo = itemButton.bagshuiData
 	local item = self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
 
 	-- Update IDs so ContainerFrameItemButton_OnClick() will work.
-	self:UpdateItemButtonIDs(this, item)
+	self:UpdateItemButtonIDs(itemButton, item)
 
 	-- Nothing normal should happen in Edit Mode.
 	if self.editMode then
@@ -920,7 +968,7 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 					-- - Calling PickupContainerItem() if none of the above are met.
 					-- It also allows hooks to both ContainerFrameItemButton_OnClick() and PickupContainerItem() to work.
 					-- (See the declaration of Bagshui:PickupItem() for details about why it exists.)
-					Bagshui:PickupItem(item, self, this, callPickupContainerItemFromBagshuiPickupItem)
+					Bagshui:PickupItem(item, self, itemButton, callPickupContainerItemFromBagshuiPickupItem)
 
 				else
 					-- Normal right-click.

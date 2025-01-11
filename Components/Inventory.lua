@@ -187,12 +187,22 @@ function Inventory:New(newPropsOrInventoryType)
 		--		bindingKey = "BINDINGKEY"
 		--    	---@type function Call this in lieu of GetContainerNumSlots() (will be passed a bagNum parameter).
 		-- 		numSlotsFunction = <function>,
-		--    	---@type function Called as the second parameter to <tooltip>:SetInventoryItem() and passed the item's slotNum.
-		--      --           This is necessary because some containers' contents can't be loaded into tooltips using SetBagItem().
-		--    	getInventorySlotFunction = <function>
 		-- }
 		-- ```
 		primaryContainer = {},
+
+		
+		---@type function? Called as the second parameter to <tooltip>:SetInventoryItem() 
+		--- and passed the item's slotNum. This is necessary because some containers'
+		--- contents can't be loaded into tooltips using SetBagItem().
+		getInventorySlotFunction = nil,
+
+		---@type string? Name of game function to call so other addons' tooltip hooks work.
+		--- Will be passed the current item slot button.
+		--- This is a string instead of the actual function so we can always be sure to
+		--- call the last link in the hook chain. If the function pointer was captured
+		--- at startup in Config\Inventory.lua then there's the risk of missing hooks.
+		itemSlotTooltipFunction = nil,
 
 		-- Bag button handling (none of these are applied to primaryContainer).
 		---@type string Name of XML template for bag buttons.
