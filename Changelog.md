@@ -1,5 +1,11 @@
 # Bagshui Changelog
 
+## 1.2.5 - 2025-01-11
+*The [Info Tooltip Taming](https://github.com/veechs/Bagshui/milestone/2?closed=1) Update*
+* [Bagshui Info Tooltips](https://github.com/veechs/Bagshui/wiki/Item-Information#info-tooltip) should behave much better with fewer edge cases and improved compatibility (thanks [@Distrattos](https://github.com/Distrattos), [@doctorwizz](https://github.com/doctorwizz), and [@thecreth](https://github.com/thecreth)).
+* It will appear above the item tooltip for auction listings to avoid obscuring the row.
+* Listings in [aux](https://github.com/shirsig/aux-addon-vanilla) will now get Info Tooltips too.<br><sup>This was a *whole thing* because aux likes to do things its own special way.</sup>
+
 ## 1.2.4 - 2025-01-11
 * [Improve compatibility with tooltip addons](https://github.com/veechs/Bagshui/issues/11), including CompareStats and anything GFW_ (thanks bo.nho and [@thecreth](https://github.com/thecreth)).
 
