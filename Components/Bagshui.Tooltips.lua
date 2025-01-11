@@ -90,7 +90,7 @@ function Bagshui:CreateTooltip(name, inherits, smallFont)
 	local tooltip = _G.CreateFrame(
 		"GameTooltip",
 		tooltipName,
-		nil,
+		_G.UIParent,  -- Required for tooltips to respect UI scale.
 		inherits or "GameTooltipTemplate"
 	)
 	tooltip.bagshuiData = {
