@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.2.4 - 2025-01-11
+* [Improve compatibility with tooltip addons](https://github.com/veechs/Bagshui/issues/11), including CompareStats and anything GFW_ (thanks bo.nho and [@thecreth](https://github.com/thecreth)).
+
 ## 1.2.3 - 2025-01-09
 * Catalog won't [annoyingly clear your search text when it shouldn't](https://github.com/veechs/Bagshui/issues/24) (thanks [@tippfelher](https://github.com/tippfelher)).
 * [Turn off Highlight Changes when there's nothing left to highlight](https://github.com/veechs/Bagshui/issues/19) (thanks [@Distrattos](https://github.com/Distrattos)).<br><sup>There's some interplay between Bags and Keyring around this that still needs to be resolved but I don't think anyone uses Keyring enough to *really* care.</sup>
