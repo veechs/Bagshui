@@ -509,6 +509,7 @@ Bagshui.config.Categories = {
 					17035,  -- Stranglethorn Seed
 					17021,  -- Wild Berries
 					17026,  -- Wild Thornroot
+					61199,  -- Bright Dream Shard (Turtle WoW)
 				},
 			},
 			HUNTER = {
