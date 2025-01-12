@@ -457,12 +457,14 @@ function Util.TableClear(tbl)
 
 	-- Clear array-type tables first so table.insert will start over at 1.
 	for i = table.getn(tbl), 1, -1 do
-        table.remove(tbl, i)
-    end
+		table.remove(tbl, i)
+	end
 
 	-- Remove any remaining associative table elements.
 	-- Credit: https://stackoverflow.com/a/27287723
-	for k in next, tbl do rawset(tbl, k, nil) end
+	for k in next, tbl do
+		rawset(tbl, k, nil)
+	end
 end
 
 
