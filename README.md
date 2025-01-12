@@ -145,7 +145,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 <sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `x#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
 
 
-## Attributions
+## Credits
 
 Bagshui owes [so much to so many people](Credits.md).
 
