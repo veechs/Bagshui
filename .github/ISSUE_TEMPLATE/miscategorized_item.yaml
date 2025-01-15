@@ -1,0 +1,39 @@
+name: "Miscategorized item"
+description: "Request a built-in Category change"
+labels: ["miscategorized item"]
+body:
+  - type: input
+    attributes:
+      label: Item name
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Item ID
+      description: "Hold **Ctrl+Alt** and hover over the item. Make note of the **ID** and enter it here."
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Current Category
+      description: "Determine this by **Alt+right-clicking** the item and reviewing the *Matched Categories* list.<br>*If you're not sure, that's OK.*"
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Proposed Category
+      description: "Where should the item be moved?"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Server
+      description: "What WoW server are you playing on? (i.e. Turtle WoW, etc.)<br>*This is important because some servers have custom items.*"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reasoning
+      description: "Why should the item be moved?"
+    validations:
+      required: true
