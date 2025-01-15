@@ -1,5 +1,6 @@
 name: "Miscategorized item"
 description: "Request a built-in Category change"
+title: "[Miscategorized] "
 labels: ["miscategorized item"]
 body:
   - type: input
