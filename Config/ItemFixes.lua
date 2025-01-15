@@ -41,6 +41,7 @@ Bagshui.config.ItemFixes = {
 
 	-- Quest Items
 	[15874] = { type = "Quest", subtype = "Quest" }, -- Soft-Shelled Clams aren't keys (this might just be a Turtle WoW issue).
+	[61793] = { type = "Quest", subtype = "Quest" }, -- Arena Marks of Honor aren't junk and there's no Vanilla "Currency" type.
 
 
 	-- Bindable book pages for quests (previously Miscellaneous/Junk).
