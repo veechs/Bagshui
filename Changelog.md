@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.2.6 - 2025-01-15
+* 🚨 Important bug fix to avoid [the wrong quest being abandoned](https://github.com/veechs/Bagshui/issues/48) (thanks [@Nikki1993](https://github.com/Nikki1993)).
+* Item categorization updates for [Bright Dream Shard](https://github.com/veechs/Bagshui/issues/44) and [Arena Mark of Honor](https://github.com/veechs/Bagshui/issues/41) (thanks bonho and [@KameleonUK](https://github.com/KameleonUK)).
+
 ## 1.2.5 - 2025-01-11
 *The [Info Tooltip Taming](https://github.com/veechs/Bagshui/milestone/2?closed=1) Update*
 * [Bagshui Info Tooltips](https://github.com/veechs/Bagshui/wiki/Item-Information#info-tooltip) should behave much better with fewer edge cases and improved compatibility (thanks [@Distrattos](https://github.com/Distrattos), [@doctorwizz](https://github.com/doctorwizz), and [@thecreth](https://github.com/thecreth)).
@@ -7,7 +11,7 @@
 * Listings in [aux](https://github.com/shirsig/aux-addon-vanilla) will now get Info Tooltips too.<br><sup>This was a *whole thing* because aux likes to do things its own special way.</sup>
 
 ## 1.2.4 - 2025-01-11
-* [Improve compatibility with tooltip addons](https://github.com/veechs/Bagshui/issues/11), including CompareStats and anything GFW_ (thanks bo.nho and [@thecreth](https://github.com/thecreth)).
+* [Improve compatibility with tooltip addons](https://github.com/veechs/Bagshui/issues/11), including CompareStats and anything GFW_ (thanks bonho and [@thecreth](https://github.com/thecreth)).
 
 ## 1.2.3 - 2025-01-09
 * Catalog won't [annoyingly clear your search text when it shouldn't](https://github.com/veechs/Bagshui/issues/24) (thanks [@tippfelher](https://github.com/tippfelher)).
