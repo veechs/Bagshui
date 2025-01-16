@@ -367,7 +367,7 @@ function Inventory:UpdateCache()
 					not BS_SUPER_WOW_LOADED
 					and preCharges ~= item.charges
 					-- Tooltip gets loaded earlier when a full cache update happens.
-					and not self.forceCacheUpdate
+					and not self.forceFullCacheUpdate
 				then
 					-- None of the "big" changes happened to trigger a call to ItemInfo:Get(),
 					-- but the item had some number of charges that we parsed from the tooltip
