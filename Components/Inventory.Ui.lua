@@ -1207,12 +1207,19 @@ function Inventory:RescueWindow(requested)
 
 	local rescued = false
 
+	-- Make sure boundary frames are scaled correctly.
+	Bagshui:ManageBoundaryFrames()
+
 	-- These two could be collapsed to one shared function but it doesn't seem worth it.
+	-- Originally this was implemented with checks against UIParent but that seemed to
+	-- fall apart at really large resolutions. So instead we're using four invisible
+	-- boundary frames that share the same scale as the Bagshui inventory windows.
+	-- HOPEFULLY this will be accurate. (There's probably a better way to do this?)
 
 	if
 		requested
-		or self.uiFrame:GetTop() / _G.UIParent:GetEffectiveScale() <= _G.UIParent:GetBottom() / _G.UIParent:GetScale() + BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
-		or self.uiFrame:GetBottom() / _G.UIParent:GetEffectiveScale() >= _G.UIParent:GetTop() / _G.UIParent:GetScale() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+		or self.uiFrame:GetTop() <= Bagshui.boundaryFrames.BOTTOM:GetBottom() + BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+		or self.uiFrame:GetBottom() >= Bagshui.boundaryFrames.TOP:GetTop() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
 	then
 		self.settings:SetDefaults(true, nil, nil, "windowAnchorYOffset", true)
 		rescued = true
@@ -1220,8 +1227,8 @@ function Inventory:RescueWindow(requested)
 
 	if
 		requested
-		or self.uiFrame:GetRight() / _G.UIParent:GetEffectiveScale() <= _G.UIParent:GetLeft() / _G.UIParent:GetScale() + BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
-		or self.uiFrame:GetLeft() / _G.UIParent:GetEffectiveScale() >= _G.UIParent:GetRight() / _G.UIParent:GetScale() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+		or self.uiFrame:GetRight() <= Bagshui.boundaryFrames.LEFT:GetLeft() + BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
+		or self.uiFrame:GetLeft() >= Bagshui.boundaryFrames.RIGHT:GetRight() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
 	then
 		self.settings:SetDefaults(true, nil, nil, "windowAnchorXOffset", true)
 		rescued = true

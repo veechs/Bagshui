@@ -103,4 +103,29 @@ function Bagshui:RegisterFrameAsChildWindow(frame)
 end
 
 
+
+
+local boundaryFramePositions = { "TOP", "RIGHT", "BOTTOM", "LEFT" }
+
+--- These "boundary frames" are used to detect when one of the Bagshui inventory
+--- windows gets moved outside the screen area. See `Inventory:RescueWindow()`.
+function Bagshui:ManageBoundaryFrames()
+	if not self.boundaryFrames then
+		self.boundaryFrames = {}
+	end
+
+	for _, position in ipairs(boundaryFramePositions) do
+		if not self.boundaryFrames[position] then
+			self.boundaryFrames[position] = _G.CreateFrame("Frame", "BagshuiBoundary" .. position, _G.UIParent)
+			self.boundaryFrames[position]:SetHeight(1)
+			self.boundaryFrames[position]:SetWidth(1)
+			self.boundaryFrames[position]:SetPoint(position, _G.UIParent, position)
+		end
+
+		self.boundaryFrames[position]:SetScale(BsSettings.windowScale)
+
+	end
+end
+
+
 end)
