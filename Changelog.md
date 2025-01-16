@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.2.7 - 2025-01-15
+* Stop item charge counts from [disappearing](https://github.com/veechs/Bagshui/issues/36).
+
 ## 1.2.6 - 2025-01-15
 * 🚨 Important bug fix to avoid [the wrong quest being abandoned](https://github.com/veechs/Bagshui/issues/48) (thanks [@Nikki1993](https://github.com/Nikki1993)).
 * Item categorization updates for [Bright Dream Shard](https://github.com/veechs/Bagshui/issues/44) and [Arena Mark of Honor](https://github.com/veechs/Bagshui/issues/41) (thanks bonho and [@KameleonUK](https://github.com/KameleonUK)).
