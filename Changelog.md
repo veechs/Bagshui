@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.2.8 - 2025-01-15
+* [Improved offscreen window detection](https://github.com/veechs/Bagshui/issues/49) (thanks [@doctorwizz](https://github.com/doctorwizz)).
+
 ## 1.2.7 - 2025-01-15
 * Stop item charge counts from [disappearing](https://github.com/veechs/Bagshui/issues/36).
 
