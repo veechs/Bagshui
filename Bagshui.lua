@@ -953,6 +953,7 @@ function Bagshui:AddonLoaded()
 		_G.BagshuiData[BS_CONFIG_KEY.LOG] = {}
 	end
 	self.log = _G.BagshuiData[BS_CONFIG_KEY.LOG]
+
 end
 
 
