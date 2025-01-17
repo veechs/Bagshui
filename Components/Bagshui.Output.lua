@@ -172,7 +172,8 @@ end
 ---@param a number? Parameter for `Bagshui:Print()`.
 ---@param duration number? Time in seconds after which the message should fade out (default: 3 seconds).
 ---@param log boolean? `true` save the message to the log.
-function Bagshui:ShowErrorMessage(msg, component, r, g, b, a, duration, log)
+---@param noPrefix boolean? Parameter for `Bagshui:Print()`.
+function Bagshui:ShowErrorMessage(msg, component, r, g, b, a, duration, log, noPrefix)
 	if log then
 		Bagshui:Log(msg, component, BS_LOG_MESSAGE_TYPE.ERROR)
 	end
@@ -184,7 +185,8 @@ function Bagshui:ShowErrorMessage(msg, component, r, g, b, a, duration, log)
 		b or 0,
 		a or 1,
 		_G.UIErrorsFrame,
-		duration or 3
+		duration or 3,
+		noPrefix
 	)
 end
 

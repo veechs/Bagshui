@@ -563,7 +563,7 @@ end
 ---@param self table Tooltip.
 ---@param type "Craft"|"TradeSkill" Profession type - used to decide what downstream functions to call.
 ---@param skill string Profession name (passed through from the `:Set*()` function).
----@param slot number Item slot (passed through from the `:Set*()` function).
+---@param slot number? Item slot (passed through from the `:Set*()` function).
 ---@param subtype string? If the hooked function ends in something other than "Item", specify that here.
 ---@return unknown
 local function hookTooltip_SetProfessionItem(self, type, skill, slot, subtype)
@@ -608,9 +608,22 @@ local hookTooltipFunctions = {
 		return hookTooltip_SetProfessionItem(self, "Craft", slot, nil, "Spell")
 	end,
 
-	SetHyperlink = function(self, itemString)
-		self.bagshuiData.lastItemString = BsItemInfo:ParseItemLink(itemString)
-		return self.bagshuiData.hooked.SetHyperlink(self, itemString)
+	SetHyperlink = function(self, link)
+		self.bagshuiData.lastItemString = BsItemInfo:ParseItemLink(link)
+		-- https://github.com/veechs/Bagshui/issues/52
+		-- Need to trap errors here because pfQuest adds "quest:" links to the game.
+		-- This in and of itself isn't a problem, but if the person clicking the
+		-- chat link isn't running pfQuest but IS using Bagshui, there will be an
+		-- error thrown that looks like it's a Bagshui issue. In reality, it's
+		-- simply that Vanilla WoW doesn't know what to do with quest links unless
+		-- an addon steps in and adds hooks to intercept them.
+		local ret, error = pcall(self.bagshuiData.hooked.SetHyperlink, self, link)
+		if error then
+			-- Display the error without the [Bagshui] prefix so it looks like a
+			-- standard game message (which it technically is).
+			Bagshui:ShowErrorMessage(error, nil, nil, nil, nil, nil, nil, nil, true)
+		end
+		return ret
 	end,
 
 	SetInboxItem = function(self, id, attachIndex)
