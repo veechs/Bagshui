@@ -47,16 +47,18 @@ function Inventory:Group_OnEnter(group)
 		_G.GameTooltip:AddLine(string.format(L.Symbol_Colon, L.Categories), nil, nil, nil, true) -- "Categories:"
 		local categoryList = inventory.groups[groupId] and inventory.groups[groupId].categories
 		if type(categoryList) == "table" and table.getn(categoryList) > 0 then
+			-- Need to smash them all into one line to circumvent the 30 line tooltip limit.
+			local categories = ""
 			BsCategories:SortIdList(categoryList)
 			for _, categoryId in ipairs(categoryList) do
 				if BsCategories.list[categoryId] then
-					_G.GameTooltip:AddLine(
-						GRAY_FONT_COLOR_CODE .. "• " .. FONT_COLOR_CODE_CLOSE ..
-						HIGHLIGHT_FONT_COLOR_CODE .. (BsCategories:GetName(categoryId) or tostring(categoryId)) .. FONT_COLOR_CODE_CLOSE,
-						nil, nil, nil, true
-					)
+					categories = categories
+						.. GRAY_FONT_COLOR_CODE .. "• " .. FONT_COLOR_CODE_CLOSE
+						.. HIGHLIGHT_FONT_COLOR_CODE .. (BsCategories:GetName(categoryId) or tostring(categoryId)) .. FONT_COLOR_CODE_CLOSE
+						.. BS_NEWLINE
 				end
 			end
+			_G.GameTooltip:AddLine(BsUtil.Trim(categories), nil, nil, nil, true)
 
 		else
 			-- No categories assigned.
