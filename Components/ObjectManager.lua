@@ -995,6 +995,11 @@ function ObjectEditor:InitUi()
 		height = 16,
 		xOffset = -BsSkin.toolbarCloseButtonOffset,
 		onClick = function()
+			-- This should never be reached, but just to be extra sure...
+			if self.originalObject and self.originalObject.readOnly then
+				Bs:PrintError("Object is read-only; saving is not allowed.")
+				return
+			end
 			if self:Save() then
 				-- Call onFirstSave function if present.
 				if type(self.onFirstSave) == "function" then
@@ -1467,10 +1472,12 @@ function ObjectEditor:PopulateField(fieldName, fallbackStorageTable)
 		-- Need to use `scrollableList_Disable` here instead of `scrollableList_DisableIfReadOnly`
 		-- because the list entries themselves won't have a readOnly property; only the
 		-- object being edited does. We still rely on the `scrollableList_DisableIfReadOnly` property
-		-- to trigger the disable though so that some buttons can be kept enabled if needed.
+		-- to trigger the disable so that some buttons can be kept enabled if needed.
 		for _, button in pairs(self.lists[fieldName].bagshuiData.buttons) do
 			button.bagshuiData.scrollableList_Disable = button.bagshuiData.scrollableList_DisableIfReadOnly and readOnly or false
 		end
+		-- Also set the list to read-only. (This was added later so I'm not messing with the original code.)
+		self.lists[fieldName].bagshuiData.readOnly = readOnly
 
 		-- Fill the list and scroll it to the top.
 		self.lists[fieldName].bagshuiData.scrollFrame:SetVerticalScroll(0)
@@ -1563,6 +1570,11 @@ function ObjectEditor:UpdateState()
 			self.fieldErrors[property].icon = "Icons\\Exclamation"
 			enableDisableFunction = "Disable"
 		end
+	end
+
+	-- Read-only -- never allow saving.
+	if self.originalObject.readOnly then
+		enableDisableFunction = "Disable"
 	end
 
 	-- Update Save buttons state and show any errors.
