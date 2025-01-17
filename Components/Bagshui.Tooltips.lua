@@ -289,7 +289,11 @@ end
 ---@param attachToTooltip table? "Parent" tooltip to which the info tooltip will attach (default: `GameTooltip`).
 ---@param infoTooltip table? Info tooltip, if `BsInfoTooltip` shouldn't be used.
 function Bagshui:SetInfoTooltipPosition(owner, managedElsewhere, forceBelow, attachToTooltip, infoTooltip)
-	assert(owner, "Bagshui:SetInfoTooltipPosition() - owner is required")
+	-- Always need an owner. Don't throw an error though. Upstream code in
+	-- Bagshui:ManageInfoTooltip() tries to guard against this, but let's be sure.
+	if not owner then
+		return
+	end
 
 	attachToTooltip = attachToTooltip or _G.GameTooltip
 
@@ -498,7 +502,8 @@ function Bagshui:ManageInfoTooltip(tooltip)
 
 		-- Should we actually show or hide?
 		if
-			(
+			tooltip.bagshuiData.lastOwner
+			and (
 				_G.IsAltKeyDown()
 				or tooltip.bagshuiData.showInfoTooltipWithoutAlt
 				or BsSettings.showInfoTooltipsWithoutAlt
@@ -526,7 +531,10 @@ function Bagshui:ManageInfoTooltip(tooltip)
 				self:ShowInfoTooltip(tooltip.bagshuiData.infoTooltip)
 			end
 
-		elseif tooltip.bagshuiData.infoTooltip:IsOwned(tooltip.bagshuiData.lastOwner) then
+		elseif
+			not tooltip.bagshuiData.lastOwner
+			or tooltip.bagshuiData.infoTooltip:IsOwned(tooltip.bagshuiData.lastOwner)
+		then
 			-- Need to hide.
 			tooltip.bagshuiData.infoTooltip:Hide()
 
