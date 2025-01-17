@@ -36,6 +36,10 @@ Bagshui.prototypes.ObjectList = ObjectList
 ---{
 --- ---@type string *Required* Key in BagshuiData where these objects will be stored.
 --- dataStorageKey,
+--- ---@type number? Current data version that can be used to determine when migration is required.
+--- objectVersion,
+--- ---@type function(data, oldVersion)? Take care of any migration actions that need to occur when object versions change. See below for example.
+--- objectMigrationFunction,
 --- ---@type string *Required* Localizable string for object name.
 --- objectName
 --- ---@type string *Required* Localizable string for plural object name.
@@ -53,6 +57,17 @@ Bagshui.prototypes.ObjectList = ObjectList
 --- ---@type table<string,any> If a property is missing from a default object, give it this value.
 --- defaultObjectValues,
 --- }
+---```
+---
+---### `objectMigrationFunction` example
+---```
+---	---@param data table Contents of the SavedVariables `dataStorageKey` for this ObjectList.
+---	---@param oldVersion number *Previous* version number before Bagshui was loaded this time.
+---	function migrate(data, oldVersion)
+---		if oldVersion < 2 then
+---			-- Perform migration actions on object list data.
+---		end
+---	end
 ---```
 ---@param instanceProperties table List of properties for the new instance.
 ---@return table objectList New instance.
@@ -78,6 +93,9 @@ function ObjectList:New(instanceProperties)
 		-- Keep track of names to assist in preventing duplicates.
 		defaultObjectNames = {},
 		customObjectNames = {},
+
+		-- Provide a base version.
+		objectVersion = instanceProperties.objectVersion or 1,
 
 		-- Derive objectType from objectName if needed.
 		objectType = string.gsub(instanceProperties.objectType or instanceProperties.objectName, "%s", ""),
@@ -268,9 +286,21 @@ function ObjectList:Init(subclassWillSetInitializedProperty)
 	if _G.BagshuiData[self.dataStorageKey] == nil or self.debugResetOnLoad then
 		-- Bagshui:PrintDebug("Resetting " .. self.dataStorageKey .. " for " .. self.objectName)
 		_G.BagshuiData[self.dataStorageKey] = {}
+		Bagshui.objectVersions[self.dataStorageKey] = self.objectVersion
 	end
 	-- Reference to `dataStorageKey` in BagshuiData.
 	self.list = _G.BagshuiData[self.dataStorageKey]
+
+	-- Perform migration if available.
+	if type(self.objectMigrationFunction) == "function" then
+		self.objectMigrationFunction(
+			self,
+			(Bagshui.objectVersions[self.dataStorageKey] or 1)
+		)
+	end
+	-- Update object version so migration won't repeat.
+	Bagshui.objectVersions[self.dataStorageKey] = self.objectVersion
+
 
 	self:LoadDefaults(self.defaults)
 

@@ -74,12 +74,14 @@ local CATEGORIES_DATA_STORAGE_KEY = "categories"
 -- Categories class is built on the ObjectList prototype.
 local Categories = Bagshui.prototypes.ObjectList:New({
 
-	dataStorageKey      = CATEGORIES_DATA_STORAGE_KEY,
-	objectName          = "Category",
-	objectNamePlural    = "Categories",
-	objectSkeleton      = BS_CATEGORY_SKELETON,
-	objectTemplate      = BS_NEW_CATEGORY_TEMPLATE,
-	defaults            = Bagshui.config.Categories,
+	dataStorageKey = CATEGORIES_DATA_STORAGE_KEY,
+	objectVersion = Bagshui.config.Categories.version,
+	objectMigrationFunction = Bagshui.config.Categories.migrate,
+	objectName = "Category",
+	objectNamePlural = "Categories",
+	objectSkeleton = BS_CATEGORY_SKELETON,
+	objectTemplate = BS_NEW_CATEGORY_TEMPLATE,
+	defaults = Bagshui.config.Categories.defaults,
 	defaultObjectValues = {
 		-- Put built-in rules without a specified sequence higher than the user default.
 		sequence = BS_DEFAULT_BUILTIN_CATEGORY_SEQUENCE,

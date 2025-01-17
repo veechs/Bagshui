@@ -507,6 +507,7 @@ BsLocalization:AddLocale("enUS", {
 ["Runes"] = "Runes",
 ["Scrolls"] = "Scrolls",
 ["Teleports"] = "Teleports",
+["Tokens"] = "Tokens",
 ["Tools"] = "Tools",
 ["TradeTools"] = "Trade Tools",
 ["Uncategorized"] = "Uncategorized",

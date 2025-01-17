@@ -128,11 +128,13 @@ local PROFILES_DATA_STORAGE_KEY = "profiles"
 local Profiles = Bagshui.prototypes.ObjectList:New({
 
 	dataStorageKey = PROFILES_DATA_STORAGE_KEY,
+	objectVersion = Bagshui.config.Profiles.version,
+	objectMigrationFunction = Bagshui.config.Profiles.migrate,
 	objectName = "Profile",
 	objectNamePlural = "Profiles",
 	objectSkeleton = BS_PROFILE_SKELETON,
 	objectTemplate = BS_NEW_PROFILE_TEMPLATE,
-	defaults = Bagshui.config.Profiles,
+	defaults = Bagshui.config.Profiles.defaults,
 	wikiPage = BS_WIKI_PAGES.Profiles,
 
 	debugResetOnLoad = false and BS_DEBUG,
