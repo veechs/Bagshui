@@ -34,20 +34,19 @@ function GameReport:Open()
 	end
 
 	addLine("Bagshui Version: " .. BS_VERSION)
-	addLine("Game Version: " .. table.concat({_G.GetBuildInfo()}, " "))
-	addLine("")
-	addLine("<details><summary>Addons:</summary>")
-	addLine("")  -- Blank line required for Github to re-enter Markdown mode.
+	addLine("Game Version: " .. table.concat({_G.GetBuildInfo()}, " ") .. BS_NEWLINE)
+	addLine("<details><summary>Addons</summary>" .. BS_NEWLINE)
+	addLine("SuperWoW: " .. (_G.SUPERWOW_VERSION or "No") .. BS_NEWLINE)
 	for i = 1, _G.GetNumAddOns() do
-		local name, title, _, _, _, state = _G.GetAddOnInfo(i)
+		local name, title, _, enabled, _, disabled = _G.GetAddOnInfo(i)
 		local version = _G.GetAddOnMetadata(name, "Version") or ""
-		addLine("* " .. title .. " " .. version, (state == "DISABLED" and disabledAddons or enabledAddons))
+		addLine("* " .. title .. " " .. version, ((enabled and not disabled) and enabledAddons or disabledAddons))
 	end
 	addLine("**Enabled:**")
 	addLine(table.concat(enabledAddons, BS_NEWLINE))
-	addLine(BS_NEWLINE .. "**Disabled:**")
+	addLine(BS_NEWLINE .. "<details><summary>Disabled:</summary>" .. BS_NEWLINE)
 	addLine(table.concat(disabledAddons, BS_NEWLINE))
-	addLine(BS_NEWLINE .. "</details>")
+	addLine(BS_NEWLINE .. "</details></details>")
 
 	self._super.Open(self, table.concat(lines, BS_NEWLINE))
 
