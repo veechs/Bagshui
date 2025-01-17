@@ -1,5 +1,12 @@
 # Bagshui Changelog
 
+## 1.2.9 - 2025-01-16
+* [Add Tokens to default Profiles](https://github.com/veechs/Bagshui/issues/42) to capture most pseudo-currency items like reputation and battleground turn-ins (thanks [@KameleonUK](https://github.com/KameleonUK)).<br>***Please note:***
+  * If the Profiles you're using are still pretty close to the default, you should get Tokens added automatically.
+  * If you don't receive a Tokens Group and want one, [it's pretty easy](https://github.com/veechs/Bagshui/wiki/Walkthroughs#creating-a-group) to create a Group and assign the Tokens Category.
+* Fix [Bank bag slot highlighting](https://github.com/veechs/Bagshui/issues/50) and a [possible tooltip error](https://github.com/veechs/Bagshui/issues/51) (thanks [@Nikki1993](https://github.com/Nikki1993)).
+* Fix Edit Mode Group tooltips potentially not displaying all Categories.
+
 ## 1.2.8 - 2025-01-15
 * [Improved offscreen window detection](https://github.com/veechs/Bagshui/issues/49) (thanks [@doctorwizz](https://github.com/doctorwizz)).
 
