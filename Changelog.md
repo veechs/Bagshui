@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.2.10 - 2025-01-17
+* Better error handling [when a quest link is clicked in chat and pfQuest isn't installed](https://github.com/veechs/Bagshui/issues/52) (thanks [@doctorwizz](https://github.com/doctorwizz)).
+* Really truly [prevent built-in Categories from being edited](https://github.com/veechs/Bagshui/issues/35) (thanks bonho).
+
 ## 1.2.9 - 2025-01-16
 * [Add Tokens to default Profiles](https://github.com/veechs/Bagshui/issues/42) to capture most pseudo-currency items like reputation and battleground turn-ins (thanks [@KameleonUK](https://github.com/KameleonUK)).<br>***Please note:***
   * If the Profiles you're using are still pretty close to the default, you should get Tokens added automatically.
