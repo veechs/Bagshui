@@ -125,6 +125,7 @@ local bagshuiEnvironment = {
 		CHARACTER_INFO = "info",
 		COLORS = "colors",
 		DATA_VERSION = "dataVersion",
+		OBJECT_VERSIONS = "objectVersions",
 		LOG = "log",
 	},
 
@@ -925,6 +926,12 @@ function Bagshui:AddonLoaded()
 		}
 	end
 
+	-- Creating the object versions key here because it was added after 1.0.
+	if not _G.BagshuiData[BS_CONFIG_KEY.OBJECT_VERSIONS] then
+		_G.BagshuiData[BS_CONFIG_KEY.OBJECT_VERSIONS] = {}
+	end
+	self.objectVersions = _G.BagshuiData[BS_CONFIG_KEY.OBJECT_VERSIONS]
+
 	-- Color history (account-wide).
 	if _G.BagshuiData[BS_CONFIG_KEY.COLORS] == nil then
 		_G.BagshuiData[BS_CONFIG_KEY.COLORS] = {}
@@ -953,6 +960,7 @@ function Bagshui:AddonLoaded()
 		_G.BagshuiData[BS_CONFIG_KEY.LOG] = {}
 	end
 	self.log = _G.BagshuiData[BS_CONFIG_KEY.LOG]
+
 end
 
 

@@ -38,11 +38,13 @@ local SORT_ORDERS_DATA_STORAGE_KEY = "sortOrders"
 local SortOrders = Bagshui.prototypes.ObjectList:New({
 
 	dataStorageKey = SORT_ORDERS_DATA_STORAGE_KEY,
+	objectVersion = Bagshui.config.SortOrders.version,
+	objectMigrationFunction = Bagshui.config.SortOrders.migrate,
 	objectName = "SortOrder",
 	objectNamePlural = "SortOrders",
 	objectSkeleton = BS_SORT_ORDER_SKELETON,
 	objectTemplate = BS_NEW_SORT_ORDER_TEMPLATE,
-	defaults = Bagshui.config.SortOrders,
+	defaults = Bagshui.config.SortOrders.defaults,
 	wikiPage = BS_WIKI_PAGES.SortOrders,
 
 	-- Can't initialize until Categories are done.

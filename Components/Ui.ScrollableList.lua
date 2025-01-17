@@ -31,8 +31,10 @@ local HEADER_SPACING = 6
 --- 	multiSelect,
 --- 	---@type boolean? When `selectable` and `multiSelect` are true, show a checkbox next to each entry.
 --- 	checkboxes,
---- 	---@type boolean? When `checkboxes` is true, headers will get checkboxes too unless this is false..
+--- 	---@type boolean? When `checkboxes` is true, headers will get checkboxes too unless this is false.
 --- 	headerCheckboxes,
+--- 	---@type boolean? List is fully read-only and cannot be changed. Gets stored in the list's `bagshuiData.readOnly` property.
+--- 	readOnly,
 --- 	---@type string? ASC/DESC
 --- 	initialSortOrder,
 --- 	---@type number?
@@ -356,6 +358,7 @@ function Ui:CreateScrollableList(params)
 	listFrame.bagshuiData.multiSelect = params.multiSelect
 	listFrame.bagshuiData.checkboxes = params.multiSelect and params.checkboxes
 	listFrame.bagshuiData.headerCheckboxes = params.headerCheckboxes
+	listFrame.bagshuiData.readOnly = params.readOnly
 	listFrame.bagshuiData.onSelectionChangedFunc = params.onSelectionChangedFunc
 	listFrame.bagshuiData.onDoubleClickFunc = params.onDoubleClickFunc
 	listFrame.bagshuiData.entryOnEnterFunc = params.entryOnEnterFunc
@@ -1539,7 +1542,7 @@ function Ui:SetScrollableListSelection(listFrame, entryToSelect, selectionState,
 				and forceSelect
 				and not forceDeselect
 			)
-			
+
 		then
 			listFrame.bagshuiData.selectedEntry = entryFrame.bagshuiData.scrollableListEntry
 			self:SetScrollableListEntrySelectionState(listFrame, entryFrame, true)
@@ -1995,7 +1998,11 @@ end
 ---@param listFrame table `listFrame` return value from `Ui:CreateScrollableList()`.
 ---@param itemList string|number One or more item IDs, links, or itemStrings. Multiple should be separated by whitespace, commas, semicolons, ore newlines.
 function Ui:ItemListAdd(listFrame, itemList)
-	if not itemList then
+	if
+		not itemList
+		or not listFrame.bagshuiData
+		or listFrame.bagshuiData.readOnly
+	then
 		return
 	end
 

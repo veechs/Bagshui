@@ -1,5 +1,26 @@
 # Bagshui Changelog
 
+## 1.2.10 - 2025-01-17
+* Better error handling [when a quest link is clicked in chat and pfQuest isn't installed](https://github.com/veechs/Bagshui/issues/52) (thanks [@doctorwizz](https://github.com/doctorwizz)).
+* Really truly [prevent built-in Categories from being edited](https://github.com/veechs/Bagshui/issues/35) (thanks bonho).
+
+## 1.2.9 - 2025-01-16
+* [Add Tokens to default Profiles](https://github.com/veechs/Bagshui/issues/42) to capture most pseudo-currency items like reputation and battleground turn-ins (thanks [@KameleonUK](https://github.com/KameleonUK)).<br>***Please note:***
+  * If the Profiles you're using are still pretty close to the default, you should get Tokens added automatically.
+  * If you don't receive a Tokens Group and want one, [it's pretty easy](https://github.com/veechs/Bagshui/wiki/Walkthroughs#creating-a-group) to create a Group and assign the Tokens Category.
+* Fix [Bank bag slot highlighting](https://github.com/veechs/Bagshui/issues/50) and a [possible tooltip error](https://github.com/veechs/Bagshui/issues/51) (thanks [@Nikki1993](https://github.com/Nikki1993)).
+* Fix Edit Mode Group tooltips potentially not displaying all Categories.
+
+## 1.2.8 - 2025-01-15
+* [Improved offscreen window detection](https://github.com/veechs/Bagshui/issues/49) (thanks [@doctorwizz](https://github.com/doctorwizz)).
+
+## 1.2.7 - 2025-01-15
+* Stop item charge counts from [disappearing](https://github.com/veechs/Bagshui/issues/36).
+
+## 1.2.6 - 2025-01-15
+* 🚨 Important bug fix to avoid [the wrong quest being abandoned](https://github.com/veechs/Bagshui/issues/48) (thanks [@Nikki1993](https://github.com/Nikki1993)).
+* Item categorization updates for [Bright Dream Shard](https://github.com/veechs/Bagshui/issues/44) and [Arena Mark of Honor](https://github.com/veechs/Bagshui/issues/41) (thanks bonho and [@KameleonUK](https://github.com/KameleonUK)).
+
 ## 1.2.5 - 2025-01-11
 *The [Info Tooltip Taming](https://github.com/veechs/Bagshui/milestone/2?closed=1) Update*
 * [Bagshui Info Tooltips](https://github.com/veechs/Bagshui/wiki/Item-Information#info-tooltip) should behave much better with fewer edge cases and improved compatibility (thanks [@Distrattos](https://github.com/Distrattos), [@doctorwizz](https://github.com/doctorwizz), and [@thecreth](https://github.com/thecreth)).
@@ -7,7 +28,7 @@
 * Listings in [aux](https://github.com/shirsig/aux-addon-vanilla) will now get Info Tooltips too.<br><sup>This was a *whole thing* because aux likes to do things its own special way.</sup>
 
 ## 1.2.4 - 2025-01-11
-* [Improve compatibility with tooltip addons](https://github.com/veechs/Bagshui/issues/11), including CompareStats and anything GFW_ (thanks bo.nho and [@thecreth](https://github.com/thecreth)).
+* [Improve compatibility with tooltip addons](https://github.com/veechs/Bagshui/issues/11), including CompareStats and anything GFW_ (thanks bonho and [@thecreth](https://github.com/thecreth)).
 
 ## 1.2.3 - 2025-01-09
 * Catalog won't [annoyingly clear your search text when it shouldn't](https://github.com/veechs/Bagshui/issues/24) (thanks [@tippfelher](https://github.com/tippfelher)).

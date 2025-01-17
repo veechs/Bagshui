@@ -81,6 +81,20 @@ end
 --- Parse the quest log to find the names of items that are quest objectives.
 function ActiveQuestItemManager:Update()
 
+	-- The quest log is one of those annoying things where you can't directly ask
+	-- about a quest; you have the tell the client to *select* the quest, and then
+	-- all the quest info functions work on that. This becomes a problem if the
+	-- Quest Log is open and we want to update, since we need to loop through
+	-- all quests, we're going to have to change the selected quest. What ends up
+	-- happening is that once we're done, the very last quest in the log remains
+	-- selected and is out of sync with the Quest Log UI. This matters when someone
+	-- abandons multiple quests in a row, because the first abandonment will be
+	-- accurate, but then the next Abandon Quest click will target the last quest
+	-- in the list instead of the one that looks like it's selected.
+	-- All that to say -- we need to store the currently selected quest number
+	-- before we start so it can be restored once we're done.
+	local previouslySelectedQuestNum = _G.GetQuestLogSelection()
+
 	-- In theory we could keep a list of the items we've actually seen and remove the ones
 	-- we don't see, but erasing it is easier. (Can always change if it's not performant enough).
 	BsUtil.TableClear(self.items)
@@ -125,6 +139,11 @@ function ActiveQuestItemManager:Update()
 				end
 			end
 		end
+	end
+
+	-- Restore Quest Log selection, if any (see the dissertation at the beginning of this function).
+	if previouslySelectedQuestNum then
+		_G.SelectQuestLogEntry(previouslySelectedQuestNum)
 	end
 end
 

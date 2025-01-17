@@ -128,8 +128,12 @@ function Bank:BagSlotButton_Init(bagSlotButton)
 			_G.StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
 		elseif not self.containers[this.bagshuiData.bagNum].purchased then
 			return
-		elseif not _G.CursorHasItem() then
+		elseif
+			not _G.IsAltKeyDown()
+			and not _G.CursorHasItem()
+		then
 			-- Hack to get a call to PickupBagFromSlot().
+			-- Without this, Bank bags can only be picked up by dragging.
 			-- Another possibility is using `_G.BankFrameItemButtonBag_OnShiftClick()`.
 			this:GetScript("OnDragStart")()
 		else
