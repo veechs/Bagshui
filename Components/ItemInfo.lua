@@ -671,6 +671,28 @@ end
 
 
 
+local arbitraryItemInfo = {}
+function ItemInfo:OpenWithArbitraryItem(itemIdentifier)
+	if self.lastArbitraryItem == itemIdentifier then
+		self.arbitraryItemTries = (self.arbitraryItemTries or 0) + 1
+	else
+		self.arbitraryItemTries = 0
+	end
+	self.lastArbitraryItem = itemIdentifier
+	if not self:Get(itemIdentifier, arbitraryItemInfo, true, true, true) then
+		if self.arbitraryItemTries < 5 then
+			Bagshui:QueueClassCallback(self, self.OpenWithArbitraryItem, 0.75, nil, itemIdentifier)
+		else
+			Bagshui:PrintError(string.format(L.Error_ItemNotFound, tostring(itemIdentifier)))
+		end
+		return
+	end
+	
+	self:Open(arbitraryItemInfo)
+end
+
+
+
 --- Construct the code examples for the info window.
 ---@param ruleFunctionExamples string[] Rule functions. If `%s` is found, the item property value will be substituted.
 ---@param itemPropertyValue string|number? Value to fill if %s is present in the rule function.
@@ -789,6 +811,26 @@ end
 --- Just need to do this little bit after initialization because the UI classes
 --- aren't loaded until well after ItemInfo.
 function ItemInfo:Init()
+
+	-- Add /bagshui info
+	-- The Character parameter is handled here for convenience.
+	local itemInfoSlashCache = {}
+	BsSlash:AddHandler("Info", function(tokens)
+		if not tokens[2] then
+			BsSlash:PrintHandlers({L.ItemId}, "Info")
+			-- Character and Game will (probably) be added in a future update.
+			--BsSlash:PrintHandlers({L.ItemId, L.Character, L.Game}, "Info")
+		-- elseif BsUtil.MatchLocalizedOrNon(tokens[2], "character") then
+		-- 	Bs:PrintError("Not implemented yet.")
+		elseif BsUtil.MatchLocalizedOrNon(tokens[2], "itemid") or BsUtil.MatchLocalizedOrNon(tokens[2], "help") then
+			Bs:PrintBare(L.Slash_Help_ItemInfo)
+		else
+			self:OpenWithArbitraryItem(tokens[2])
+		end
+	end)
+
+
+	-- Get the UI ready.
 	self.window = Bagshui.prototypes.ScrollableTextWindow:New({
 		name = "ItemInfo",
 		title = "Item Info",  -- Will be updated to the name of the item in Open().
@@ -807,33 +849,36 @@ function ItemInfo:Init()
 			return
 		end
 
-		-- Build item information text.
-
 		local infoText = ""
 
-		for itemProperty, itemPropertyFriendly, itemPropertyValue, itemPropertyDisplay in ItemInfo:ItemPropertyValuesForDisplay(item, BS_ITEM_INFO_DISPLAY_TYPE.TEXT) do
+		if type(item) == "table" then
 
-			-- Start this property with `<Friendly Property Name>: <Property Value>`.
-			infoText = infoText .. string.format(L.Symbol_Colon, itemPropertyFriendly) .. " " .. itemPropertyDisplay .. BS_NEWLINE
+			-- Build item information text.
 
-			-- Add rule function examples.
-			local ruleFunctionExamples = BS_ITEM_PROPERTIES_TO_FUNCTIONS[itemProperty]
-			if type(ruleFunctionExamples) == "table" then
-				if type(itemPropertyValue) == "table" then
-					for _, val in ipairs(itemPropertyValue) do
-						infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, val, itemPropertyFriendly)
+			for itemProperty, itemPropertyFriendly, itemPropertyValue, itemPropertyDisplay in ItemInfo:ItemPropertyValuesForDisplay(item, BS_ITEM_INFO_DISPLAY_TYPE.TEXT) do
+
+				-- Start this property with `<Friendly Property Name>: <Property Value>`.
+				infoText = infoText .. string.format(L.Symbol_Colon, itemPropertyFriendly) .. " " .. itemPropertyDisplay .. BS_NEWLINE
+
+				-- Add rule function examples.
+				local ruleFunctionExamples = BS_ITEM_PROPERTIES_TO_FUNCTIONS[itemProperty]
+				if type(ruleFunctionExamples) == "table" then
+					if type(itemPropertyValue) == "table" then
+						for _, val in ipairs(itemPropertyValue) do
+							infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, val, itemPropertyFriendly)
+						end
+					else
+						infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, itemPropertyValue, itemPropertyFriendly)
 					end
 				else
-					infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, itemPropertyValue, itemPropertyFriendly)
+					infoText = infoText .. GRAY_FONT_COLOR_CODE .. L.NoRuleFunction .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE
 				end
-			else
-				infoText = infoText .. GRAY_FONT_COLOR_CODE .. L.NoRuleFunction .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE
+
+				-- End with a final newline so that there are two newlines to separate from
+				-- the next property (extra newlines at the very end don't matter).
+				infoText = infoText .. BS_NEWLINE
+
 			end
-
-			-- End with a final newline so that there are two newlines to separate from
-			-- the next property (extra newlines at the very end don't matter).
-			infoText = infoText .. BS_NEWLINE
-
 		end
 
 		-- Prepare to open the window.

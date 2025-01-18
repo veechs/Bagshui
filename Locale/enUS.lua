@@ -73,6 +73,7 @@ BsLocalization:AddLocale("enUS", {
 ["Catalog"] = "Catalog",
 ["Categories"] = "Categories",
 ["Category"] = "Category",
+["Character"] = "Character",
 ["CharacterData"] = "Character Data",
 ["CategorySlashItem"] = "Category/Item",
 ["ClassCategory"] = "Class Category",
@@ -112,6 +113,7 @@ BsLocalization:AddLocale("enUS", {
 ["Information"] = "Information",
 ["Inventory"] = "Inventory",
 ["Item"] = "Item",
+["ItemId"] = "ItemId",
 ["ItemProperties"] = "Item Properties",
 ["KeepEditing"] = "Keep Editing",
 ["Label"] = "Label",
@@ -212,9 +214,11 @@ BsLocalization:AddLocale("enUS", {
 ["Abbrev_Keyring"] = "Key",
 ["Abbrev_Equipped"] = "Equip",
 
--- Slash command help message.
+-- Slash command help messages.
 ["Slash_Help"] = "%s commands:",
 ["Slash_Help_Postscript"] = "For a list of subcommands, append Help to the command.",
+
+["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! Examples:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444".. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
 
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 ["Binding_Resort"] = "Organize All",
@@ -839,6 +843,7 @@ BsLocalization:AddLocale("enUS", {
 ["Error_ImportInvalidFormat"] = "Import failed: Data was in an unexpected format.`",
 ["Error_ImportVersionTooNew"] = "Import failed: Please upgrade to the latest version of Bagshui.",
 ["Error_ItemCategoryUnknown"] = "!Unknown! (This shouldn't happen).",  -- Placed in the tooltip if the item doesn't have a category.
+["Error_ItemNotFound"] = "Item %s not found.",
 ["Error_RestackFailed"] = "Failed to restack %s",
 ["Error_SaveFailed"] = "%s could not be saved: %s",
 ["Error_Suffix_Retrying"] = "%s; retrying…",  -- Appended to the end of an error message when an action has failed but is being attempted again.
