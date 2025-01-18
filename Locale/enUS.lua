@@ -1002,6 +1002,10 @@ BsLocalization:AddLocale("enUS", {
 ["itemStockBadges_TooltipTitle"] = "Item Stock Badges",
 ["itemStockBadges_TooltipText"] = "Indicate when items are new or quantities increase/decrease.",
 
+["itemStockChangeClearOnInteract"] = "Clear on Click",
+["itemStockChangeClearOnInteract_TooltipTitle"] = "Clear Item Stock Badge On Click",
+["itemStockChangeClearOnInteract_TooltipText"] = "Immediately reset the item stock change state (new/increased/decreased) upon interaction.",
+
 ["itemStockChangeExpiration"] = "Expiration",
 ["itemStockChangeExpiration_TooltipTitle"] = "Item Stock Badge Change Expiration",
 ["itemStockChangeExpiration_TooltipText"] = "After this time has elapsed, an item will no longer be considered changed (new/increased/decreased).",
