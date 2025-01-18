@@ -35,7 +35,7 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 
 ## Docs and tools
 * [BLPNG Converter](https://www.wowinterface.com/downloads/info22128-BLPNGConverter.html)
-* [Vanilla](https://github.com/AtheneGenesis/Vanilla_enUS_FrameXML) and [Turtle WoW](https://github.com/refaim/Turtle-WoW-UI-Source/) FrameXML source.
+* [Vanilla](https://github.com/MOUZU/Blizzard-WoW-Interface/tree/master/1.12.1/FrameXML) and [Turtle WoW](https://github.com/refaim/Turtle-WoW-UI-Source/) FrameXML source.
 * Everyone who has ever contributed to the [Warcraft Wiki](https://warcraft.wiki.gg/index.php?title=World_of_Warcraft_API&oldid=567429) (and to [this page about tables and garbage collection](https://warcraft.wiki.gg/wiki/HOWTO:_Use_Tables_Without_Generating_Extra_Garbage) in particular).
 * Basically everything [shagu](https://github.com/shagu) has written, which at times served as de facto documentation.
 
