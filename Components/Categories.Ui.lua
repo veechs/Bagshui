@@ -81,22 +81,15 @@ function Categories:InitUi()
 		arg1.editor:SetClass(_G.this.value)
 	end
 
-	local classMenu = {}
+	local classMenu = BsUtil.TableCopy(BsGameInfo.characterClassMenu)
 	-- Reusable table for passing values through to the callback function.
 	local classMenuArg1 = {}
 
 	-- Generate the menu items and add the menu.
-	for _, class in ipairs(BsGameInfo.sortedCharacterClasses) do
-		table.insert(
-			classMenu,
-			{
-				text = L[BsGameInfo.characterClasses[class]],
-				value = class,
-				arg1 = classMenuArg1,
-				notCheckable = true,
-				func = classMenuFunc
-			}
-		)
+	for _, menuItem in ipairs(classMenu) do
+		menuItem.arg1 = classMenuArg1
+		menuItem.notCheckable = true
+		menuItem.func = classMenuFunc
 	end
 
 	self.menus:AddMenu(

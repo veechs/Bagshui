@@ -591,6 +591,7 @@ end
 
 
 
+
 --- Obtain the list of categories to which a given item ID has been manually assigned.
 ---@param itemId number Item ID.
 ---@param categoryIdListOutput any[] Array to fill with category IDs (will be cleared).
@@ -599,17 +600,74 @@ function Categories:GetDirectCategoryAssignmentsForItem(itemId, categoryIdListOu
 	assert(type(categoryIdListOutput) == "table", "Categories:GetDirectCategoryAssignmentsForItem(): categoryIdListOutput is required and must be the table to fill.")
 	BsUtil.TableClear(categoryIdListOutput)
 	for categoryId, categoryInfo in pairs(self.list) do
-		if categoryInfo.list then
-			for i, categoryItemId in ipairs(categoryInfo.list) do
-				if
-					categoryItemId == itemId
-					and (
-						(limitToCategoryIds and BsUtil.TableContainsValue(limitToCategoryIds, itemId) ~= nil)
-						or not limitToCategoryIds
-					)
-				then
+		if categoryInfo.classes ~= nil then
+			for class, classInfo in pairs(categoryInfo.classes) do
+				self:ItemInDirectAssignmentList(
+					classInfo.list,
+					categoryId,
+					itemId,
+					categoryIdListOutput,
+					limitToCategoryIds
+				)
+			end
+		else
+			self:ItemInDirectAssignmentList(
+				categoryInfo.list,
+				categoryId,
+				itemId,
+				categoryIdListOutput,
+				limitToCategoryIds
+			)
+		end
+	end
+end
+
+
+
+--- Test whether the given Category contains the specified item ID in its Direct Assignment list.
+--- Two modes:
+--- 1. Helper for `Categories:GetDirectCategoryAssignmentsForItem()` to fill `categoryIdListOutput`.
+--- 2. Return `true` if the Category has the item. Used for Direct Assignment Class menus in Edit Mode.
+---@param list number[]? Direct Assignment list.
+---@param itemId number Item ID.
+---@param categoryId number|string Unique Category identifier.
+---@param categoryIdListOutput? any[] See `Categories:GetDirectCategoryAssignmentsForItem()`
+---@param limitToCategoryIds (string|number)[]? See `Categories:GetDirectCategoryAssignmentsForItem()`
+---@param class string? Required if `list` is not provided and `categoryId` represents a Class Category.
+---@return boolean?
+function Categories:ItemInDirectAssignmentList(list, categoryId, itemId, categoryIdListOutput, limitToCategoryIds, class)
+	if not list then
+		local categoryInfo = self.list[categoryId]
+		if not categoryInfo then
+			return
+		end
+		if categoryInfo.classes then
+			if
+				not class
+				or not categoryInfo.classes[class]
+			then
+				return
+			end
+
+			list = categoryInfo.classes[class].list
+		else
+			list = categoryInfo.list
+		end
+	end
+
+	if type(list) == "table" then
+		for i, categoryItemId in ipairs(list) do
+			if
+				categoryItemId == itemId
+				and (
+					(limitToCategoryIds and BsUtil.TableContainsValue(limitToCategoryIds, itemId) ~= nil)
+					or not limitToCategoryIds
+				)
+			then
+				if categoryIdListOutput then
 					table.insert(categoryIdListOutput, categoryId)
 				end
+				return true
 			end
 		end
 	end
@@ -620,17 +678,42 @@ end
 --- Directly assign an item to a category.
 ---@param categoryId string|number
 ---@param itemId string|number
-function Categories:AssignItemToCategory(categoryId, itemId)
+---@param class string? Required for class categories.
+function Categories:AssignItemToCategory(categoryId, itemId, class)
 	assert(itemId, "Categories:AssignItemToCategory(): itemID is required.")
+
 	local categoryInfo = self.list[categoryId]
 	if not categoryInfo then
 		return
 	end
-	if BsUtil.TableContainsValue(categoryInfo.list, itemId) == nil then
+
+	local list
+
+	if categoryInfo.classes ~= nil then
+		assert(class, "Categories:AssignItemToCategory(): class is required for Class Categories.")
+
+		if not categoryInfo.classes[class] then
+			categoryInfo.classes[class] = {}
+		end
+		if not categoryInfo.classes[class].list then
+			categoryInfo.classes[class].list = {}
+		end
+
+		list = categoryInfo.classes[class].list
+
+	else
 		if not categoryInfo.list then
 			categoryInfo.list = {}
 		end
-		table.insert(categoryInfo.list, itemId)
+		list = categoryInfo.list
+	end
+
+	if not list then
+		return
+	end
+
+	if BsUtil.TableContainsValue(list, itemId) == nil then
+		table.insert(list, itemId)
 	end
 	self:Save(categoryId, categoryInfo)
 end
@@ -640,13 +723,32 @@ end
 --- Remove the direct assignment of an item to a category.
 ---@param categoryId string|number
 ---@param itemId string|number
-function Categories:RemoveItemFromCategory(categoryId, itemId)
-	assert(itemId, "Categories:AssignItemToCategory(): itemID is required.")
+---@param class string? Required for class categories.
+function Categories:RemoveItemFromCategory(categoryId, itemId, class)
+	assert(itemId, "Categories:RemoveItemFromCategory(): itemID is required.")
+
 	local categoryInfo = self.list[categoryId]
 	if not categoryInfo then
 		return
 	end
-	BsUtil.TableRemoveArrayItem(categoryInfo.list, itemId)
+
+	local list = categoryInfo.list
+
+	if categoryInfo.classes ~= nil then
+		assert(class, "Categories:RemoveItemFromCategory(): class is required for Class Categories.")
+
+		if not categoryInfo.classes[class] then
+			return
+		end
+
+		list = categoryInfo.classes[class].list
+	end
+
+	if not list then
+		return
+	end
+
+	BsUtil.TableRemoveArrayItem(list, itemId)
 	self:Save(categoryId, categoryInfo)
 end
 
@@ -655,16 +757,32 @@ end
 --- Assign/unassign and item to a category, depending on its current status.
 ---@param categoryId string|number
 ---@param itemId string|number
-function Categories:ToggleItemCategoryAssignment(categoryId, itemId)
-	assert(itemId, "Categories:AssignItemToCategory(): itemID is required.")
+---@param class string? Required for class categories.
+function Categories:ToggleItemCategoryAssignment(categoryId, itemId, class)
+	assert(itemId, "Categories:ToggleItemCategoryAssignment(): itemID is required.")
+
 	local categoryInfo = self.list[categoryId]
 	if not categoryInfo then
 		return
 	end
-	if BsUtil.TableContainsValue(categoryInfo.list, itemId) ~= nil then
-		self:RemoveItemFromCategory(categoryId, itemId)
+
+	local list = categoryInfo.list
+
+	if categoryInfo.classes ~= nil then
+		assert(class, "Categories:ToggleItemCategoryAssignment(): class is required for Class Categories.")
+
+		if
+			categoryInfo.classes[class]
+			and categoryInfo.classes[class].list
+		then
+			list = categoryInfo.classes[class].list
+		end
+	end
+
+	if list and BsUtil.TableContainsValue(list, itemId) ~= nil then
+		self:RemoveItemFromCategory(categoryId, itemId, class)
 	else
-		self:AssignItemToCategory(categoryId, itemId)
+		self:AssignItemToCategory(categoryId, itemId, class)
 	end
 end
 
