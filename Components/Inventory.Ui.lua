@@ -421,6 +421,10 @@ function Inventory:InitUi()
 			if self.dockedInventory then
 				self.dockedInventory:UpdateItemSlotColors()
 			end
+			if not self.searchTextSetFromEvent then
+				Bagshui:RaiseEvent("BAGSHUI_INVENTORY_SEARCH", nil, self.inventoryType, self.searchText)
+			end
+			self.searchTextSetFromEvent = false
 		end,
 
 		-- OnEnterPressed -- open Catalog if a modifier is down.

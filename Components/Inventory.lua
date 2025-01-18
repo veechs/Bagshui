@@ -252,6 +252,7 @@ function Inventory:New(newPropsOrInventoryType)
 			ITEM_LOCKED = true,  -- Doesn't seem to actually ever fire but let's register for it anyway.
 			ITEM_LOCK_CHANGED = true,  -- Required for multiple reasons, including preventing items from staying gray if you attempt to place them in an incompatible container (ex. non-ammo in ammo bags).
 			BAGSHUI_INVENTORY_INIT_RETRY = true,
+			BAGSHUI_INVENTORY_SEARCH = true,
 			BAGSHUI_ACTIVE_QUEST_ITEM_UPDATE = true,
 			BAGSHUI_INITIAL_INVENTORY_UPDATE = true,
 			BAGSHUI_CATEGORY_UPDATE = true,
@@ -670,6 +671,25 @@ function Inventory:OnEvent(event, arg1, arg2)
 		or event == "BAGSHUI_CHARACTERDATA_UPDATE"
 	then
 		self:UpdateToolbar()
+		return
+	end
+
+
+	-- When a character learns a new recipe, we have to re-cache all item tooltips
+	-- so learned indicators will be correct.
+	if event == "BAGSHUI_INVENTORY_SEARCH" then
+		if self:Visible() and arg1 ~= self.inventoryType then
+			self.searchTextSetFromEvent = true
+			if string.len(arg2 or "") > 0 then
+				self.ui.buttons.toolbar.search:Hide()
+				self.ui.frames.searchBox:Show()
+				self.ui.frames.searchBox:SetText(arg2)
+			else
+				self:ClearSearch()
+				self.ui.buttons.toolbar.search:Show()
+				self.ui.frames.searchBox:Hide()
+			end
+		end
 		return
 	end
 
