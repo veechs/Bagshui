@@ -787,15 +787,12 @@ function Inventory:OnEvent(event, arg1, arg2)
 	end
 
 
-	-- Lock/unlock events need a cache update.
+	-- Lock/unlock events need a cache update, but not when a container has
+	-- been picked up.
 	if
 		event == "ITEM_LOCK_CHANGED"
-		-- Always update the inventory cache immediately after a container is put down.
-		or (
-			event == "BAGSHUI_ITEM_LOCK_CHANGED"
-			and Bagshui.pickedUpBagSlotNum
-			and self.inventoryIdsToContainerIds[Bagshui.pickedUpBagSlotNum]
-		)
+		and not Bagshui.pickedUpBagSlotNum
+		and not Bagshui.putDownBagSlotNum
 	then
 		self.forceCacheUpdate = true
 	end

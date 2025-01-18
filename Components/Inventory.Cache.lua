@@ -424,7 +424,7 @@ function Inventory:UpdateCache()
 
 				elseif item.bagshuiDate == -1 then
 					-- -1 means to clear the stock state.
-					-- Among other things, this is triggered by Inventory:ItemButton_OnClick().
+					-- Among other things, this can be triggered by Inventory:ItemButton_OnClick().
 					item.bagshuiDate = 0
 					item.bagshuiStockState = BS_ITEM_STOCK_STATE.NO_CHANGE
 				end

@@ -134,7 +134,7 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 	-- able to see what was cached from the previous session. It's not a HUGE deal,
 	-- but preserving the cache does make things feel better.
 	if reinitialize and not itemAlreadyInitialized then
-		--Bagshui:PrintDebug("re-initialized " .. bagNum .. ":" .. slotNum)
+		-- Bagshui:PrintDebug("re-initialized " .. tostring(item.bagNum) .. ":" .. tostring(item.slotNum))
 		self:InitializeItem(item)
 	end
 

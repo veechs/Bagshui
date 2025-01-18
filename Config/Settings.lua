@@ -1022,6 +1022,12 @@ Bagshui.config.Settings = {
 					},
 					inventoryWindowUpdateOnChange = true,
 				},
+				{
+					name = "itemStockChangeClearOnInteract",
+					scope = BS_SETTING_SCOPE.ACCOUNT,
+					type = BS_SETTING_TYPE.BOOL,
+					defaultValue = false,
+				},
 
 
 				{

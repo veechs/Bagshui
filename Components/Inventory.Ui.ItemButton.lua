@@ -804,7 +804,9 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 		if item then
 
 			-- Clear stock state when interacting with an item.
-			item.bagshuiDate = -1
+			if self.settings.itemStockChangeClearOnInteract then
+				item.bagshuiDate = -1
+			end
 
 			-- Flip the expandEmptySlotStacks flag when clicking empty slots if stacking is enabled.
 			if
