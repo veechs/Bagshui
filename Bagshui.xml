@@ -20,6 +20,7 @@ Don't move things around unless you're sure it won't break anything.
 <Include file="Config\ItemFixes.lua" />
 <Include file="Config\PeriodicTable.lua" />
 <Include file="Components\Hooks.lua" />
+<Include file="Components\ItemInfo.lua" />
 <Include file="Components\Slash.lua" />
 <Include file="Components\Menus.lua" />
 <Include file="Components\ObjectList.lua" />
@@ -67,9 +68,6 @@ Don't move things around unless you're sure it won't break anything.
 <!-- UI Skinning - must load after UI. -->
 <Include file="Config\Skins.lua" />
 <Include file="Components\Skins.lua" />
-
-<!-- Item info must load after UI because it depends on ScrollableTextWindow. -->
-<Include file="Components\ItemInfo.lua" />
 
 <!-- Rules -->
 <Include file="Config\RuleFunctions.lua" />
