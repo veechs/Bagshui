@@ -848,7 +848,7 @@ function Inventory:InitMenus()
 				hasArrow = true,
 			},
 			-- Direct Assignment is a Categories auto-split menu that contains all
-			-- editable (custom) categories. Any categories the item is directly
+			-- editable (custom) NON-CLASS categories. Any categories the item is directly
 			-- assigned to will be checked. These updates are performed by the
 			-- OpenMenu callback function.
 			{
@@ -859,8 +859,12 @@ function Inventory:InitMenus()
 				value = {
 					autoSplitMenuType = BS_AUTO_SPLIT_MENU_TYPE.CATEGORIES,
 					func = function(itemAndGroupId, categoryId)
-						BsCategories:ToggleItemCategoryAssignment(categoryId, itemAndGroupId.item.id)
-						self:EditModeWindowUpdate(true)
+						if BsCategories.list[categoryId].classes then
+							self.menus:OpenMenu("DirectAssignmentClasses", itemAndGroupId, categoryId, "cursor")
+						else
+							BsCategories:ToggleItemCategoryAssignment(categoryId, itemAndGroupId.item.id)
+							self:EditModeWindowUpdate(true)
+						end
 					end,
 					nameFunc = function(categoryId)
 						-- Need to override nameFunc to turn off duplicate suffix since we're only showing custom categories.
@@ -1065,6 +1069,93 @@ function Inventory:InitMenus()
 			arg1 = "",
 			func = showItemInfo,
 		}
+	)
+
+
+	-- Direct Assignment Class Selection Menu.
+	-- Triggered when a Class Category is chosen from the Direct Assignment menu.
+
+	local function toggleClassCategoryDirectAssignment(arg1)
+		BsCategories:ToggleItemCategoryAssignment(arg1.categoryId, arg1.itemId, _G.this.value)
+	end
+
+	local classMenu = BsUtil.TableCopy(BsGameInfo.characterClassMenu)
+	-- Reusable table for passing values through to the callback function.
+	local classMenuArg1 = {}
+
+	for _, menuItem in ipairs(classMenu) do
+		menuItem.arg1 = classMenuArg1
+		menuItem.func = toggleClassCategoryDirectAssignment
+	end
+	table.insert(
+		classMenu, 1,
+		{
+			text = "Item placeholder",
+			isTitle = true,
+			notCheckable = true,
+		}
+	)
+	table.insert(
+		classMenu, 2,
+		{
+			text = LIGHTYELLOW_FONT_COLOR_CODE .. L.Menu_Item_AssignToClassCategory .. FONT_COLOR_CODE_CLOSE,
+			isTitle = true,
+			notCheckable = true,
+		}
+	)
+	table.insert(
+		classMenu, 3,
+		{
+			text = LIGHTYELLOW_FONT_COLOR_CODE .. L.ClassCategory .. FONT_COLOR_CODE_CLOSE,
+			isTitle = true,
+			notCheckable = true,
+		}
+	)
+	table.insert(
+		classMenu, 4,
+		{
+			text = "Category placeholder",
+			isTitle = true,
+			notCheckable = true,
+		}
+	)
+
+	self.menus:AddMenu(
+		"DirectAssignmentClasses",
+		classMenu,
+		-- Nothing for level 2/3.
+		nil, nil,
+		-- OpenMenu callback.
+		function(menu, itemAndGroupId, categoryId)
+			classMenuArg1.itemId = itemAndGroupId.item.id
+			classMenuArg1.categoryId = categoryId
+
+			menu.levels[1][1].text = itemAndGroupId.item.name
+			menu.levels[1][1].icon = itemAndGroupId.item.texture
+			menu.levels[1][1]._bagshuiTextureR = 1
+			menu.levels[1][1]._bagshuiTextureG = 1
+			menu.levels[1][1]._bagshuiTextureB = 1
+			if BsSkin.itemSlotIconTexCoord then
+				menu.levels[1][1].tCoordLeft = BsSkin.itemSlotIconTexCoord[1]
+				menu.levels[1][1].tCoordRight = BsSkin.itemSlotIconTexCoord[2]
+				menu.levels[1][1].tCoordTop = BsSkin.itemSlotIconTexCoord[3]
+				menu.levels[1][1].tCoordBottom = BsSkin.itemSlotIconTexCoord[4]
+			end
+
+			menu.levels[1][4].text = BsCategories:GetName(categoryId, true) or tostring(categoryId)
+
+			for i = 5, table.getn(menu.levels[1]) do
+				local menuItem = menu.levels[1][i]
+				menuItem.checked = BsCategories:ItemInDirectAssignmentList(
+					nil,
+					categoryId,
+					itemAndGroupId.item.id,
+					nil,
+					nil,
+					menuItem.value
+				)
+			end
+		end
 	)
 
 end

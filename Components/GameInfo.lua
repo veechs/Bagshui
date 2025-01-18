@@ -235,6 +235,19 @@ function GameInfo:PopulatePostLocalizationInfo()
 		return L[self.characterClasses[a]] < L[self.characterClasses[b]]
 	end)
 
+	-- Provide a menu template for player classes.
+	-- Used by Category Editor and Inventory Edit Mode Direct Assignment menu.
+	self.characterClassMenu = {}
+	for _, class in ipairs(BsGameInfo.sortedCharacterClasses) do
+		table.insert(
+			self.characterClassMenu,
+			{
+				text = L[BsGameInfo.characterClasses[class]],
+				value = class,
+			}
+		)
+	end
+
 	-- Used by ItemInfo:IsUsable().
 	for subclass, skill in pairs(BS_ITEM_SUBCLASS_TO_SKILL) do
 		self.itemSubclassToSkill[L[subclass]] = L[skill]

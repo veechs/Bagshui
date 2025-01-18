@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.2.11 - 2025-01-18
+* Edit Mode [Direct Assignment](https://github.com/veechs/Bagshui/wiki/Edit-Mode#managing-direct-assignment) didn't work correctly with Class Categories. Now it does.
+
 ## 1.2.10 - 2025-01-17
 * Better error handling [when a quest link is clicked in chat and pfQuest isn't installed](https://github.com/veechs/Bagshui/issues/52) (thanks [@doctorwizz](https://github.com/doctorwizz)).
 * Really truly [prevent built-in Categories from being edited](https://github.com/veechs/Bagshui/issues/35) (thanks bonho).
