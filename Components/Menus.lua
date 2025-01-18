@@ -741,7 +741,7 @@ function Menus:PrepareAutoSplitMenu(menuValue)
 	local objectId = menuValue.objectId
 
 	---@type any[]? Actual list of items potentially contained in the menu. Passed as the second parameter to omitFunc so item properties can be looked up.
-	local itemList = autoSplitMenuParams.itemList
+	local itemList = menuValue.itemList or autoSplitMenuParams.itemList
 
 	---@type any[] List of item IDs with which to populate the menu.
 	local idList = menuValue.idList or autoSplitMenuParams.defaultIdList
@@ -791,6 +791,7 @@ function Menus:PrepareAutoSplitMenu(menuValue)
 	local disableFunc = menuValue.disableFunc
 
 	---@type function? Decide whether the menu entry for a given item should be omitted.
+	--- NOT CALLED unless `itemList` is provided.
 	---```
 	--- ---@param itemId any ID of the item the menu entry represents.
 	--- ---@param menuItem table? `itemList`, if available.
@@ -834,8 +835,8 @@ function Menus:PrepareAutoSplitMenu(menuValue)
 			BsUtil.TableContainsValue(idsToOmit, id) == nil
 			-- Call omitFunc() if present.
 			and (
-				not omitFunc
-				or (type(itemList) == "table" and not omitFunc(id, itemList))
+				(type(omitFunc) ~= "function" or type(itemList) ~= "table")
+				or not omitFunc(id, itemList)
 			)
 		then
 			table.insert(idListSorted, id)

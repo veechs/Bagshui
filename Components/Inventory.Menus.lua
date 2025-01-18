@@ -848,7 +848,7 @@ function Inventory:InitMenus()
 				hasArrow = true,
 			},
 			-- Direct Assignment is a Categories auto-split menu that contains all
-			-- editable (custom) categories. Any categories the item is directly
+			-- editable (custom) NON-CLASS categories. Any categories the item is directly
 			-- assigned to will be checked. These updates are performed by the
 			-- OpenMenu callback function.
 			{
@@ -869,6 +869,10 @@ function Inventory:InitMenus()
 					tooltipTextFunc = self._autoSplitMenuItem_Categories_TooltipTextFunc,
 					idsToCheck = self._itemMenuDirectCategoryAssignmentList,
 					idList = BsCategories.filteredIdLists.custom,
+					itemList = BsCategories.list,  -- Required for omitFunc() to be called.
+					omitFunc = function(categoryId, categories)
+						return categories[categoryId].classes ~= nil
+					end,
 
 					-- This will be passed as arg1 to the auto-split menu func()s.
 					objectId = {
