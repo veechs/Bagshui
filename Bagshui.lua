@@ -311,12 +311,13 @@ local bagshuiEnvironment = {
 		bagType = "",
 		charges = 0,
 		count = 0,
-		equipLocationLocalized = "",
 		equipLocation = "",
-		emptySlot = 0,  -- Using 0/1 instead of true/false for easy sorting
+		equipLocationLocalized = "",
+		equipLocationSort = 0,
+		emptySlot = 0,  -- Using 0/1 instead of true/false for easy sorting.
 		id = 0,
-		itemLink = "",  -- Item link (|cffffffff|Hitem:12345:0:0:0|h[Name]|h|r)
-		itemString = "",  -- Item string (item:12345:0:0:0)
+		itemLink = "",  -- Item link (|cffffffff|Hitem:12345:0:0:0|h[Name]|h|r).
+		itemString = "",  -- Item string (item:12345:0:0:0).
 		locked = 0,
 		maxStackCount = 0,
 		minLevel = "",
@@ -330,7 +331,7 @@ local bagshuiEnvironment = {
 		tooltip = "",
 		texture = "Interface\\Icons\\INV_Misc_QuestionMark",
 		type = "",
-		uncategorized = 0,  -- Using 0/1 instead of true/false for easy sorting
+		uncategorized = 0,  -- Using 0/1 instead of true/false for easy sorting.
 
 		bagshuiGroupId = "",
 		bagshuiCategoryId = "",
@@ -357,8 +358,7 @@ local bagshuiEnvironment = {
 		"bagType",
 		"charges",
 		"count",
-		"equipLocationLocalized",
-		"equipLocation",
+		"equipLocationSort",
 		"emptySlot",
 		"id",
 		"itemLink",
@@ -371,6 +371,22 @@ local bagshuiEnvironment = {
 		"tooltip",
 		"type",
 		"uncategorized",
+	},
+
+	-- ItemInfo:InitializeItem() will never reset these properties.
+	---@type table<string, boolean>
+	BS_ITEM_PROTECTED_PROPERTIES = {
+		bagNum = true,
+		bagType = true,
+		slotNum = true,
+	},
+
+	-- ItemInfo:InitializeItem() will not set these properties to default if nil.
+	-- Typically needed for properties that are used for empty slot identification.
+	---@type table<string, boolean>
+	BS_ITEM_NIL_PROPERTIES = {
+		itemLink = true,
+		itemString = true,
 	},
 
 	-- Rule functions that correspond to item properties.
@@ -485,6 +501,42 @@ local bagshuiEnvironment = {
 	-- Automatically built out by `ItemInfo:BuildSortedItemTemplatePropertyList()` the first time it's needed.
 	---@type string[]
 	BS_ITEM_PROPERTIES_SORTED = nil,
+
+	-- Used to get numbers for slot names so they can be sorted.
+	---@type table<string, number>
+	BS_INVENTORY_EQUIP_LOCATION_SORT_ORDER = {
+		INVTYPE_HEAD = 1,
+		INVTYPE_NECK = 2,
+		INVTYPE_SHOULDER = 3,
+		INVTYPE_CLOAK = 4,  -- Back
+		INVTYPE_CHEST = 5,
+		INVTYPE_ROBE = 5,  -- Chest
+		INVTYPE_BODY = 6,  -- Shirt
+		INVTYPE_TABARD = 7,
+		INVTYPE_WRIST = 8,
+		INVTYPE_HAND = 9,
+		INVTYPE_WAIST = 10,
+		INVTYPE_LEGS = 11,
+		INVTYPE_FEET = 12,
+		INVTYPE_FINGER = 13,
+		INVTYPE_FINGER_OTHER = 14,
+		INVTYPE_TRINKET = 15,
+		INVTYPE_TRINKET_OTHER = 16,
+		INVTYPE_2HWEAPON = 17,  -- Main Hand
+		INVTYPE_WEAPON = 17,  -- Main Hand
+		INVTYPE_WEAPONMAINHAND = 17,  -- Main Hand
+		INVTYPE_HOLDABLE = 18,  -- Offhand
+		INVTYPE_SHIELD = 18,  -- Offhand
+		INVTYPE_WEAPON_OTHER = 18,  -- Offhand
+		INVTYPE_WEAPONOFFHAND = 18,  -- Offhand
+		INVTYPE_RANGED = 19,
+		INVTYPE_RELIC = 19,  -- Ranged
+		INVTYPE_WAND = 19,  -- Ranged
+		INVTYPE_GUN = 19,  -- Ranged
+		INVTYPE_CROSSBOW = 19,  -- Ranged
+		INVTYPE_THROWN = 19,  -- Ranged
+		INVTYPE_PROJECTILE = 20,  -- Ammo
+	},
 
 
 	-- In addition to the bagshuiStockState item property, stock state table values are used
@@ -954,6 +1006,21 @@ function Bagshui:AddonLoaded()
 		self.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO] = {}
 	end
 	self.currentCharacterInfo = self.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]
+
+	-- Inventory validation.
+	-- This will ensure there are no errors when changes are made to the expected inventory cache structure.
+	for character, characterData in pairs(self.characters) do
+		for _, inventoryType in pairs(BS_INVENTORY_TYPE) do
+			inventoryType = string.lower(inventoryType)
+			if characterData[inventoryType] and characterData[inventoryType].inventory then
+				for containerNum, containerContents in pairs(characterData[inventoryType].inventory) do
+					for slotNum, item in ipairs(containerContents) do
+						BsItemInfo:InitializeItem(item, false, true)
+					end
+				end
+			end
+		end
+	end
 
 	-- Log storage.
 	if _G.BagshuiData[BS_CONFIG_KEY.LOG] == nil then

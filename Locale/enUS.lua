@@ -231,6 +231,7 @@ BsLocalization:AddLocale("enUS", {
 ["ItemPropFriendly_count"] = "Count",
 ["ItemPropFriendly_equipLocation"] = "Equip Location",
 ["ItemPropFriendly_equipLocationLocalized"] = "Equip Location (Localized)",
+["ItemPropFriendly_equipLocationSort"] = "Equip Location",
 ["ItemPropFriendly_emptySlot"] = "Empty Slot",
 ["ItemPropFriendly_id"] = "Item ID",
 ["ItemPropFriendly_itemLink"] = "Item Link",

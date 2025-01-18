@@ -298,7 +298,7 @@ function Inventory:UpdateCache()
 
 					else
 						-- Slot is empty.
-						self:InitializeEmptySlotItem(item)
+						BsItemInfo:InitializeEmptySlotItem(item)
 						if self.containers[bagNum].isProfessionBag then
 							item.name = item.bagType .. " " .. item.name
 						end
@@ -598,32 +598,6 @@ end
 
 
 
---- Set the proper cache values for an empty slot item.
----@param item table self.inventory cache entry.
----@param isEmptySlotStack boolean? true for empty slot stack proxy entries.
-function Inventory:InitializeEmptySlotItem(item, isEmptySlotStack)
-	item.id = 0
-	-- Using 0/1 for ease of sorting.
-	item.emptySlot = 1
-	-- Add "[Profession Bag Type]" to the name when needed.
-	item.name =
-		(isEmptySlotStack and item.bagType ~= BsGameInfo.itemSubclasses.Container.Bag)
-		and string.format(L.Suffix_EmptySlot, item.bagType)
-		or L.ItemPropFriendly_emptySlot
-	item.subtype = item.bagType
-	item.quality = -1
-	item.charges = -1
-	item.texture = nil
-	item.readable = nil
-	if not item._bagsRepresented then
-		item._bagsRepresented = {}
-	else
-		BsUtil.TableClear(item._bagsRepresented)
-	end
-end
-
-
-
 --- Prepare an entry in the emptySlotStacks table for to track the empty slot count for a given bag.
 ---@param bagInfo table self.containers entry.
 function Inventory:InitializeEmptySlotStackTracking(bagInfo)
@@ -638,7 +612,7 @@ function Inventory:InitializeEmptySlotStackTracking(bagInfo)
 	-- Always re-initialize when called to ensure bag changes don't result in incorrect empty slot textures.
 	BsItemInfo:InitializeItem(self.emptySlotStacks[bagInfo.genericType])
 	self:AddItemBagInfo(self.emptySlotStacks[bagInfo.genericType], bagInfo, true)
-	self:InitializeEmptySlotItem(self.emptySlotStacks[bagInfo.genericType], true)
+	BsItemInfo:InitializeEmptySlotItem(self.emptySlotStacks[bagInfo.genericType], true)
 end
 
 
