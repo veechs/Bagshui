@@ -559,9 +559,8 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 
 
 		-- Dim locked items and their badges.
-
-		_G.SetItemButtonDesaturated(button, item.locked, 0.5, 0.5, 0.5)
-		if item.locked then
+		_G.SetItemButtonDesaturated(button, (item.locked == 1 and 1 or nil), 0.5, 0.5, 0.5)
+		if item.locked == 1 then
 			buttonInfo.iconTextureColorR = BS_COLOR.ITEM_SLOT_STATE_LOCKED[1]
 			buttonInfo.iconTextureColorG = BS_COLOR.ITEM_SLOT_STATE_LOCKED[2]
 			buttonInfo.iconTextureColorB = BS_COLOR.ITEM_SLOT_STATE_LOCKED[3]
@@ -659,7 +658,6 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			)
 		)
 	)
-
 
 
 	if inventory and inventory.editMode then
@@ -777,7 +775,7 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			buttonInfo.qualityColor.g,
 			buttonInfo.qualityColor.b,
 			(
-				((inventory or buttonInfo.colorBorders) and item and item.quality > -1 and not item.locked) and (opacityOverride or BsSkin.itemSlotBorderOpacity)
+				((inventory or buttonInfo.colorBorders) and item and item.quality > -1 and item.locked == 1) and (opacityOverride or BsSkin.itemSlotBorderOpacity)
 				or (buttonInfo.forceBorderDisplay and opacityOverride or buttonInfo.qualityColor.a)
 				or 0
 			)
@@ -790,7 +788,7 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 				buttonInfo.qualityColor.g,
 				buttonInfo.qualityColor.b,
 				(
-					((inventory or buttonInfo.colorBorders) and item and item.quality > 1 and not item.locked)
+					((inventory or buttonInfo.colorBorders) and item and item.quality > 1 and item.locked ~= 1)
 					and (opacityOverride or BsSkin.itemSlotInnerGlowOpacity)
 					or 0
 				)
@@ -799,7 +797,7 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 
 		-- This is safe to call even if count is 0 because it will be hidden by
 		-- SetItemButtonCount(), which means SetAlpha() won't do anything.
-		buttonComponents.count:SetAlpha(opacityOverride or 1)
+		buttonComponents.count:SetAlpha(opacityOverride or iconTextureAlpha or 1)
 
 		-- Additional badges.
 		if buttonComponents.qualityBadge then
@@ -963,7 +961,7 @@ function Ui:UpdateItemButtonStockState(button)
 				-- 	stockBadgeColor[3]
 				-- )
 
-				button.bagshuiData.stockBadgeAlpha = (not item.locked) and stockBadgeAlpha or 0
+				button.bagshuiData.stockBadgeAlpha = item.locked ~= 1 and stockBadgeAlpha or 0
 
 			end
 

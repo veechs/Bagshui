@@ -288,8 +288,8 @@ function Inventory:UpdateCache()
 					if item.itemString ~= nil then
 						-- Slot contains an item.
 						item.count = nowCount
-						item.locked = nowLocked
-						item.readable = itemReadable
+						item.locked = nowLocked or BS_ITEM_SKELETON.locked
+						item.readable = itemReadable or BS_ITEM_SKELETON.readable
 						-- We got charges from GetContainerItemInfo() and need to restore
 						-- because ItemInfo:Get() might have wiped them.
 						if nowCharges > 0 then

@@ -365,7 +365,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					-- At merchant.
 					_G.ShowContainerSellCursor(item.bagNum, item.slotNum)
 
-				elseif (item.readable or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
+				elseif (item.readable == 1 or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
 					-- Readable items (books, etc) / Control key dressup.
 					_G.ShowInspectCursor()
 
