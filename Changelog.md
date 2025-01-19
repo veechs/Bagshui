@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.2.14 - 2025-01-19
+* Prevent errors when opening menus (thanks Miwi).
+
 ## 1.2.13 - 2025-01-18
 * Item stock change badges (new/increased/decreased) [will not disappear immediately when the item is clicked](https://github.com/veechs/Bagshui/issues/57) by default.  
 ℹ️ If you prefer the old behavior, it's available by enabling **Clear on Click** under **Settings** > **More** > **Stock Change Timers**.
