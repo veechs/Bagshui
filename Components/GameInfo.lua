@@ -28,6 +28,8 @@ Bagshui:AddConstants({
 		RangedSlot = _G.INVTYPE_RANGED,
 	},
 
+	-- Map item subclasses to the skills they require.
+	-- Only needed when the subclass doesn't match the skill name.
 	BS_ITEM_SUBCLASS_TO_SKILL = {
 		["Fishing Pole"] = "Fishing",
 		["One-Handed Axes"] = "Axes",
@@ -36,6 +38,13 @@ Bagshui:AddConstants({
 		["Plate"] = "Plate Mail",
 		["Shields"] = "Shield",
 	},
+
+	-- Item subclasses that don't require a skill.
+	BS_ITEM_SUBCLASS_NO_SKILL_NEEDED = {
+		Idols = true,
+		Librams = true,
+		Miscellaneous = true,
+	}
 })
 
 
@@ -85,6 +94,9 @@ local GameInfo = {
 
 	-- Localized version of BS_ITEM_SUBCLASS_TO_SKILL.
 	itemSubclassToSkill = {},
+
+	-- Localized version of BS_ITEM_SUBCLASS_NO_SKILL_NEEDED.
+	itemSubclassNoSkillNeeded = {},
 
 	-- Class translation helper tables.
 	reverseTranslatedCharacterClasses = {},
@@ -251,6 +263,9 @@ function GameInfo:PopulatePostLocalizationInfo()
 	-- Used by ItemInfo:IsUsable().
 	for subclass, skill in pairs(BS_ITEM_SUBCLASS_TO_SKILL) do
 		self.itemSubclassToSkill[L[subclass]] = L[skill]
+	end
+	for subclass, _ in pairs(BS_ITEM_SUBCLASS_NO_SKILL_NEEDED) do
+		self.itemSubclassNoSkillNeeded[L[subclass]] = true
 	end
 
 	-- Used by RequiresClass.
