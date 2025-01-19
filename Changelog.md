@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## 1.2.15 - 2025-01-19
+* Improve [accuracy of unusable item coloring](https://github.com/veechs/Bagshui/issues/58) (thanks bonho).
+
 ## 1.2.14 - 2025-01-19
 * Prevent errors when opening menus (thanks Miwi).
 
