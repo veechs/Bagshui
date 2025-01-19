@@ -354,7 +354,8 @@ function ItemInfo:GetTooltip(item, inventory, forceItemString)
 				if ttText ~= nil then
 
 					-- Append to tooltip.
-					item.tooltip = BsUtil.Trim(item.tooltip .. BS_INVENTORY_TOOLTIP_JOIN_CHARACTERS[lr] .. ttText)
+					ttText = string.gsub(ttText, "^%s+$", "")
+					item.tooltip = item.tooltip .. BS_INVENTORY_TOOLTIP_JOIN_CHARACTERS[lr] .. ttText
 
 					-- Parse charges and store, but don't overwrite if we already know them.
 					if not BS_SUPER_WOW_LOADED and item.charges == 0 then
@@ -368,6 +369,8 @@ function ItemInfo:GetTooltip(item, inventory, forceItemString)
 			end -- ttTextFrame exists
 		end -- Left/Right
 	end -- Lines
+
+	item.tooltip = BsUtil.Trim(item.tooltip)
 end
 
 
@@ -498,6 +501,7 @@ function ItemInfo:IsUsable(item, character)
 		-- Wrapping the class name in a frontier pattern for word boundary matching.
 		-- This allows for safely matching things like "Classes: Hunter, Rogue, Mage".
 		if not string.find(item.tooltip, string.format(_G.ITEM_CLASSES_ALLOWED, ".*%f[%a]" .. character.localizedClass .. "%f[%A].*")) then
+			-- Bagshui:PrintDebug(item.name ..  " requires class")
 			return false
 		end
 	end
@@ -509,12 +513,15 @@ function ItemInfo:IsUsable(item, character)
 		-- GetSkillLevel returns -1 if the character doesn't have the skill.
 		local skillLevel = BsCharacter:GetSkillLevel(requiredSkill, character)
 		if skillLevel < 1 or (requiredLevel and skillLevel < requiredLevel) then
-			-- Bagshui:PrintDebug(item.name ..  " required skill " .. tostring(requiredSkill) .. " lvl " .. tostring(requiredLevel) .. " not " .. tostring(skillLevel))
+			-- Bagshui:PrintDebug(item.name ..  " requires skill " .. tostring(requiredSkill) .. " lvl " .. tostring(requiredLevel) .. " not " .. tostring(skillLevel))
 			return false
 		end
 	end
 
-	if (item.type == L.Armor or item.type == L.Weapon) and item.subtype ~= L.Miscellaneous then
+	if
+		(item.type == L.Armor or item.type == L.Weapon)
+		and not BsGameInfo.itemSubclassNoSkillNeeded[item.subtype]
+	then
 		-- Armor/Weapons (including Fishing Poles).
 
 		-- Start by assuming the skill the character must possess is based on the item subtype.
@@ -525,6 +532,7 @@ function ItemInfo:IsUsable(item, character)
 
 		-- GetSkillLevel will return -1 if the character doesn't have the skill.
 		if BsCharacter:GetSkillLevel(skillName, character) < 1 then
+			-- Bagshui:PrintDebug(item.name ..  " requires skill " .. tostring(skillName))
 			return false
 		end
 
@@ -533,7 +541,7 @@ function ItemInfo:IsUsable(item, character)
 			and BsCharacter:GetSkillLevel(L["Dual Wield"], character) < 1
 		then
 			-- Off-hand weapons require Dual Wield skill.
-			-- Bagshui:PrintDebug(item.name ..  " required Dual Wield")
+			-- Bagshui:PrintDebug(item.name ..  " requires Dual Wield")
 			return false
 		end
 
@@ -545,7 +553,7 @@ function ItemInfo:IsUsable(item, character)
 			and BsCharacter:GetSkillLevel(L.Bows, character) < -1
 		then
 			-- Arrow/Quiver require Bows skill.
-			-- Bagshui:PrintDebug(item.name ..  " required Bows")
+			-- Bagshui:PrintDebug(item.name ..  " requires Bows")
 			return false
 
 		elseif
@@ -553,7 +561,7 @@ function ItemInfo:IsUsable(item, character)
 			and BsCharacter:GetSkillLevel(L.Guns, character) < -1
 		then
 			-- Bullets/Ammo Pouches require Guns skill.
-			-- Bagshui:PrintDebug(item.name ..  " required Guns")
+			-- Bagshui:PrintDebug(item.name ..  " requires Guns")
 			return false
 		end
 
@@ -584,7 +592,12 @@ function ItemInfo:GetRequiredSkillAndLevel(itemTooltip)
 	if not itemTooltip then
 		return
 	end
-	local _, _, skillName, skillLevel = string.find(itemTooltip, L.TooltipParse_RequiresLevel)
+	local _, _, skillName, skillLevel = string.find(
+		-- Remove anything after a double line break since text after this point doesn't
+		-- refer to the item itself, but to an item set or the item a recipe crafts.
+		string.gsub(itemTooltip, "\n\n.+$", ""),
+		L.TooltipParse_RequiresLevel
+	)
 	if skillName then
 		return skillName, tonumber(skillLevel)
 	end

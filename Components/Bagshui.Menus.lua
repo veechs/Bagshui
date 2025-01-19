@@ -226,7 +226,7 @@ function Bagshui:ToggleDropDownMenu(wowApiFunctionName, level, value, dropDownFr
 			adjustY = frame:GetHeight()
 			-- When anchoring to another frame, move the menu above that frame.
 			if anchorName ~= "cursor" and type(anchorName) == "table" and anchorName.GetParent then
-				adjustY = adjustY + (anchorName:GetHeight() * anchorName:GetScale()) + (yOffset * -1)
+				adjustY = adjustY + ((anchorName:GetHeight() or 0) * anchorName:GetScale()) + ((yOffset or 0) * -1)
 			end
 			-- Since we're flipping the menu upwards, a second pass is needed in case it goes off the top.
 			secondPassNeeded = true
@@ -255,7 +255,7 @@ function Bagshui:ToggleDropDownMenu(wowApiFunctionName, level, value, dropDownFr
 
 			-- Set new, adjusted point.
 			frame:ClearAllPoints()
-			frame:SetPoint(point, anchorToFrame, anchorToPoint, xOffset + adjustX, yOffset + adjustY)
+			frame:SetPoint(point, anchorToFrame, anchorToPoint, (xOffset or 0) + adjustX, (yOffset or 0) + adjustY)
 
 		else
 			-- No current parent frame (or level 1) -- just anchor to UIParent and adjust.
