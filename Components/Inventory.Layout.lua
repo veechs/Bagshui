@@ -482,6 +482,9 @@ function Inventory:UpdateWindow()
 		self.hasHiddenGroups = false  -- Updated in this function.
 		self.hasHiddenItems = false  -- Updated in GetGroupItemCountForLayout().
 		self.hasChanges = false  -- Updated in AssignItemsToSlots().
+		self.hasOpenables = false  -- Updated in AssignItemsToSlots().
+		self.nextOpenableItemBagNum = nil  -- Updated in AssignItemsToSlots().
+		self.nextOpenableItemSlotNum = nil  -- Updated in AssignItemsToSlots().
 
 		-- Full reset of empty slot stack counts is needed so that the tracking of which
 		-- bag they represent is rebuilt.
@@ -1005,48 +1008,6 @@ function Inventory:UpdateWindow()
 				uiFrames.bagBar:Hide()
 			end
 
-			-- Variables for hearthstone button position based on whether money frame is shown.
-			local hearthButtonAnchorToFrame = uiButtons.toolbar.hearthstone.bagshuiData.defaultAnchorToFrame
-			local hearthButtonAnchorToPoint = uiButtons.toolbar.hearthstone.bagshuiData.defaultAnchorToPoint
-
-			-- Show/hide Money frame.
-			if self.settings.showMoney then
-				uiFrames.money:Show()
-				uiFrames.money:SetAlpha(self.editMode and 0.2 or 1)
-				-- Use label colors for money text.
-				for _, text in pairs(uiFrames.money.bagshuiData.texts) do
-					text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
-				end
-			else
-				uiFrames.money:Hide()
-				-- Move the hearthstone button to the money frame's position.
-				_, hearthButtonAnchorToFrame, hearthButtonAnchorToPoint = uiFrames.money:GetPoint(1)
-			end
-
-			-- Show/hide Hearthstone button.
-			if
-				self.hearthButton
-				and self.settings.showFooter
-				and self.settings.showHearthstone
-				and self.hearthstoneItemRef
-			then
-				uiButtons.toolbar.hearthstone:SetPoint(
-					"RIGHT",
-					hearthButtonAnchorToFrame,
-					hearthButtonAnchorToPoint,
-					uiButtons.toolbar.hearthstone.bagshuiData.defaultXOffset,
-					0
-				)
-				uiButtons.toolbar.hearthstone:Show()
-
-				-- Display cooldown.
-				local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
-				self.ui:SetIconButtonCooldown(uiButtons.toolbar.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
-
-			else
-				uiButtons.toolbar.hearthstone:Hide()
-			end
-
 			-- Apply bag bar scaling and opacity.
 			local bagBarScale = (itemSlotSize / uiButtons.itemSlots[1].bagshuiData.originalSizeAdjusted) * BsSkin.bagBarScale
 			uiFrames.bagBar:SetScale(bagBarScale)
@@ -1060,7 +1021,6 @@ function Inventory:UpdateWindow()
 					bagSlotButton.bagshuiData.buttonComponents.border:SetScale(1 / bagBarScale)
 				end
 			end
-
 
 			-- Determine footer height based on whether the bag bar is visible.
 			local footerHeight = self.settings.showBagBar
@@ -1274,6 +1234,16 @@ function Inventory:AssignItemsToSlots(
 				-- Update tracking of whether there are highlight-able items.
 				if item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE then
 					self.hasChanges = true
+				end
+
+				-- Should the Clam button be enabled?
+				if item.openable == 1 then
+					self.hasOpenables = true
+					-- The first openable item we come across will be the one the Clam button targets.
+					if not self.nextOpenableItemBagNum then
+						self.nextOpenableItemBagNum = item.bagNum
+						self.nextOpenableItemSlotNum = item.slotNum
+					end
 				end
 
 				-- Increment counters.
@@ -1951,7 +1921,7 @@ function Inventory:UpdateToolbar()
 		self.ui:SetIconButtonColors(button)
 	end
 
-	-- State buttons.
+	-- State buttons .
 	self:SetToolbarButtonState(toolbarButtons.offline, (not self.online))
 	self:SetToolbarButtonState(toolbarButtons.error, (string.len(self.errorText or "") > 0))
 	self:SetToolbarButtonState(toolbarButtons.editMode, self.editMode, nil, self.editMode)
@@ -1980,9 +1950,75 @@ function Inventory:UpdateToolbar()
 		toolbarButtons.offline.bagshuiData.tooltipText = nil
 	end
 
+	-- Money frame.
+	if self.settings.showMoney then
+		self.ui.frames.money:Show()
+		self.ui.frames.money:SetAlpha(self.editMode and 0.2 or 1)
+		-- Use label colors for money text.
+		for _, text in pairs(self.ui.frames.money.bagshuiData.texts) do
+			text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		end
+	else
+		self.ui.frames.money:Hide()
+	end
+
+	-- Hearthstone button.
+	if
+		self.hearthButton
+		and self.settings.showFooter
+		and self.settings.showHearthstone
+		and self.hearthstoneItemRef
+	then
+		toolbarButtons.hearthstone:Show()
+
+		-- Display cooldown.
+		local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
+		self.ui:SetIconButtonCooldown(toolbarButtons.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
+
+	else
+		toolbarButtons.hearthstone:Hide()
+	end
+
+	-- Clam (open container) button.
+	self:SetToolbarButtonState(
+		toolbarButtons.clam,
+		(
+			self.clamButton
+			and self.settings.showClam
+			or false
+		),
+		self.hasOpenables and not self.editMode
+	)
+
+	-- Disenchant button.
+	self:SetToolbarButtonState(
+		toolbarButtons.disenchant,
+		(
+			self.disenchantButton
+			and BsCharacter.spellNamesToIds[toolbarButtons.disenchant.bagshuiData.spellName]
+			and self.settings.showDisenchant
+			or false
+		),
+		not self.editMode
+	)
+
+	-- Pick Lock button.
+	self:SetToolbarButtonState(
+		toolbarButtons.pickLock,
+		(
+			self.pickLockButton
+			and BsCharacter.spellNamesToIds[toolbarButtons.pickLock.bagshuiData.spellName]
+			and self.settings.showPickLock
+			or false
+		),
+		not self.editMode
+	)
+
+
 	-- Re-anchor all toolbar widgets based on visibility.
-	self:UpdateToolbarAnchoring(self.ui.ordering.leftToolbar, "LEFT")
-	self:UpdateToolbarAnchoring(self.ui.ordering.rightToolbar, "RIGHT")
+	self:UpdateToolbarAnchoring(self.ui.ordering.topLeftToolbar, "LEFT")
+	self:UpdateToolbarAnchoring(self.ui.ordering.topRightToolbar, "RIGHT")
+	self:UpdateToolbarAnchoring(self.ui.ordering.bottomRightToolbar, "RIGHT")
 
 	-- Disable unusable stuff in Edit Mode.
 	local editModeState = (self.editMode) and "Disable" or "Enable"
@@ -2055,7 +2091,8 @@ end
 ---@param widgetList (table|number)[] WoW UI widgets, in display order. Numbers are spacing directives that override the default.
 ---@param anchorPoint "LEFT"|"RIGHT" Place to anchor each widget. This point will be anchored to the opposing point of the previous widget.
 function Inventory:UpdateToolbarAnchoring(widgetList, anchorPoint)
-	local defaultOffset = (anchorPoint == "RIGHT" and -1 or 1) * BsSkin.toolbarSpacing
+	local invert = (anchorPoint == "RIGHT" and -1 or 1)
+	local defaultOffset = invert * BsSkin.toolbarSpacing
 	local nextOffset
 
 	-- Go through the list of widgets in order, but skip the first one since
@@ -2064,8 +2101,8 @@ function Inventory:UpdateToolbarAnchoring(widgetList, anchorPoint)
 		local widget = widgetList[widgetPosition]
 		-- Ignore spacing directives when finding widgets.
 		if type(widget) == "table" and widget:IsShown() then
-			-- Assume default spacing.
-			nextOffset = defaultOffset
+			-- Assume default spacing, adjusted if customized for the widget.
+			nextOffset = defaultOffset + (widget.bagshuiData and widget.bagshuiData.autoLayoutXOffset or 0)
 			-- Walk backwards through the list of widgets and anchor to the first visible one.
 			for anchorPosition = widgetPosition - 1, 1, -1 do
 

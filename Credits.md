@@ -46,6 +46,7 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 
 * [Archive](https://www.flaticon.com/free-icon/archive_10486727) - [See Icons - Flaticon](https://www.flaticon.com/authors/see-icons)
 * backpack-f - [jam](https://github.com/michaelampr/jam/)
+* [Birthday and Party](https://www.flaticon.com/free-icon/birthday-and-party_1714529) - [Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
 * [Category](https://icons8.com/icon/JIaAkFry4yiV/category) - [Icons8](https://icons8.com)
 * [Clean](https://thenounproject.com/icon/clean-5507667/) - [LAFS - Noun Project](https://thenounproject.com/creator/LAFS/)
 * [Customer](https://www.flaticon.com/free-icon/customer_10426399) - [Tanah Basah - Flaticon](https://www.flaticon.com/authors/tanah-basah)
@@ -53,7 +54,9 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 * [flash](https://www.flaticon.com/free-icon/flash_658110) - [Stockio - Flaticon](https://www.flaticon.com/authors/stockio)
 * [Floppy Disk](https://www.flaticon.com/free-icon/check_9403270) - [Pixel perfect - Flaticon](https://www.flaticon.com/authors/pixel-perfect)
 * [Hammer](https://www.flaticon.com/free-icon/hammer_3998325) - [Mehwish - Flaticon](https://www.flaticon.com/authors/mehwish)
+* [Lock Picking](https://thenounproject.com/icon/lock-picking-5627779/) - [Juicy Fish - Noun Project](https://thenounproject.com/creator/admin885/)
 * [Magnifying Glass](https://www.flaticon.com/free-icon/magnifying-glass_3626504) - [Icon home - Flaticon](https://www.flaticon.com/authors/icon-home)
+* [Pearl](https://www.flaticon.com/free-icon/pearl_3092943) - [Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
 * [Priest](https://www.flaticon.com/free-icon/priest_4263904) - [Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
 * [question mark](https://thenounproject.com/icon/question-mark-3844680/) - [The Icon Z - Noun Project](https://thenounproject.com/creator/theiconz/)
 * [Setting](https://www.flaticon.com/free-icon/setting_9333993) - [Tanah Basah - Flaticon](https://www.flaticon.com/authors/tanah-basah)

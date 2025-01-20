@@ -331,6 +331,8 @@ function ItemInfo:GetTooltip(item, inventory, forceItemString)
 	end
 
 	item.tooltip = ""
+	item.lockPickable = BS_ITEM_SKELETON.lockPickable
+	item.openable = BS_ITEM_SKELETON.openable
 
 	-- Pull the tooltip text into our hidden tooltip.
 	BsHiddenTooltip:SetOwner(_G.WorldFrame, "ANCHOR_NONE")  -- Need to clear lines first.
@@ -356,6 +358,14 @@ function ItemInfo:GetTooltip(item, inventory, forceItemString)
 					-- Append to tooltip.
 					ttText = string.gsub(ttText, "^%s+$", "")
 					item.tooltip = item.tooltip .. BS_INVENTORY_TOOLTIP_JOIN_CHARACTERS[lr] .. ttText
+
+					-- Check whether openable or lock-pickable.
+					if ttText == L.TooltipIdentifier_Openable then
+						item.openable = 1
+					end
+					if ttText == L.TooltipIdentifier_Locked then
+						item.lockPickable = 1
+					end
 
 					-- Parse charges and store, but don't overwrite if we already know them.
 					if not BS_SUPER_WOW_LOADED and item.charges == 0 then

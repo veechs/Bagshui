@@ -7,6 +7,7 @@ local Inventory = Bagshui.prototypes.Inventory
 
 
 --- Set up everything related to the UI that needs to be done at startup.
+--- This could probably be broken into multiple functions because it's a bit of a monstrosity at this point.
 function Inventory:InitUi()
 
 	-- Instance of the `InventoryUi` class specific to this Inventory class instance.
@@ -232,7 +233,69 @@ function Inventory:InitUi()
 	ui.text.noData:SetAlpha(0.4)
 	ui.text.noData:Hide()
 
+
 	-- Toolbar.
+
+	-- Shared functions for spell cast buttons.
+
+	--- Return `true` if the current button does *not* have an associated spell
+	--- in its `bagshuiData.spellName` property.
+	---@return boolean
+	local function inventory_SpellButton_NoSpell()
+		return (
+			not _G.this.bagshuiData
+			or not _G.this.bagshuiData.spellName
+			or not BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName]
+		)
+	end
+
+	--- Cast the configured spell on a button.
+	local function inventory_SpellButton_OnClick()
+		if inventory_SpellButton_NoSpell() then
+			return
+		end
+		_G.CastSpell(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
+	end
+
+	--- Show the spell tooltip associated with a button.
+	local function inventory_SpellButton_OnEnter()
+		if inventory_SpellButton_NoSpell() then
+			return
+		end
+		_G.GameTooltip:SetOwner(_G.this, "ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint))
+		_G.GameTooltip:SetSpell(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
+		_G.GameTooltip:Show()
+	end
+
+	--- Hide the tooltip.
+	local function inventory_SpellButton_OnLeave()
+		if _G.GameTooltip:IsOwned(_G.this) then
+			_G.GameTooltip:Hide()
+		end
+	end
+
+	-- Permanent variables for OnUpdate to keep the garbage collector happy.
+	local spellButton_OnUpdate_cooldownStart, spellButton_OnUpdate_cooldownDuration, spellButton_OnUpdate_cooldownEnable
+
+	--- Manage the spell cooldown.
+	local function inventory_SpellButton_OnUpdate()
+		if inventory_SpellButton_NoSpell() then
+			return
+		end
+		spellButton_OnUpdate_cooldownStart,
+			spellButton_OnUpdate_cooldownDuration,
+			spellButton_OnUpdate_cooldownEnable
+			= _G.GetSpellCooldown(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
+		if spellButton_OnUpdate_cooldownEnable and (spellButton_OnUpdate_cooldownDuration or 0) > 0 then
+			self.ui:SetIconButtonCooldown(
+				_G.this,
+				spellButton_OnUpdate_cooldownStart,
+				spellButton_OnUpdate_cooldownDuration,
+				spellButton_OnUpdate_cooldownEnable
+			)
+		end
+	end
+
 
 	-- Top left icon.
 	buttons.toolbar.menu = ui:CreateIconButton({
@@ -339,7 +402,6 @@ function Inventory:InitUi()
 		name = "Catalog",
 		parentFrame = header,
 		anchorToFrame = nextAnchor,
-		xOffset = nextOffset,
 		onClick = function()
 			BsCatalog:Toggle()
 		end,
@@ -353,7 +415,7 @@ function Inventory:InitUi()
 
 	-- Right toolbar order, consumed by `Inventory:UpdateToolbarAnchoring()`
 	-- to manage anchoring based on what is visible.
-	self.ui.ordering.rightToolbar = {
+	self.ui.ordering.topRightToolbar = {
 		buttons.toolbar.close,
 		-BsSkin.toolbarCloseButtonOffset,
 		buttons.toolbar.catalog,
@@ -366,7 +428,6 @@ function Inventory:InitUi()
 			name = inventoryType,
 			parentFrame = header,
 			anchorToFrame = nextAnchor,
-			xOffset = nextOffset,
 			onClick = function()
 				inventoryClass:Toggle()
 			end,
@@ -376,9 +437,9 @@ function Inventory:InitUi()
 		nextAnchor = buttons.toolbar[inventoryType]
 		nextOffset = -BsSkin.toolbarSpacing
 
-		table.insert(self.ui.ordering.rightToolbar, buttons.toolbar[inventoryType])
+		table.insert(self.ui.ordering.topRightToolbar, buttons.toolbar[inventoryType])
 	end
-	table.insert(self.ui.ordering.rightToolbar, -BsSkin.toolbarGroupSpacing)
+	table.insert(self.ui.ordering.topRightToolbar, -BsSkin.toolbarGroupSpacing)
 
 	-- Add remainder of toolbar buttons right to left.
 	nextOffset = -BsSkin.toolbarGroupSpacing
@@ -397,13 +458,12 @@ function Inventory:InitUi()
 		buttons.toolbar[item.id] = button
 
 		nextAnchor = button
-		nextOffset = -BsSkin.toolbarSpacing
 
 		-- Store special spacing directives so they can be read by Inventory:UpdateToolbarAnchoring().
 		if item.xOffset and item.xOffset ~= nextOffset then
-			table.insert(self.ui.ordering.rightToolbar, item.xOffset)
+			table.insert(self.ui.ordering.topRightToolbar, item.xOffset)
 		end
-		table.insert(self.ui.ordering.rightToolbar, button)
+		table.insert(self.ui.ordering.topRightToolbar, button)
 	end
 
 
@@ -450,7 +510,7 @@ function Inventory:InitUi()
 	frames.searchBox:SetPoint("TOPRIGHT", buttons.toolbar.resort, -BsSkin.toolbarGroupSpacing - 12, 2)
 	frames.searchBox:Hide()
 
-	table.insert(self.ui.ordering.rightToolbar, frames.searchBox)
+	table.insert(self.ui.ordering.topRightToolbar, frames.searchBox)
 
 	-- Hide search box when empty.
 	local oldOnEditFocusLost = frames.searchBox:GetScript("OnEditFocusLost")
@@ -483,12 +543,12 @@ function Inventory:InitUi()
 	ui.frames.status:Show()
 
 	-- The last thing anchored to the leftmost right toolbar icon is the status text. 
-	table.insert(self.ui.ordering.rightToolbar, ui.frames.status)
+	table.insert(self.ui.ordering.topRightToolbar, ui.frames.status)
 
 
 	-- Left toolbar order, consumed by `Inventory:UpdateToolbarAnchoring()`
 	-- to manage anchoring based on what is visible.
-	self.ui.ordering.leftToolbar = {
+	self.ui.ordering.topLeftToolbar = {
 		buttons.toolbar.menu,
 		buttons.toolbar.offline,
 		buttons.toolbar.error,
@@ -648,6 +708,12 @@ function Inventory:InitUi()
 
 
 
+	-- Bottom right toolbar anchor.
+	frames.bottomRightToolbarAnchor = _G.CreateFrame("Frame", nil, footer)
+	frames.bottomRightToolbarAnchor:SetHeight(25)
+	frames.bottomRightToolbarAnchor:SetWidth(1)
+	frames.bottomRightToolbarAnchor:SetPoint("RIGHT", footer, "RIGHT", 5, 0)
+
 	-- Money frame.
 
 	local moneyFrameName = ui:CreateElementName("Money")
@@ -664,10 +730,10 @@ function Inventory:InitUi()
 			silver = _G[moneyFrameName .. "SilverButtonText"],
 			copper = _G[moneyFrameName .. "CopperButtonText"],
 		},
+		autoLayoutXOffset = 12
 	}
 	frames.money:SetWidth(22)
 	frames.money:SetHeight(25)
-	-- Anchor point will be updated during UpdateWindow() if Hearthstone button is visible.
 	frames.money:SetPoint("RIGHT", 8, 0)
 
 	-- Need custom OnEnter/OnLeave to show tooltip with all characters' money.
@@ -713,7 +779,6 @@ function Inventory:InitUi()
 		anchorPoint = "RIGHT",
 		anchorToFrame = frames.money,
 		anchorToPoint = "LEFT",
-		xOffset = -8,
 		disable = false,
 		onClick = function()
 			if Bagshui:GetCursorItem() == self.hearthstoneItemRef then
@@ -742,13 +807,6 @@ function Inventory:InitUi()
 		end,
 	})
 
-	-- Store default positioning for later use in UpdateWindow().
-	_,
-		buttons.toolbar.hearthstone.bagshuiData.defaultAnchorToFrame,
-		buttons.toolbar.hearthstone.bagshuiData.defaultAnchorToPoint,
-		buttons.toolbar.hearthstone.bagshuiData.defaultXOffset
-			= buttons.toolbar.hearthstone:GetPoint(1)
-
 	-- Allow picking up the Hearthstone from the button.
 	buttons.toolbar.hearthstone:RegisterForDrag("LeftButton")
 	buttons.toolbar.hearthstone:SetScript("OnDragStart", function()
@@ -765,6 +823,104 @@ function Inventory:InitUi()
 		buttons.toolbar.hearthstone:Hide()
 	end
 
+
+	-- Clam (open container) button.
+	buttons.toolbar.clam = ui:CreateIconButton({
+		name = "Clam",
+		parentFrame = footer,
+		anchorPoint = "RIGHT",
+		anchorToFrame = buttons.toolbar.hearthstone,
+		anchorToPoint = "LEFT",
+		disable = false,
+		texture = "Clam",
+		onClick = function()
+			if
+				self.nextOpenableItemBagNum
+				and self.nextOpenableItemSlotNum
+			then
+				_G.UseContainerItem(self.nextOpenableItemBagNum, self.nextOpenableItemSlotNum)
+			end
+		end,
+		onEnter = function()
+			_G.this.bagshuiData.mouseIsOver = true
+			if not self.hasOpenables then
+				return
+			end
+			-- Highlight targeted item.
+			self.highlightItemsInContainerId = self.nextOpenableItemBagNum
+			self.highlightItemsContainerSlot = self.nextOpenableItemSlotNum
+			self:UpdateItemSlotColors()
+			-- Show item tooltip. It's fine that the tooltip says "<Right Click to Open>"
+			-- since toolbar buttons respond to both left and right click.
+			_G.GameTooltip:SetOwner(_G.this, "ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint))
+			_G.GameTooltip:SetBagItem(self.nextOpenableItemBagNum, self.nextOpenableItemSlotNum)
+			_G.GameTooltip:Show()
+		end,
+		onLeave = function()
+			_G.this.bagshuiData.mouseIsOver = false
+			self.highlightItemsInContainerId = nil
+			self.highlightItemsContainerSlot = nil
+			self:UpdateItemSlotColors()
+			if _G.GameTooltip:IsOwned(_G.this) then
+				_G.GameTooltip:Hide()
+			end
+		end,
+		onUpdate = function()
+			if not _G.this.bagshuiData.mouseIsOver then
+				return
+			end
+			_G.this:GetScript("OnEnter")()
+		end,
+	})
+
+
+	-- Disenchant button.
+	buttons.toolbar.disenchant = ui:CreateIconButton({
+		name = "Disenchant",
+		parentFrame = footer,
+		anchorPoint = "RIGHT",
+		anchorToFrame = buttons.toolbar.clam,
+		anchorToPoint = "LEFT",
+		disable = false,
+		texture = "Disenchant",
+		onClick = inventory_SpellButton_OnClick,
+		onEnter = inventory_SpellButton_OnEnter,
+		onLeave = inventory_SpellButton_OnLeave,
+		onUpdate = inventory_SpellButton_OnUpdate,
+	})
+	buttons.toolbar.disenchant.bagshuiData.spellName = L.Spell_Disenchant
+
+
+	-- Pick Lock button.
+	buttons.toolbar.pickLock = ui:CreateIconButton({
+		name = "PickLock",
+		parentFrame = footer,
+		anchorPoint = "RIGHT",
+		anchorToFrame = buttons.toolbar.disenchant,
+		anchorToPoint = "LEFT",
+		disable = false,
+		texture = "PickLock",
+		onClick = inventory_SpellButton_OnClick,
+		onEnter = inventory_SpellButton_OnEnter,
+		onLeave = inventory_SpellButton_OnLeave,
+		onUpdate = inventory_SpellButton_OnUpdate,
+	})
+	buttons.toolbar.pickLock.bagshuiData.spellName = L.Spell_PickLock
+
+
+
+	-- Bottom right toolbar order, consumed by `Inventory:UpdateToolbarAnchoring()`
+	-- to manage anchoring based on what is visible.
+	self.ui.ordering.bottomRightToolbar = {
+		frames.bottomRightToolbarAnchor,
+		frames.money,
+		-BsSkin.toolbarGroupSpacing,
+		buttons.toolbar.hearthstone,
+		-BsSkin.toolbarGroupSpacing,
+		buttons.toolbar.clam,
+		buttons.toolbar.disenchant,
+		buttons.toolbar.pickLock,
+	}
 
 
 	-- Tooltips.
