@@ -25,7 +25,7 @@ local CHARACTER_EVENTS = {
 	CHAT_MSG_SKILL = true,  -- New skills learned or leveled up
 	CHAT_MSG_SYSTEM = true,  -- Messages to parse for important events.
 	CRAFT_SHOW = true,  -- Enchanting profession window is opened
-	PLAYER_ALIVE = true,  -- Trigger initial processing at startup
+	PLAYER_ENTERING_WORLD = true,  -- Trigger initial processing at startup
 	PLAYER_LEVEL_UP = true,  -- Level up
 	SPELLS_CHANGED = true,  -- Need to update spells
 	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting)
@@ -50,6 +50,7 @@ local MONEY_EVENTS = {
 -- Array of property names for `currentCharacterInfo` whose values are tables.
 local CHARACTER_INFO_TABLES = {
 	"skills",
+	"spellNamesToIds",
 	"spells",
 	"professionCrafts",
 	"professionReagents",
@@ -115,10 +116,16 @@ end
 
 -- Build Character class.
 local Character = {
-	info = currentCharacterInfo,  -- `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
-	inventorySlots = {},  -- List of all inventory slots, including bags, and their localized names.
-	bagSlots = {},  -- Bag slot IDs so `Character:UpdateGear()` can differentiate.
-	startupRetries = 0,  -- When character info is nil, we'll retry a few times.
+	-- `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
+	info = currentCharacterInfo,
+	-- List of all inventory slots, including bags, and their localized names.
+	---@type table<number,string>
+	inventorySlots = {},
+	-- Bag slot IDs so `Character:UpdateGear()` can differentiate.
+	---@type table<number,true>
+	bagSlots = {},
+	-- When character info is nil, we'll retry a few times.
+	startupRetries = 0,
 	initialized = false,
 }
 -- Add skills, spells, etc.
@@ -154,7 +161,7 @@ function Character:OnEvent(event, arg1)
 	-- we can actually get the data we need, which isn't available instantly.
 	-- See comment above the initial call to Character:UpdateInfo() at the end of
 	-- this file for more information.
-	if event == "PLAYER_ALIVE" then
+	if event == "PLAYER_ENTERING_WORLD" then
 		if not self.initialized then
 			Bagshui:QueueEvent("BAGSHUI_INITIAL_CHARACTER_UPDATE", 1.5)
 		end
@@ -263,8 +270,6 @@ function Character:UpdateInfo(newLevel)
 	self.info.class = string.upper(self.info.class)
 
 	-- Retry at startup (when no `newLevel` parameter is passed) if needed due to empty values.
-	-- Using PLAYER_ALIVE instead of PLAYER_ENTERING_WORLD seems to mostly mitigate this,
-	-- but it seems like a good thing to account for just in case.
 	if not newLevel and not self.faction and self.infoRetries < 5 then
 		self.infoRetries = self.infoRetries + 1
 		Bagshui:QueueEvent("BAGSHUI_INITIAL_CHARACTER_UPDATE", 1)
@@ -303,6 +308,7 @@ function Character:UpdateSkillsAndSpells()
 
 	-- Rebuild the lists fresh each time.
 	BsUtil.TableClear(self.spells)
+	BsUtil.TableClear(self.spellNamesToIds)
 	for _, skillTypeList in pairs(self.skills) do
 		BsUtil.TableClear(skillTypeList)
 	end
@@ -316,6 +322,7 @@ function Character:UpdateSkillsAndSpells()
 			break
 		end
 		self.spells[spellName] = spellRank
+		self.spellNamesToIds[spellName] = spellNum
 		spellNum = spellNum + 1
 	end
 
