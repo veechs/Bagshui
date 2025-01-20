@@ -228,8 +228,12 @@ function Inventory:New(newPropsOrInventoryType)
 		---@type BS_INVENTORY_TYPE to attach frame to.
 		dockTo = nil,
 
-		---@type boolean Should the Hearthstone button be available?
+		---@type boolean Should the special toolbar buttons be available?
+
+		clamButton = false,
 		hearthButton = false,
+		disenchantButton = false,
+		pickLockButton = false,
 
 		---@type string Default sound to play when window is opened.
 		openSound = "igMainMenuOpen",
@@ -354,14 +358,18 @@ function Inventory:New(newPropsOrInventoryType)
 		lastExpandEmptySlotStacks = false,
 		highlightItemsInContainerId = nil,
 		highlightItemsInContainerLocked = false,
+		highlightItemsContainerSlot = nil,
 		showHidden = false,  -- Toggle display of hidden groups and items (like Hearthstone).
 		hasHiddenGroups = false,  -- Whether any objects are hidden and the toolbar icon should appear.
 		multiplePartialStacks = false,  -- Whether there are multiple partial stacks of the same item, meaning the restack toolbar icon should be enabled.
+		positioningTables = {},
+		enableResortIcon = false,  -- Managed by `Inventory:CategorizeAndSort()` and consumed by `Inventory:UpdateToolbar()`.
 		hideItems = {},
 		hasHiddenItems = false,
 		hasChanges = false,
-		positioningTables = {},
-		enableResortIcon = false,  -- Managed by `Inventory:CategorizeAndSort()` and consumed by `Inventory:UpdateToolbar()`.
+		hasOpenables = false,
+		nextOpenableItemBagNum = nil,
+		nextOpenableItemSlotNum = nil,
 
 		-- Used to track changes that occur when bags are moved between slots (see `Bagshui:PickupInventoryItem()` for details).
 		pendingContainerChanges = {},

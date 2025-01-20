@@ -264,6 +264,10 @@ BsLocalization:AddLocale("enUS", {
 
 ["Inventory_NoData"] = "Offline inventory not available.",
 
+-- Spell names that enable special features.
+["Spell_Disenchant"] = "Disenchant",
+["Spell_PickLock"] = "Pick Lock",
+
 -- Toolbar.
 ["Toolbar_Menu_TooltipTitle"] = "Menu",
 ["Toolbar_ExitEditMode"] = "Exit Edit Mode",
@@ -460,8 +464,10 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipIdentifier_Companion"] = [[Right Click to summon and dismiss your]],
 ["TooltipIdentifier_Drink"] = [[Must remain seated while drinking]],
 ["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
+["TooltipIdentifier_Locked"] = [[Locked]],
 ["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
 ["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
+["TooltipIdentifier_Openable"] = [[<Right Click to Open>]],
 ["TooltipIdentifier_PotionHealth"] = [[/Restores [%d.]+ to [%d.]+ health\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_PotionMana"] = [[/Restores [%d.]+ to [%d.]+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
@@ -1037,6 +1043,13 @@ BsLocalization:AddLocale("enUS", {
 ["showBagBar"] = "Bag Bar",
 ["showBagBar_TooltipText"] = "Show the bag bar in the bottom left.",
 
+["showClam"] = "Clam Button",
+["showClam_TooltipTitle"] = "Clam (Open Container) Button",
+["showClam_TooltipText"] = "Show the Clam button to enable rapid container opening." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["showDisenchant"] = "Disenchant Button",
+["showDisenchant_TooltipText"] = "Show the Disenchant button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to characters who have Enchanting and Bags only." .. FONT_COLOR_CODE_CLOSE,
+
 ["showFooter"] = "Bottom Toolbar",
 ["showFooter_TooltipTitle"] = "Bottom Toolbar",
 ["showFooter_TooltipText"] = "Show the bottom toolbar." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Hiding this will conceal everything below the items, including the Bag Bar and money display." .. FONT_COLOR_CODE_CLOSE,
@@ -1050,7 +1063,7 @@ BsLocalization:AddLocale("enUS", {
 ["showHeader_TooltipText"] = "Show the top toolbar." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Hiding this will conceal everything above the items, including the Close button, so you'll need to close via key bindings, action bar buttons, or macros." .. FONT_COLOR_CODE_CLOSE,
 
 ["showHearthstone"] = "Hearthstone Button",
-["showHearthstone_TooltipText"] = "Show the hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+["showHearthstone_TooltipText"] = "Show the Hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["showInfoTooltipsWithoutAlt"] = "Show Without Alt",
 ["showInfoTooltipsWithoutAlt_TooltipText"] = "Always display the Bagshui Info Tooltip (hold Shift to temporarily hide it).",
@@ -1059,6 +1072,9 @@ BsLocalization:AddLocale("enUS", {
 
 ["showMoney"] = "Money",
 ["showMoney_TooltipText"] = "Display money in the bottom right.",
+
+["showPickLock"] = "Pick Lock Button",
+["showPickLock_TooltipText"] = "Show the Pick Lock button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Rogues and Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["stackEmptySlots"] = "Stack Empty",
 ["stackEmptySlots_TooltipTitle"] = "Stack Empty Slots",

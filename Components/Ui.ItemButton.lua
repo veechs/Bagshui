@@ -650,11 +650,17 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 				inventory.highlightItemsInContainerId
 				and item.bagNum == inventory.highlightItemsInContainerId
 				and not button.bagshuiData.isEmptySlotStack
+				-- Specific slot highlighting.
+				and (
+					not inventory.highlightItemsContainerSlot
+					or item.slotNum == inventory.highlightItemsContainerSlot
+				)
 			)
 			-- Condition 2: Item IS an empty slot stack and represents the desired container.
 			or (
 				button.bagshuiData.isEmptySlotStack
 				and inventory.emptySlotStacks[inventory.containers[item.bagNum].genericType]._bagsRepresented[inventory.highlightItemsInContainerId]
+				and not inventory.highlightItemsContainerSlot
 			)
 		)
 	)
@@ -720,7 +726,15 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			inventory
 			and inventory.highlightItemsInContainerId
 			and item
-			and item.bagNum ~= inventory.highlightItemsInContainerId
+			and (
+				item.bagNum ~= inventory.highlightItemsInContainerId
+				-- Specific slot highlighting.
+				or (
+					inventory.highlightItemsContainerSlot
+					and item.bagNum == inventory.highlightItemsInContainerId
+					and item.slotNum ~= inventory.highlightItemsContainerSlot
+				)
+			)
 		then
 			iconTextureAlpha = 0.3
 			opacityOverride = 0.2

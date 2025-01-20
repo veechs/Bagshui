@@ -737,6 +737,33 @@ Bagshui.config.Settings = {
 				},
 
 				{
+					name = "showPickLock",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOL,
+					defaultValue = true,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+				{
+					name = "showDisenchant",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOL,
+					defaultValue = true,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+				{
+					name = "showClam",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOL,
+					defaultValue = true,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+				{
 					name = "showHearthstone",
 					scope = BS_SETTING_SCOPE.INVENTORY,
 					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
