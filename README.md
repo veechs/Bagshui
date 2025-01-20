@@ -35,8 +35,10 @@ And with “[OneBagshui](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-swi
 
 ## Documentation
 
-* [Wiki](https://github.com/veechs/Bagshui/wiki) + [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ) + [Walkthroughs](https://github.com/veechs/Bagshui/wiki/Walkthroughs)
-* [Version history](Changelog.md)
+📕 [Wiki](https://github.com/veechs/Bagshui/wiki)  
+🙋 [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)  
+🐾 [Walkthroughs](https://github.com/veechs/Bagshui/wiki/Walkthroughs)  
+🕝 [Version history](Changelog.md)
 
 ## Installation
 
