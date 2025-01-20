@@ -28,8 +28,8 @@
 
 <summary>Recommended if you like…</summary>
 
-AdiBags, ArkInventory, Baganator, Baggins, BetterBags, EngInventory/EngBags, TBag.  
-And with “[OneBagshui](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-switch-to-the-onebag-style-layout)”: Bagnon, Combuctor, Inventorian, LiteBag, OneBag3, SUCC-bag.
+> AdiBags, ArkInventory, Baganator, Baggins, BetterBags, EngInventory/EngBags, TBag.  
+> And with “[OneBagshui](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-switch-to-the-onebag-style-layout)”: Bagnon, Combuctor, Inventorian, LiteBag, OneBag3, SUCC-bag.
 
 </details>
 
@@ -57,7 +57,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
    <sup>*These are all **wrong**:*  
     × `Bagshui-main\Bagshui.toc`  
     × `Bagshui\Bagshui\Bagshui.toc`  
-	 × `Bagshui\Bagshui-main\Bagshui.toc`
+    × `Bagshui\Bagshui-main\Bagshui.toc`
    </sup>
 
 
@@ -146,7 +146,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 </table>
 
-<sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `x#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
+<sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `×#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
 
 
 ## Credits
@@ -155,4 +155,4 @@ Bagshui owes [so much to so many people](Credits.md).
 
 ## Localization
 
-Translations are welcome! [Instructions here](Localization/Readme.md).
+Translations welcome! [Instructions here](Localization/Readme.md).
