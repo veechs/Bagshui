@@ -6,6 +6,8 @@
 **A Vanilla WoW 1.12 (and Turtle WoW) inventory addon.**<br><sup><small>Not for Classic or Retail; you have [so](https://www.curseforge.com/wow/addons/better-bags) [many](https://www.curseforge.com/wow/addons/ark-inventory) [options](https://www.curseforge.com/wow/search?class=addons&categories=bags-inventory&sortBy=popularity).</small></sup>
 
 [![Bagshui](https://github.com/veechs/Bagshui/wiki/images/Bagshui_Thumb.png)](https://github.com/veechs/Bagshui/wiki/Screenshots)  
+[<img src="https://github.com/veechs/Bagshui/wiki/images/OneBagshui_Thumb.png" width="150">](https://github.com/veechs/Bagshui/wiki/Screenshots) 
+[<img src="https://github.com/veechs/Bagshui/wiki/images/BankOffline_Thumb.png" width="150">](https://github.com/veechs/Bagshui/wiki/Screenshots)  
 <sup>[More screenshots](https://github.com/veechs/Bagshui/wiki/Screenshots)</sup>
 
 ## Features
@@ -26,15 +28,17 @@
 
 <summary>Recommended if you like…</summary>
 
-AdiBags, ArkInventory, Baganator, Baggins, BetterBags, EngInventory/EngBags, TBag.  
-And with “[OneBagshui](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-switch-to-the-onebag-style-layout)”: Bagnon, Combuctor, Inventorian, LiteBag, OneBag3, SUCC-bag.
+> AdiBags, ArkInventory, Baganator, Baggins, BetterBags, EngInventory/EngBags, TBag.  
+> And with “[OneBagshui](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-switch-to-the-onebag-style-layout)”: Bagnon, Combuctor, Inventorian, LiteBag, OneBag3, SUCC-bag.
 
 </details>
 
 ## Documentation
 
-* [Wiki](https://github.com/veechs/Bagshui/wiki) + [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ) + [Walkthroughs](https://github.com/veechs/Bagshui/wiki/Walkthroughs)
-* [Version history](Changelog.md)
+📕 [Wiki](https://github.com/veechs/Bagshui/wiki)  
+🙋 [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)  
+🐾 [Walkthroughs](https://github.com/veechs/Bagshui/wiki/Walkthroughs)  
+🕝 [Version history](Changelog.md)
 
 ## Installation
 
@@ -45,15 +49,14 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 ### Manual
 
-1. [Download Bagshui](https://github.com/veechs/Bagshui/archive/refs/heads/main.zip).
-2. Extract the zip file.
-3. Rename the resulting `Bagshui-main` folder to `Bagshui`.
+1. [Download Bagshui](https://github.com/veechs/Bagshui/releases/latest/download/Bagshui.zip).
+2. Extract the zip file. A folder named `Bagshui` should typically be created.
 4. Move that folder to `[Path\To\WoW]\Interface\Addons`.
 5. Ensure the structure is `Interface\Addons\Bagshui\Bagshui.toc`.  
    <sup>*These are all **wrong**:*  
-    × `Bagshui-main\Bagshui.toc`  
     × `Bagshui\Bagshui\Bagshui.toc`  
-	 × `Bagshui\Bagshui-main\Bagshui.toc`
+    × `Bagshui-main\Bagshui.toc`  
+    × `Bagshui\Bagshui-main\Bagshui.toc`
    </sup>
 
 
@@ -142,7 +145,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 </table>
 
-<sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `x#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
+<sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `×#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
 
 
 ## Credits
@@ -151,4 +154,4 @@ Bagshui owes [so much to so many people](Credits.md).
 
 ## Localization
 
-Translations are welcome! [Instructions here](Localization/Readme.md).
+Translations welcome! [Instructions here](Localization/Readme.md).
