@@ -273,7 +273,8 @@ function Inventory:ItemButton_OnEnter(itemButton)
 			-- (itemSlotTooltipFunction is the function name, not the actual function
 			-- see declaration in Inventory.lua for reasoning.)
 			if
-				not self.editMode  -- Not calling in Edit Mode so we cut out some hooks and have a little more control.
+				self.online  -- Definitely have to be online for this.
+				and not self.editMode  -- Not calling in Edit Mode so we cut out some hooks and have a little more control.
 				and not truncateTooltip  -- Also, we don't need extra stuff if we're just going to truncate anyway.
 				and self.itemSlotTooltipFunction
 				and type(_G[self.itemSlotTooltipFunction]) == "function"
