@@ -1,0 +1,28 @@
+name: Automatic Release on vX.Y.Z Tag
+on:
+  push:
+    tags:
+    - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Create Zip
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: 'zip'
+        filename: 'Bagshui.zip'
+        exclusions: '*.git*'
+
+    - name: Release
+      uses: docker://antonyurchenko/git-release:latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Filename is case-sensitive so we have to override the default CHANGELOG.md.
+        CHANGELOG_FILE: "Changelog.md"
+      with:
+        args: Bagshui.zip
