@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## [1.2.16] - 2025-01-21
+* Fix [offline tooltips in Bags](https://github.com/veechs/Bagshui/issues/60), which were broken since 1.2.4 (thanks [@Kirius88](https://github.com/Kirius88)).
+
 ## [1.2.15] - 2025-01-19
 * Improve [accuracy of unusable item coloring](https://github.com/veechs/Bagshui/issues/58) (thanks bonho).
 
