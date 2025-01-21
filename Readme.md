@@ -50,7 +50,8 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 ### Manual
 
 1. [Download Bagshui](https://github.com/veechs/Bagshui/releases/latest/download/Bagshui.zip).
-2. Extract the zip file. A folder named `Bagshui` should typically be created.
+2. Extract the zip file.
+3. Ensure the resulting folder is named `Bagshui` and rename if needed.
 4. Move that folder to `[Path\To\WoW]\Interface\Addons`.
 5. Ensure the structure is `Interface\Addons\Bagshui\Bagshui.toc`.  
    <sup>*These are all **wrong**:*  
