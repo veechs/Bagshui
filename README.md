@@ -49,14 +49,13 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 ### Manual
 
-1. [Download Bagshui](https://github.com/veechs/Bagshui/archive/refs/heads/main.zip).
-2. Extract the zip file.
-3. Rename the resulting `Bagshui-main` folder to `Bagshui`.
+1. [Download Bagshui](https://github.com/veechs/Bagshui/releases/latest/download/Bagshui.zip).
+2. Extract the zip file. A folder named `Bagshui` should typically be created.
 4. Move that folder to `[Path\To\WoW]\Interface\Addons`.
 5. Ensure the structure is `Interface\Addons\Bagshui\Bagshui.toc`.  
    <sup>*These are all **wrong**:*  
-    × `Bagshui-main\Bagshui.toc`  
     × `Bagshui\Bagshui\Bagshui.toc`  
+    × `Bagshui-main\Bagshui.toc`  
     × `Bagshui\Bagshui-main\Bagshui.toc`
    </sup>
 
