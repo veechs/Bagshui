@@ -33,6 +33,7 @@
 
 ## Documentation
 
+⬇️ [Installation](#installation)  
 📕 [Wiki](https://github.com/veechs/Bagshui/wiki)  
 🙋 [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)  
 🐾 [Walkthroughs](https://github.com/veechs/Bagshui/wiki/Walkthroughs)  
