@@ -318,6 +318,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Anchoring"] = "Anchoring",
 ["Menu_Settings_Behaviors"] = "Behaviors",
 ["Menu_Settings_Badges"] = "Item Badges",
+["Menu_Settings_Buttons"] = "Buttons",
 ["Menu_Settings_ChangeTiming"] = "Stock Change Timers",
 ["Menu_Settings_Colors"] = "Colors",
 ["Menu_Settings_ColorHistory_TooltipTitle"] = "Color Picker History",
@@ -1040,14 +1041,15 @@ BsLocalization:AddLocale("enUS", {
 ["resetStockState"] = "Mark Items Unchanged",
 ["resetStockState_TooltipText"] = "Set all items in this inventory as no longer new, increased, or decreased.",
 
-["showBagBar"] = "Bag Bar",
-["showBagBar_TooltipText"] = "Show the bag bar in the bottom left.",
+["showBagBar"] = "Bag Slots",
+["showBagBar_TooltipText"] = "Show bag bar in the bottom left.",
 
-["showClam"] = "Clam Button",
+["showClam"] = "Clam",
 ["showClam_TooltipTitle"] = "Clam (Open Container) Button",
 ["showClam_TooltipText"] = "Show the Clam button to enable rapid container opening." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
 
-["showDisenchant"] = "Disenchant Button",
+["showDisenchant"] = "Disenchant",
+["showDisenchant_TooltipTitle"] = "Disenchant Button",
 ["showDisenchant_TooltipText"] = "Show the Disenchant button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to characters who have Enchanting and Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["showFooter"] = "Bottom Toolbar",
@@ -1062,7 +1064,8 @@ BsLocalization:AddLocale("enUS", {
 ["showHeader_TooltipTitle"] = "Top Toolbar",
 ["showHeader_TooltipText"] = "Show the top toolbar." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Hiding this will conceal everything above the items, including the Close button, so you'll need to close via key bindings, action bar buttons, or macros." .. FONT_COLOR_CODE_CLOSE,
 
-["showHearthstone"] = "Hearthstone Button",
+["showHearthstone"] = "Hearthstone",
+["showHearthstone_TooltipTitle"] = "Hearthstone Button",
 ["showHearthstone_TooltipText"] = "Show the Hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["showInfoTooltipsWithoutAlt"] = "Show Without Alt",
@@ -1071,9 +1074,10 @@ BsLocalization:AddLocale("enUS", {
 ["showLogWindow_TooltipText"] = "Open the Bagshui log window.",
 
 ["showMoney"] = "Money",
-["showMoney_TooltipText"] = "Display money in the bottom right.",
+["showMoney_TooltipText"] = "Show money in the bottom right.",
 
-["showPickLock"] = "Pick Lock Button",
+["showPickLock"] = "Pick Lock",
+["showPickLock_TooltipTitle"] = "Pick Lock Button",
 ["showPickLock_TooltipText"] = "Show the Pick Lock button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Rogues and Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["stackEmptySlots"] = "Stack Empty",

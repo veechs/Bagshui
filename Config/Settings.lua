@@ -745,6 +745,20 @@ Bagshui.config.Settings = {
 					inventoryWindowUpdateOnChange = true,
 				},
 
+
+				{
+					menuTitle = L.Menu_Settings_Buttons
+				},
+
+				{
+					name = "showPickLock",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOL,
+					defaultValue = true,
+					inventoryWindowUpdateOnChange = true,
+				},
+
 				{
 					name = "showDisenchant",
 					scope = BS_SETTING_SCOPE.INVENTORY,
@@ -770,15 +784,6 @@ Bagshui.config.Settings = {
 					type = BS_SETTING_TYPE.BOOL,
 					defaultValue = true,
 					inventoryCacheUpdateOnChange = true,
-				},
-
-				{
-					name = "showMoney",
-					scope = BS_SETTING_SCOPE.INVENTORY,
-					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
-					type = BS_SETTING_TYPE.BOOL,
-					defaultValue = true,
-					inventoryWindowUpdateOnChange = true,
 				},
 
 				{
