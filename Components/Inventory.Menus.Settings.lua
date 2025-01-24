@@ -459,12 +459,12 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 			-- Inside submenu -- checked/unchecked based on current value, change setting on click.
 			-- Need to use tostring() here so we don't get caught by float nonsense where 1 somehow doesn't equal 1.
 			menuItem.checked = tostring(menuItem.value) == tostring(currentSettingValue)
-			menuItem.keepShownOnClick = false
+			menuItem.keepShownOnClick = true
 			menuItem.func = function()
-				Bagshui:CloseMenus(_G.UIDROPDOWNMENU_MENU_LEVEL, nil, true)
 				settingsStorage[settingName] = _G.this.value
 				settingUpdateFunction()
-				self.menus:Refresh(menuLevel, -1)
+				self.menus:Refresh()
+				self.menus:Refresh(menuLevel, true)
 			end
 		else
 			-- Parent menu item to open the submenu.
@@ -507,7 +507,7 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 					Bagshui:CloseMenus(_G.UIDROPDOWNMENU_MENU_LEVEL, nil, true)
 					settingsStorage[settingName] = color
 					settingUpdateFunction()
-					self.menus:Refresh(menuLevel, -1)
+					self.menus:Refresh(menuLevel, true)
 					self:AddToColorHistory(color)
 				end
 				menuItem._bagshuiColorSwatchFunc = menuItem.func
