@@ -452,9 +452,8 @@ Bagshui.config.RuleFunctions = {
 
 			-- Borrowing some code from ItemRack because it doesn't provide an
 			-- isolated function to parse an itemLink into their format.
-			local _ ,_, id = string.find(rules.item.itemLink or "", "(item:%d+:%d+:%d+:%d+)")
-			local _ ,_, itemRackItemId = string.find(id or "", "item:(%d+:%d+:%d+):%d+")
-			if not itemRackItemId or (type(itemRackItemId) == "string" and string.len(itemRackItemId) == 0) then
+			local found ,_, itemRackItemId = string.find(rules.item.itemLink or "", "item:(%d+:%d+:%d+):%d+")
+			if not found or (type(itemRackItemId) == "string" and string.len(itemRackItemId) == 0) then
 				return false
 			end
 
