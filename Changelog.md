@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## [1.2.19] - 2025-01-25
+* Temporarily revert change from 1.2.17 because it seems to be [breaking some things](https://github.com/veechs/Bagshui/issues/65).
+
 ## [1.2.18] - 2025-01-25
 * Outfitter integration now [ignores enchant codes](https://github.com/veechs/Bagshui/issues/62) since those don't always seem to be updated on the Outfitter side (thanks bonho).
 
