@@ -574,20 +574,20 @@ Bagshui.config.RuleFunctions = {
 
 			-- Not using `Outfitter_GetItemInfoFromLink` because it generates throwaway
 			-- tables and will make the garbage collector upset.
-			local found , _, code, enchantCode, subCode = string.find(rules.item.itemLink or "", "(item:%d+:%d+:%d+:%d+)")
+			local found , _, code, enchantCode, subCode = string.find(rules.item.itemLink or "", "item:(%d+):(%d+):(%d+)")
 			if not found then
 				return false
 			end
 
 			local matchAny = (table.getn(ruleArguments) == 0)
 
-			for _, outfits in pairs(outfitterOutfits) do
-				for _, outfit in pairs(outfits) do
+			for outfitType, outfits in pairs(outfitterOutfits) do
+				for outfitId, outfit in pairs(outfits) do
 					local outfitName = string.lower(BsUtil.Trim(outfit.Name))
-					for _, item in pairs(outfit.Items) do
+					for slot, item in pairs(outfit.Items) do
 						if
-							item.Code == code
-							and item.SubCode == subCode
+							item.Code == tonumber(code)
+							and item.SubCode == tonumber(subCode)
 							-- False positives seem preferable to false negatives?
 							-- Replicating exactly what Outfitter does in terms of
 							-- when it decides to do fuzzy matching and ignore
@@ -595,7 +595,7 @@ Bagshui.config.RuleFunctions = {
 							-- willing to put in. Always ignoring enchants will at
 							-- least ensure that items are matched more permissively.
 							-- 
-							-- and item.EnchantCode == enchantCode
+							-- and item.EnchantCode == tonumber(enchantCode)
 						then
 							if matchAny then
 								return true
