@@ -4,8 +4,10 @@ on:
     tags:
     - "v[0-9]+.[0-9]+.[0-9]+"
 jobs:
-  build:
-    permissions: write-all
+  release:
+    # Override repository workflow security settings to ensure git-release can create the new release.
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -16,9 +18,9 @@ jobs:
       with:
         type: 'zip'
         filename: 'Bagshui.zip'
-        exclusions: '*.git*'
+        exclusions: '*.git* .vscode .editorconfig'
 
-    - name: Release
+    - name: Create Release
       uses: docker://antonyurchenko/git-release:latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

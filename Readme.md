@@ -5,9 +5,7 @@
 
 **A Vanilla WoW 1.12 (and Turtle WoW) inventory addon.**<br><sup><small>Not for Classic or Retail; you have [so](https://www.curseforge.com/wow/addons/better-bags) [many](https://www.curseforge.com/wow/addons/ark-inventory) [options](https://www.curseforge.com/wow/search?class=addons&categories=bags-inventory&sortBy=popularity).</small></sup>
 
-[![Bagshui](https://github.com/veechs/Bagshui/wiki/images/Bagshui_Thumb.png)](https://github.com/veechs/Bagshui/wiki/Screenshots)  
-[<img src="https://github.com/veechs/Bagshui/wiki/images/OneBagshui_Thumb.png" width="150">](https://github.com/veechs/Bagshui/wiki/Screenshots) 
-[<img src="https://github.com/veechs/Bagshui/wiki/images/BankOffline_Thumb.png" width="150">](https://github.com/veechs/Bagshui/wiki/Screenshots)  
+[![Bagshui](https://github.com/veechs/Bagshui/wiki/images/BagshuiScreenshots.png)](https://github.com/veechs/Bagshui/wiki/Screenshots)  
 <sup>[More screenshots](https://github.com/veechs/Bagshui/wiki/Screenshots)</sup>
 
 ## Features
@@ -35,6 +33,7 @@
 
 ## Documentation
 
+⬇️ [Installation](#installation)  
 📕 [Wiki](https://github.com/veechs/Bagshui/wiki)  
 🙋 [FAQ](https://github.com/veechs/Bagshui/wiki/FAQ)  
 🐾 [Walkthroughs](https://github.com/veechs/Bagshui/wiki/Walkthroughs)  
@@ -50,7 +49,8 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 ### Manual
 
 1. [Download Bagshui](https://github.com/veechs/Bagshui/releases/latest/download/Bagshui.zip).
-2. Extract the zip file. A folder named `Bagshui` should typically be created.
+2. Extract the zip file.
+3. Ensure the resulting folder is named `Bagshui` and rename if needed.
 4. Move that folder to `[Path\To\WoW]\Interface\Addons`.
 5. Ensure the structure is `Interface\Addons\Bagshui\Bagshui.toc`.  
    <sup>*These are all **wrong**:*  
