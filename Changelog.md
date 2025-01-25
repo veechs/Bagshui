@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## [1.2.17] - 2025-01-25
+* Ensure [stack splitting targets the correct item](https://github.com/veechs/Bagshui/issues/58) (thanks bonho).
+
 ## [1.2.16] - 2025-01-21
 * Fix [offline tooltips in Bags](https://github.com/veechs/Bagshui/issues/60), which were broken since 1.2.4 (thanks [@Kirius88](https://github.com/Kirius88)).
 
