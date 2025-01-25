@@ -1,5 +1,8 @@
 # Bagshui Changelog
 
+## [1.2.18] - 2025-01-25
+* Outfitter integration now [ignores enchant codes](https://github.com/veechs/Bagshui/issues/62) since those don't always seem to be updated on the Outfitter side (thanks bonho).
+
 ## [1.2.17] - 2025-01-25
 * Ensure [stack splitting targets the correct item](https://github.com/veechs/Bagshui/issues/63) (thanks bonho).
 
