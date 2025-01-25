@@ -1248,7 +1248,7 @@ function Inventory:AssignItemsToSlots(
 
 				-- Ensure parentage of item slot button is set to current group frame.
 				-- This is required to get the layering right -- without it, stuff can end up behind groups.
-				button:SetParent(groupFrame)
+				button.bagshuiData.parent:SetParent(groupFrame)
 
 				-- Record details of this button's assignments so we can access
 				-- them during UI events.
@@ -1501,7 +1501,7 @@ function Inventory:ShowFrameInNextPosition(
 
 	-- Display the frame.
 	self:SizeAndShowFrame(
-		frame,
+		(frame.bagshuiData and frame.bagshuiData.parent) or frame,
 		positioningTable.anchorPoint,
 		positioningTable.anchorToFrame,
 		positioningTable.anchorToPoint,
