@@ -14,6 +14,11 @@ Bagshui:LoadComponent(function()
 ---@param callPickupContainerItem boolean?
 function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupContainerItem)
 
+	self.pendingSplitStackBagNum = nil
+	self.pendingSplitStackSlotNum = nil
+	self.splitStackBagNum = nil
+	self.splitStackSlotNum = nil
+
 	-- Track where the pickup call came from so we know whether it's being put down
 	-- in the same inventory or moved to a different one.
 	local owningFrame = inventoryClass and inventoryClass.uiFrame or _G.this
@@ -157,6 +162,10 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 		else
 			-- Don't need to (and can't) pass bagNum/slotNum to ContainerFrameItemButton_OnClick(),
 			-- since it pulls them from _G.this:GetId()/_G.this:GetParent():GetId().
+			if _G.IsShiftKeyDown() then
+				self.pendingSplitStackBagNum = item.bagNum
+				self.pendingSplitStackSlotNum = item.slotNum
+			end
 			_G.ContainerFrameItemButton_OnClick("LeftButton")
 		end
 	end
