@@ -370,6 +370,34 @@ Bagshui.config.RuleFunctions = {
 	},
 
 
+	-- Item can be opened.
+	{
+		functionNames = {
+			"Openable",
+			"Locked",
+			"Opens",
+			"Pickable",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			if table.getn(ruleArguments) > 0 then
+				if ruleArguments[1] then
+					return rules.item.lockPickable == 1
+				else
+					return rules.item.openable == 1
+				end
+			else
+				return rules.item.openable == 1 or rules.item.lockPickable == 1
+			end
+		end,
+		environmentVariables = {
+			Locked = true,
+			NotLocked = false,
+			Unlocked = false,
+		},
+		-- Templates come from localization.
+	},
+
+
 	-- Outfit() stub -- needs to be replaced by another function.
 	-- Stubs current
 	{

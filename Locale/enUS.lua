@@ -763,6 +763,14 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_NameExact_ExampleExtra1"] = 'NameExact("string1", "string2", "stringN")',
 ["RuleFunction_NameExact_ExampleDescriptionExtra1"] = "Check if the item name exactly matches any of the specified strings.",
 
+["RuleFunction_Openable_GenericDescription"] = "Check if the item can be opened.",
+["RuleFunction_Openable_Example1"] = 'Openable()',
+["RuleFunction_Openable_ExampleDescription1"] = "Check if the item is openable.",
+["RuleFunction_Openable_Example2"] = 'Openable(Locked)',
+["RuleFunction_Openable_ExampleDescription2"] = "Check if the item is openable, but locked.",
+["RuleFunction_Openable_Example3"] = 'Openable(Unlocked)',
+["RuleFunction_Openable_ExampleDescription3"] = "Check if the item is openable and unlocked.",
+
 ["RuleFunction_Outfit_GenericDescription"] = "Check if the item is part of an outfit in %s.",
 ["RuleFunction_Outfit_Example1"] = 'Outfit()',
 ["RuleFunction_Outfit_ExampleDescription1"] = "Check if the item is part of an outfit in %s.",
