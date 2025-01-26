@@ -177,6 +177,7 @@ local bagshuiEnvironment = {
 	---@type table<string, string>
 	BS_SETTING_TYPE = {
 		BOOL = "Bool",
+		BOOLEAN = "Bool",
 		CHOICES = "Choices",
 		COLOR = "ColorRgba",
 		NUMBER = "Number",
