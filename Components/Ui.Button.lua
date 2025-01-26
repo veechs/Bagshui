@@ -371,10 +371,20 @@ function Ui:CreateIconButton(buttonOpts)
 
 	-- Set up other scripts.
 	if buttonOpts.onEnter then
-		button:SetScript("OnEnter", buttonOpts.onEnter)
+		local oldOnEnter = button:GetScript("OnEnter")
+		button:SetScript("OnEnter", function()
+			if buttonOpts.onEnter() ~= false and oldOnEnter then
+				oldOnEnter()
+			end
+		end)
 	end
 	if buttonOpts.onLeave then
-		button:SetScript("OnLeave", buttonOpts.onLeave)
+		local oldOnLeave = button:GetScript("OnLeave")
+		button:SetScript("OnLeave", function()
+			if buttonOpts.onLeave() ~= false and oldOnLeave then
+				oldOnLeave()
+			end
+		end)
 	end
 
 	if buttonOpts.onShow then
@@ -683,7 +693,6 @@ function Ui:ShowIconButtonTooltip(button, tooltipDelayOverride, secondPass)
 
 	if bagshuiInfo.tooltipFunction then
 		-- When a tooltipFunction is configured, it should handle adding all tooltip content.
-		-- This isn't currently used.
 		bagshuiInfo.tooltipFunction(button, tooltip)
 	else
 		-- Normal behavior.
