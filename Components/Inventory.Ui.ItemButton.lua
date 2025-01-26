@@ -79,25 +79,10 @@ function InventoryUi:CreateInventoryItemSlotButton(buttonNum)
 		function(elementNum)
 			-- The button is created normally, then customized for Inventory use.
 			local slotButton = ui:CreateItemSlotButton(
-				"Item" .. elementNum,
+				"Item"..elementNum,
 				inventory.uiFrame
 			)
 			ui.buttons.itemSlots[elementNum] = slotButton
-
-			-- Wrap the button in another frame so GetParent() in 
-			-- ContainerFrameItemButton_OnClick() / ContainerFrameItemButton_OnEnter()
-			-- will work. This is updated in `Ui:AssignItemToItemButton()`.
-			slotButton.bagshuiData.parent = _G.CreateFrame(
-				"Frame",
-				"ItemParent" .. elementNum,
-				-- Even though the parentage is going to be changed in `Inventory:AssignItemsToSlots()`,
-				-- things *will not work* unless the initial parent is set here.
-				inventory.uiFrame
-			)
-			slotButton:SetParent(slotButton.bagshuiData.parent)
-			-- We'll be sizing and positioning using the parent in `Inventory:ShowFrameInNextPosition()`,
-			-- so this will force the item button to match.
-			slotButton:SetAllPoints(slotButton.bagshuiData.parent)
 
 			-- Used by OnUpdate to manage real-time stock badge fading.
 			slotButton.bagshuiData.lastStockStateRefresh = _G.GetTime()
@@ -144,6 +129,12 @@ function Inventory:ItemButton_OnEnter(itemButton)
 
 	local buttonInfo = itemButton.bagshuiData
 	local item = itemButton.bagshuiData.item or self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
+
+	-- Update IDs so ContainerFrameItemButton_OnEnter() will work.
+	-- Disabled because we're currently not actually calling ContainerFrameItemButton_OnEnter,
+	-- but this could probably be added in the future if it's found to be necessary for compatibility
+	-- with other addons.
+	self:UpdateItemButtonIDs(itemButton, item)
 
 	-- Record that the mouse has moved over this button (used by OnUpdate to determine
 	-- whether the tooltip should be shown when the Edit Mode cursor puts down an item).
@@ -768,6 +759,9 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 	local buttonInfo = itemButton.bagshuiData
 	local item = self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
 
+	-- Update IDs so ContainerFrameItemButton_OnClick() will work.
+	self:UpdateItemButtonIDs(itemButton, item)
+
 	-- Nothing normal should happen in Edit Mode.
 	if self.editMode then
 
@@ -995,6 +989,17 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 			self:ForceUpdateWindow()
 		end
 	end
+end
+
+
+
+--- Set item slot button and parent frame ID to the given item's bagNum and slotNum, respectively.
+--- This provides compatibility with Blizzard's ContainerFrameItemButton_OnClick(), etc.
+---@param button table Item slot button.
+---@param item table Bagshui item.
+function Inventory:UpdateItemButtonIDs(button, item)
+	button:SetID(item and item.slotNum or -99)
+	button:GetParent():SetID(item and item.bagNum or -99)
 end
 
 
