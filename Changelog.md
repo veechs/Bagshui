@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.20] - 2025-01-25
+### Fixed
+* Ensure [stack splitting targets the correct item](https://github.com/veechs/Bagshui/issues/63) (and don't break everything like 1.2.17 did).
+
 ## [1.2.19] - 2025-01-25
 ### Fixed
 * Temporarily revert change from 1.2.17 because it seems to be [breaking some things](https://github.com/veechs/Bagshui/issues/65).
