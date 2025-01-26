@@ -917,8 +917,8 @@ function Inventory:InitUi()
 		buttons.toolbar.hearthstone,
 		-BsSkin.toolbarGroupSpacing,
 		buttons.toolbar.clam,
-		buttons.toolbar.disenchant,
 		buttons.toolbar.pickLock,
+		buttons.toolbar.disenchant,
 	}
 
 
