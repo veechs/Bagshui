@@ -407,10 +407,6 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 	buttonInfo.item = item
 	buttonInfo.itemId = item.id
 
-	-- Update IDs so ContainerFrameItemButton_OnClick()/ContainerFrameItemButton_OnEnter() will work.
-	button:SetID(item and item.slotNum or -99)
-	button:GetParent():SetID(item and item.bagNum or -99)
-
 	-- Store group ID so `UpdateItemButtonStockState()` can pull per-group settings.
 	buttonInfo.groupId = groupId
 
