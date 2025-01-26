@@ -34,6 +34,51 @@ local POSITION_CHOICES = {
 }
 
 
+-- Generate the menu for bag utilization display and format.
+local bagUsageDisplayChoices = {}
+local bagUsageFormats = {}
+
+-- Need an order because the enum doesn't have one.
+do
+	local bagUsageDisplayOrder = {
+		BS_INVENTORY_BAG_USAGE_DISPLAY.ALWAYS,
+		BS_INVENTORY_BAG_USAGE_DISPLAY.SMART,
+		BS_INVENTORY_BAG_USAGE_DISPLAY.NEVER,
+	}
+	-- This will be assigned to the `choices` for `bagUsageFormat`.
+	for _, bagUsageDisplay in ipairs(bagUsageDisplayOrder) do
+		table.insert(
+			bagUsageDisplayChoices,
+			{
+				value = bagUsageDisplay,
+				text = L["Setting_BagUsageDisplay_" .. bagUsageDisplay],
+				tooltipTitle = L["Setting_BagUsageDisplay_" .. bagUsageDisplay .. "_TooltipTitle"],
+				tooltipText = L["Setting_BagUsageDisplay_" .. bagUsageDisplay .. "_TooltipText"],
+			}
+		)
+	end
+
+	-- Need an order because the enum doesn't have one.
+	local bagUsageFormatOrder = {
+		BS_INVENTORY_BAG_USAGE_FORMAT.EMPTY,
+		BS_INVENTORY_BAG_USAGE_FORMAT.EMPTY_TOTAL,
+		BS_INVENTORY_BAG_USAGE_FORMAT.EMPTY_USED_TOTAL,
+		BS_INVENTORY_BAG_USAGE_FORMAT.USED,
+		BS_INVENTORY_BAG_USAGE_FORMAT.USED_TOTAL,
+		BS_INVENTORY_BAG_USAGE_FORMAT.USED_EMPTY_TOTAL,
+	}
+	-- This will be assigned to the `choices` for `bagUsageFormat`.
+	for _, bagUsageFormat in ipairs(bagUsageFormatOrder) do
+		table.insert(
+			bagUsageFormats,
+			{
+				value = bagUsageFormat,
+				text = L["Setting_BagUsageFormat_" .. bagUsageFormat],
+			}
+		)
+	end
+end
+
 
 --- Assigned to the `hideFunc` property of the `*UseSkinColors` settings to hide
 --- their menu entries when the default skin is active.
@@ -738,7 +783,57 @@ Bagshui.config.Settings = {
 
 
 				{
-					name = "showPickLock",
+					submenuName = L.Menu_Settings_BagUsage,
+					tooltipText = L.Menu_Settings_BagUsage_TooltipText,
+					settings = {
+						{
+							menuTitle = L.Menu_Settings_PerBag,
+						},
+						{
+							name = "bagUsageAlwaysShow",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = false,
+							inventoryWindowUpdateOnChange = true,
+						},
+
+						{
+							menuTitle = L.Menu_Settings_Summary,
+						},
+						{
+							menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Visibility,
+						},
+						{
+							name = "bagUsageDisplay",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.CHOICES,
+							inline = true,
+							defaultValue = BS_INVENTORY_BAG_USAGE_DISPLAY.SMART,
+							inventoryWindowUpdateOnChange = true,
+							choices = bagUsageDisplayChoices,
+						},
+
+						{
+							menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Format,
+						},
+						{
+							name = "bagUsageFormat",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.CHOICES,
+							inline = true,
+							defaultValue = BS_INVENTORY_BAG_USAGE_FORMAT.EMPTY,
+							inventoryWindowUpdateOnChange = true,
+							choices = bagUsageFormats,
+						},
+
+					},
+				},
+
+				{
+					name = "showMoney",
 					scope = BS_SETTING_SCOPE.INVENTORY,
 					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
 					type = BS_SETTING_TYPE.BOOLEAN,

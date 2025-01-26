@@ -393,6 +393,9 @@ function Inventory:New(newPropsOrInventoryType)
 		---@type boolean Alter frame close behavior -- see UiFrame_OnShow().
 		dockingFrameVisibleOnLastOpen = false,
 
+		---@type boolean Make the bag utilization summary visible at all times - managed by UpdateWindow().
+		bagUsageAlwaysShow = false,
+
 		---@type table|nil Hearthstone cache entry tracking.
 		hearthstoneItemRef = nil,
 
