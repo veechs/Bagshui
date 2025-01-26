@@ -125,7 +125,6 @@ function Inventory:InitUi()
 							self.settings.showFooter = false
 
 						end
-						self:PrintDebug("toolbars are different")
 					end
 					self.ignoreNextSettingChange = true
 					-- self.settings.showHeader = not self.settings.showHeader
@@ -312,8 +311,31 @@ function Inventory:InitUi()
 			self.ui.tooltips.mini:Hide()
 			self.menus:OpenMenu("Main", nil, nil, _G.this, -5, -5)
 		end,
+		onEnter = function()
+			_G.this.bagshuiData.overrideTooltip = (
+				(
+					not self.settings.showFooter
+					and not self.alwaysShowUsageSummary
+				) or (
+					self.settings.bagUsageDisplay ~= BS_INVENTORY_BAG_USAGE_DISPLAY.ALWAYS
+					and not self.settings.showBagBar
+				)
+			)
+
+			if _G.this.bagshuiData.overrideTooltip then
+				self:ShowUsageSummary(_G.this, false)
+				return false
+			end
+		end,
+		onLeave = function()
+			if _G.this.bagshuiData.overrideTooltip then
+				self:HideUsageSummary(_G.this, false)
+				return false
+			end
+		end,
 		texture = self.inventoryType,
-		tooltipTitle = L.Toolbar_Menu_TooltipTitle
+		tooltipTitle = L.Toolbar_Menu_TooltipTitle,
+		tooltipAnchorPoint = "",
 	})
 
 	-- Offline indicator.
@@ -612,100 +634,77 @@ function Inventory:InitUi()
 	-- Actual bag slot setup.
 	ui:CreateBagSlotButtons()
 
-	-- Create free space display.
-	frames.spaceSummary = _G.CreateFrame("Frame", nil, frames.bagBar)
+
+	-- Shared functions for utilization displays.
+
+	local function usageSummary_OnEnter()
+		self:ShowUsageSummary(_G.this, true)
+	end
+	local function usageSummary_OnLeave()
+		self:HideUsageSummary(_G.this, true)
+	end
+
+
+	--- Create a space utilization display.
+	--- Frame and FontStrings will *not* have positions set.
+	---@param parent table? Parent frame.
+	---@param justifyH string? FontString justification.
+	---@return table spaceSummary
+	local function CreateSpaceSummary(parent, justifyH)
+		local spaceSummary = _G.CreateFrame("Frame", nil, parent)
+		spaceSummary:SetHitRectInsets(-(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2))
+		spaceSummary.bagshuiData = {
+			text = spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
+			subtext = spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
+		}
+		spaceSummary.bagshuiData.text:SetTextColor(1, 1, 1, 0.75)
+		spaceSummary.bagshuiData.text:SetShadowColor(0, 0, 0, 0.75)
+		spaceSummary.bagshuiData.text:SetShadowOffset(1, -1)
+		spaceSummary.bagshuiData.text:SetJustifyH(justifyH or "CENTER")
+		spaceSummary.bagshuiData.text:SetJustifyV("MIDDLE")
+		spaceSummary.bagshuiData.subtext:SetTextColor(1, 1, 1, 0.65)
+		spaceSummary.bagshuiData.subtext:SetShadowColor(0, 0, 0, 0.75)
+		spaceSummary.bagshuiData.subtext:SetShadowOffset(1, -1)
+		spaceSummary.bagshuiData.subtext:SetJustifyH(justifyH or "CENTER")
+		spaceSummary.bagshuiData.subtext:SetJustifyV("MIDDLE")
+		spaceSummary.bagshuiData.subtext:SetFont(spaceSummary.bagshuiData.subtext:GetFont(), 9)
+
+		-- Show individual bag type information on mouseover.
+		spaceSummary:EnableMouse(true)
+		spaceSummary:RegisterForDrag("LeftButton")
+		ui:PassMouseEventsThrough(spaceSummary, uiFrame, true)
+		spaceSummary:SetScript("OnEnter", usageSummary_OnEnter)
+		spaceSummary:SetScript("OnLeave", usageSummary_OnLeave)
+
+		return spaceSummary
+	end
+
+	-- This is the main utilization display that goes to the right of the bag bar.
+	frames.spaceSummary = CreateSpaceSummary(frames.bagBar, "CENTER")
 	frames.spaceSummary:SetPoint("LEFT", buttons.bagSlots[table.getn(buttons.bagSlots)], "RIGHT", BsSkin.bagBarSpacing - 2, 0)
 	frames.spaceSummary:SetPoint("TOP", frames.bagBar)
 	frames.spaceSummary:SetPoint("BOTTOM", frames.bagBar)
 	frames.spaceSummary:SetWidth(50)
-	frames.spaceSummary:SetHitRectInsets(-(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2))
-	frames.spaceSummary.bagshuiData = {
-		text = frames.spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
-		subtext = frames.spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
-	}
-	frames.spaceSummary.bagshuiData.text:SetTextColor(1, 1, 1, 0.75)
-	frames.spaceSummary.bagshuiData.text:SetShadowColor(0, 0, 0, 0.75)
-	frames.spaceSummary.bagshuiData.text:SetShadowOffset(1, -1)
 	frames.spaceSummary.bagshuiData.text:SetPoint("BOTTOM", frames.spaceSummary, "CENTER", 0, -2)
-	frames.spaceSummary.bagshuiData.text:SetJustifyH("CENTER")
-	frames.spaceSummary.bagshuiData.text:SetJustifyV("MIDDLE")
 	frames.spaceSummary.bagshuiData.subtext:SetPoint("TOP", frames.spaceSummary, "CENTER", 0, -3)
-	frames.spaceSummary.bagshuiData.subtext:SetJustifyH("CENTER")
-	frames.spaceSummary.bagshuiData.subtext:SetJustifyV("MIDDLE")
-	frames.spaceSummary.bagshuiData.subtext:SetFont(frames.spaceSummary.bagshuiData.subtext:GetFont(), 9)
-	frames.spaceSummary.bagshuiData.subtext:SetTextColor(1, 1, 1, 0.65)
-	frames.spaceSummary.bagshuiData.subtext:SetShadowColor(0, 0, 0, 0.75)
-	frames.spaceSummary.bagshuiData.subtext:SetShadowOffset(1, -1)
 
-	-- Show individual bag type information on mouseover.
-	frames.spaceSummary:EnableMouse(true)
-	frames.spaceSummary:RegisterForDrag("LeftButton")
-	ui:PassMouseEventsThrough(frames.spaceSummary, uiFrame, true)
-
-	frames.spaceSummary:SetScript("OnEnter", function()
-		if self.editMode then
-			return
-		end
-
-		_G.this.bagshuiData.mouseIsOver = true
-
-		-- Trigger bag bar OnEnter to avoid flickering.
-		frames.bagBar:GetScript("OnEnter")()
-
-		-- Add overall info.
-		_G.GameTooltip:SetOwner(
-			_G.this,
-			"ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint),
-			-BsSkin.tooltipExtraOffset,
-			BsSkin.tooltipExtraOffset
-		)
-		_G.GameTooltip:AddDoubleLine(
-			-- Available: 10     Used: 8/18
-			string.format(L.Symbol_Colon, L.Available) .. " " .. tostring(self.availableSlots),
-			string.format(L.Symbol_Colon, L.Used) .. " " .. string.format("%s/%s", tostring(self.usedSlots), tostring(self.totalSlots))
-		)
-
-		-- Only show per-bag-type info if there are profession bags.
-		local hasProfessionBags = false
-		for containerType, spaceInfo in pairs(self.containerSpace) do
-			if (spaceInfo.total or 0) > 0 and containerType ~= L.Bag then
-				hasProfessionBags = true
-			end
-		end
-
-		-- Add per-bag-type info, excluding any bag types where total is 0 (necessary
-		-- because we don't bother cleaning up the containerSpace table when all bags
-		-- of a given type are unequipped).
-		if hasProfessionBags then
-			for _, containerType in ipairs(BS_INVENTORY_CONTAINER_TYPE_ORDER) do
-				local spaceInfo = self.containerSpace[containerType]
-				if spaceInfo and (spaceInfo.total or 0) > 0 then
-					-- Bag: 2             6/8
-					_G.GameTooltip:AddDoubleLine(
-						string.format(L.Symbol_Colon, containerType) .. " " .. tostring(spaceInfo.available),
-						string.format("%s/%s", tostring(spaceInfo.used), tostring(spaceInfo.total)),
-						HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b,
-						HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b
-					)
-				end
-			end
-		end
-
-		_G.GameTooltip:Show()
-	end)
-
-	frames.spaceSummary:SetScript("OnLeave", function()
-		_G.this.bagshuiData.mouseIsOver = false
-
-		-- Hide tooltip.
-		if _G.GameTooltip:IsOwned(_G.this) then
-			_G.GameTooltip:Hide()
-		end
-
-		-- Decide whether to keep displaying slot available/used counts.
-		frames.bagBar:GetScript("OnLeave")()
-	end)
-
+	-- Create two "mini" utilization displays to use when the bag bar is hidden.
+	-- One is for the bottom left and the other for the top left when the bottom toolbar is hidden.
+	-- Reusing just one would be nice but this is more expedient.
+	for _, position in ipairs({"Bottom", "Top"}) do
+		local name = "miniSpaceSummary" .. position
+		frames[name] = CreateSpaceSummary(footer, "LEFT")
+		frames[name]:SetPoint("LEFT", footer, "LEFT", BsSkin.toolbarSpacing, 0)
+		frames[name]:SetWidth(100)
+		frames[name]:SetHeight(18)
+		frames[name].bagshuiData.text:SetPoint("LEFT", frames[name], "LEFT", 0, 0)
+		frames[name].bagshuiData.subtext:SetPoint("LEFT", frames[name].bagshuiData.text, "RIGHT", 1, 0.5)
+	end
+	-- Make the top one conditionally part of the top left toolbar.
+	frames.miniSpaceSummaryTop:SetParent(header)
+	frames.miniSpaceSummaryTop:ClearAllPoints()
+	frames.miniSpaceSummaryTop.bagshuiData.text:SetPoint("LEFT", frames.miniSpaceSummaryTop, "LEFT", 0, -1)
+	table.insert(self.ui.ordering.topLeftToolbar, 2, frames.miniSpaceSummaryTop)
 
 
 	-- Bottom right toolbar anchor.
@@ -1208,6 +1207,121 @@ function Inventory:UiFrame_OnDragStop()
 		-- Has to be self instead of "this" because it can be called from docked windows.
 		self.uiFrame:StopMovingOrSizing()
 		self:SaveWindowPosition()
+	end
+end
+
+
+
+--- Display the inventory utilization summary tooltip.
+---@param owner table Frame to which the tooltip should bet attached.
+---@param attachedToBagBar boolean? When `true`, call the bag bar's OnEnter.
+---@param extraText string? Text to append to the tooltip.
+---@param delay boolean|number? Time to wait before showing the tooltip.
+---@param tooltip table? Tooltip to use instead of GameTooltip.
+function Inventory:ShowUsageSummary(owner, attachedToBagBar, tooltip, extraText, delay)
+	if self.editMode then
+		return
+	end
+
+	owner = owner or _G.this
+	tooltip = tooltip or _G.GameTooltip
+
+	_G.this.bagshuiData.mouseIsOver = true
+
+	-- Trigger bag bar OnEnter to avoid flickering.
+	if attachedToBagBar then
+		if self.ui.frames.bagBar:IsVisible() then
+			self.ui.frames.bagBar:GetScript("OnEnter")()
+		end
+	end
+
+	-- Add overall info.
+	tooltip:SetOwner(
+		owner,
+		"ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint),
+		-BsSkin.tooltipExtraOffset,
+		BsSkin.tooltipExtraOffset
+	)
+	tooltip:AddDoubleLine(
+		-- Available: 10     Used: 8/18
+		string.format(L.Symbol_Colon, L.Available) .. " " .. tostring(self.availableSlots),
+		string.format(L.Symbol_Colon, L.Used) .. " " .. string.format("%s/%s", tostring(self.usedSlots), tostring(self.totalSlots))
+	)
+
+	-- Only show per-bag-type info if there are profession bags.
+	local hasProfessionBags = false
+	for containerType, spaceInfo in pairs(self.containerSpace) do
+		if (spaceInfo.total or 0) > 0 and containerType ~= L.Bag then
+			hasProfessionBags = true
+		end
+	end
+
+	-- Add per-bag-type info, excluding any bag types where total is 0 (necessary
+	-- because we don't bother cleaning up the containerSpace table when all bags
+	-- of a given type are unequipped).
+	if hasProfessionBags then
+		for _, containerType in ipairs(BS_INVENTORY_CONTAINER_TYPE_ORDER) do
+			local spaceInfo = self.containerSpace[containerType]
+			if spaceInfo and (spaceInfo.total or 0) > 0 then
+				-- Bag: 2             6/8
+				tooltip:AddDoubleLine(
+					string.format(L.Symbol_Colon, containerType) .. " " .. tostring(spaceInfo.available),
+					string.format("%s/%s", tostring(spaceInfo.used), tostring(spaceInfo.total)),
+					HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b,
+					HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b
+				)
+			end
+		end
+	end
+
+
+	if delay then
+		Bagshui:ShowTooltipAfterDelay(
+			tooltip,
+			owner,
+			nil,
+			type(delay) == "number" and delay or BS_TOOLTIP_DELAY_SECONDS.DEFAULT,
+			nil,
+			function()
+				if extraText then
+					Bagshui:QueueEvent(function()
+						if tooltip:IsOwned(owner) and tooltip:IsVisible() then
+							tooltip:AddLine(extraText)
+							tooltip:Show()
+						end
+					end, BS_TOOLTIP_DELAY_SECONDS.TOOLBAR_DEFAULT)
+				end
+			end
+		)
+	else
+		if extraText then
+			tooltip:AddLine(extraText)
+			tooltip:Show()
+		end
+		tooltip:Show()
+	end
+end
+
+
+
+--- Companion to `ShowUsageSummary()`.
+---@param owner table Tooltip will only be hidden if still owned by this frame.
+---@param attachedToBagBar boolean? When `true`, call the bag bar's OnLeave.
+---@param tooltip table? Tooltip to use instead of GameTooltip.
+function Inventory:HideUsageSummary(owner, attachedToBagBar, tooltip)
+	owner = owner or _G.this
+	tooltip = tooltip or _G.GameTooltip
+
+	owner.bagshuiData.mouseIsOver = false
+
+	-- Hide tooltip.
+	if tooltip:IsOwned(owner) then
+		tooltip:Hide()
+	end
+
+	-- Decide whether to keep displaying slot available/used counts.
+	if attachedToBagBar and self.ui.frames.bagBar:IsVisible() then
+		self.ui.frames.bagBar:GetScript("OnLeave")()
 	end
 end
 

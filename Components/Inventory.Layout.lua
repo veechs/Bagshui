@@ -447,9 +447,16 @@ function Inventory:UpdateWindow()
 		self.borderColor[4]
 	)
 
-	-- if Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline then
-	-- 	Bagshui:PrintDebug("neverOnline")
-	-- end
+	-- Update the utilization display setting.
+	-- Done here because it's consumed in `UpdateBagBar()` and `UpdateToolbar()`.
+	self.alwaysShowUsageSummary = (
+		self.settings.bagUsageDisplay == BS_INVENTORY_BAG_USAGE_DISPLAY.ALWAYS
+		or (
+			self.settings.bagUsageDisplay == BS_INVENTORY_BAG_USAGE_DISPLAY.SMART
+			and not self.settings.stackEmptySlots
+		)
+		or false
+	)
 
 
 	-- Only do the intensive work of redrawing the UI if we have to.
@@ -1001,12 +1008,19 @@ function Inventory:UpdateWindow()
 			-- Ensure main frame anchor is correct.
 			uiFrames.main:SetPoint("BOTTOM", uiFrames.footer, "TOP", 0, 0)
 
-			-- Show/hide Bag Bar.
+			-- Show/hide Bag Bar and mini utilization summary.
 			if self.settings.showBagBar then
 				uiFrames.bagBar:Show()
+				self.ui.frames.miniSpaceSummaryBottom:Hide()
 			else
 				uiFrames.bagBar:Hide()
+				if self.alwaysShowUsageSummary then
+					self.ui.frames.miniSpaceSummaryBottom:Show()
+				end
 			end
+
+			-- Remove space summary from top toolbar.
+			self.ui.frames.miniSpaceSummaryTop:Hide()
 
 			-- Apply bag bar scaling and opacity.
 			local bagBarScale = (itemSlotSize / uiButtons.itemSlots[1].bagshuiData.originalSizeAdjusted) * BsSkin.bagBarScale
@@ -1655,7 +1669,8 @@ end
 --- Update free/available slot counts. Subclasses should override for special bag bar stuff.
 function Inventory:UpdateBagBar()
 
-	local shouldShowSpaceInformation = false
+	local showBagUsage = self.settings.bagUsageAlwaysShow
+	local showUsageSummary = false
 
 	-- We always need to do one loop through the bag buttons to refresh the appearance and make some decisions.
 	for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
@@ -1737,97 +1752,154 @@ function Inventory:UpdateBagBar()
 
 		-- Display free space information when the mouse is over any button.
 		if bagSlotButton.bagshuiData.mouseIsOver then
-			shouldShowSpaceInformation = true
+			showBagUsage = true
+			showUsageSummary = true
 		end
 
 	end
 
 	-- Also display free space information when the mouse is over the summary area.
-	if self.ui.frames.spaceSummary.bagshuiData.mouseIsOver then
-		shouldShowSpaceInformation = true
+	if
+		self.alwaysShowUsageSummary
+		or self.ui.frames.spaceSummary.bagshuiData.mouseIsOver
+	then
+		showUsageSummary = true
 	end
 
 	-- Cancel free space display in Edit Mode.
 	if self.editMode then
-		shouldShowSpaceInformation = false
+		showBagUsage = false
+		showUsageSummary = false
 	end
 
 	-- Width of bag space summary text area to the right of the bag bar that will be added
 	-- to the overall bag bar width.
 	local summaryWidth = 0
 
-	-- Don't bother with calculations if space information isn't going to be shown.
-	if shouldShowSpaceInformation then
+	-- Reset space tracking - don't need to worry about whether the table members
+	-- are initialized because that's handled below. Here we're only iterating over
+	-- what already exists.
+	for _, spaceInfo in pairs(self.containerSpace) do
+		spaceInfo.available = 0
+		spaceInfo.used = 0
+		spaceInfo.total = 0
+	end
+	self.availableSlots, self.usedSlots, self.totalSlots = 0, 0, 0
 
-		-- Reset space tracking - don't need to worry about whether the table members
-		-- are initialized because that's handled below. Here we're only iterating over
-		-- what already exists.
-		for _, spaceInfo in pairs(self.containerSpace) do
-			spaceInfo.available = 0
-			spaceInfo.used = 0
-			spaceInfo.total = 0
-		end
-		self.availableSlots, self.usedSlots, self.totalSlots = 0, 0, 0
-
-		-- Gether free space information.
-		for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
-			-- Step through bag slot buttons and determine available/used/total space.
-			local container = self.containers[bagSlotButton.bagshuiData.bagNum]
-			local available, used = 0, 0
-			local slotText = ""
-			if container.numSlots > 0 then
-				used = container.slotsFilled
-				if container.slotsFilled < container.numSlots then
-					available = container.numSlots - used
-					slotText = string.format("%s/%s", used, container.numSlots)
-				else
-					slotText = L.Full
-				end
+	-- Gether free space information.
+	for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
+		-- Step through bag slot buttons and determine available/used/total space.
+		local container = self.containers[bagSlotButton.bagshuiData.bagNum]
+		local available, used = 0, 0
+		local slotText = ""
+		if container.numSlots > 0 then
+			used = container.slotsFilled
+			if container.slotsFilled < container.numSlots then
+				available = container.numSlots - used
+				slotText = string.format("%s/%s", used, container.numSlots)
+			else
+				slotText = L.Full
 			end
+		end
+		if showBagUsage then
 			bagSlotButton.bagshuiData.buttonComponents.stock:SetText(slotText)
 			bagSlotButton.bagshuiData.buttonComponents.stock:Show()
-
-			local genericType = container.genericType or BsGameInfo.itemSubclasses["Container"]["Bag"]
-
-			-- Initialize space tracking if needed.
-			if not self.containerSpace[genericType] then
-				self.containerSpace[genericType] = {
-					available = 0,
-					used = 0,
-					total = 0
-				}
-			end
-
-			-- Update calculations.
-			local spaceInfo = self.containerSpace[genericType]
-			spaceInfo.available = spaceInfo.available + available
-			spaceInfo.used = spaceInfo.used + used
-			spaceInfo.total = spaceInfo.total + container.numSlots
-			self.availableSlots = self.availableSlots + available
-			self.usedSlots = self.usedSlots + used
-			self.totalSlots = self.totalSlots + container.numSlots
+		else
+			bagSlotButton.bagshuiData.buttonComponents.stock:Hide()
 		end
 
-		-- Set text.
-		self.ui.frames.spaceSummary.bagshuiData.text:SetText(self.availableSlots)
+		local genericType = container.genericType or BsGameInfo.itemSubclasses["Container"]["Bag"]
+
+		-- Initialize space tracking if needed.
+		if not self.containerSpace[genericType] then
+			self.containerSpace[genericType] = {
+				available = 0,
+				used = 0,
+				total = 0
+			}
+		end
+
+		-- Update calculations.
+		local spaceInfo = self.containerSpace[genericType]
+		spaceInfo.available = spaceInfo.available + available
+		spaceInfo.used = spaceInfo.used + used
+		spaceInfo.total = spaceInfo.total + container.numSlots
+		self.availableSlots = self.availableSlots + available
+		self.usedSlots = self.usedSlots + used
+		self.totalSlots = self.totalSlots + container.numSlots
+	end
+
+	-- Figure out what to display in the summary based on settings.
+
+	local textParts = BsUtil.Split(self.settings.bagUsageFormat, "_")
+
+	local mainText = tostring(textParts[1] == "Used" and self.usedSlots or self.availableSlots)
+	local miniText = mainText
+	local subText
+	if textParts[2] then
+		if textParts[2] == "Total" then
+			subText = self.totalSlots
+		elseif textParts[3] == "Total" then
+			subText = string.format(
+				"%s/%s",
+				(textParts[2] == "Used" and self.usedSlots or self.availableSlots),
+				self.totalSlots
+			)
+			-- miniText = miniText .. " (" .. subText .. ")"
+		end
+	end
+
+
+	if showUsageSummary then
+		self.ui.frames.spaceSummary.bagshuiData.text:SetText(mainText)
 		self.ui.frames.spaceSummary.bagshuiData.text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
-		self.ui.frames.spaceSummary.bagshuiData.subtext:SetText(string.format("%s/%s", self.usedSlots, self.totalSlots))
-		self.ui.frames.spaceSummary.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		self.ui.frames.miniSpaceSummaryBottom.bagshuiData.text:SetText(miniText)
+		self.ui.frames.miniSpaceSummaryBottom.bagshuiData.text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		self.ui.frames.miniSpaceSummaryTop.bagshuiData.text:SetText(miniText)
+		self.ui.frames.miniSpaceSummaryTop.bagshuiData.text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		if subText then
+			self.ui.frames.spaceSummary.bagshuiData.text:ClearAllPoints()
+			self.ui.frames.spaceSummary.bagshuiData.text:SetPoint("BOTTOM", self.ui.frames.spaceSummary, "CENTER", 0, -2)
+			self.ui.frames.spaceSummary.bagshuiData.subtext:SetText(subText)
+			self.ui.frames.spaceSummary.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+			self.ui.frames.spaceSummary.bagshuiData.subtext:Show()
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:SetText(subText)
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:Show()
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:SetText(subText)
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:Show()
+		else
+			self.ui.frames.spaceSummary.bagshuiData.subtext:Hide()
+			self.ui.frames.spaceSummary.bagshuiData.text:ClearAllPoints()
+			self.ui.frames.spaceSummary.bagshuiData.text:SetPoint("CENTER", self.ui.frames.spaceSummary, "CENTER")
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:Hide()
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:SetText("")
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:Hide()
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:SetText("")
+		end
 
 		-- Resize and show/hide.
 		summaryWidth = math.max(self.ui.frames.spaceSummary.bagshuiData.text:GetStringWidth(), self.ui.frames.spaceSummary.bagshuiData.subtext:GetStringWidth())
 		self.ui.frames.spaceSummary:SetWidth(summaryWidth)
 		self.ui.frames.spaceSummary:SetAlpha(1)  -- Reversing the SetAlpha(0) call that happens when we hide the summary.
 
+		self.ui.frames.miniSpaceSummaryBottom:SetWidth(
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.text:GetStringWidth()
+			+ self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:GetStringWidth()
+			+ 2
+		)
+		self.ui.frames.miniSpaceSummaryTop:SetWidth(
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.text:GetStringWidth()
+			+ self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:GetStringWidth()
+			+ 2
+		)
 	else
-		-- Hide totals.
-		for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
-			bagSlotButton.bagshuiData.buttonComponents.stock:Hide()
-		end
-
 		-- Hide space summary.
 		self.ui.frames.spaceSummary:SetAlpha(0)  -- Using SetAlpha() instead of Hide() so it's still responsive to mouseover.
 	end
+
+	
 
 	-- Set the Bag Bar to the correct width.
 	self.ui.frames.bagBar:SetWidth(
@@ -1921,7 +1993,7 @@ function Inventory:UpdateToolbar()
 		self.ui:SetIconButtonColors(button)
 	end
 
-	-- State buttons .
+	-- State buttons.
 	self:SetToolbarButtonState(toolbarButtons.offline, (not self.online))
 	self:SetToolbarButtonState(toolbarButtons.error, (string.len(self.errorText or "") > 0))
 	self:SetToolbarButtonState(toolbarButtons.editMode, self.editMode, nil, self.editMode)
@@ -2014,11 +2086,33 @@ function Inventory:UpdateToolbar()
 		not self.editMode
 	)
 
+	-- Utilization summaries.
+	if
+		self.alwaysShowUsageSummary
+		and (
+			not self.settings.showFooter
+			or (
+				self.settings.showFooter
+				and not self.settings.showBagBar
+			)
+		)
+	then
+		if self.settings.showFooter then
+			self.ui.frames.miniSpaceSummaryBottom:Show()
+			self.ui.frames.miniSpaceSummaryTop:Hide()
+		else
+			self.ui.frames.miniSpaceSummaryBottom:Hide()
+			self.ui.frames.miniSpaceSummaryTop:Show()
+		end
+	else
+		self.ui.frames.miniSpaceSummaryBottom:Hide()
+		self.ui.frames.miniSpaceSummaryTop:Hide()
+	end
 
 	-- Re-anchor all toolbar widgets based on visibility.
-	self:UpdateToolbarAnchoring(self.ui.ordering.topLeftToolbar, "LEFT")
-	self:UpdateToolbarAnchoring(self.ui.ordering.topRightToolbar, "RIGHT")
-	self:UpdateToolbarAnchoring(self.ui.ordering.bottomRightToolbar, "RIGHT")
+	self:UpdateToolbarAnchoring("topLeftToolbar", "LEFT")
+	self:UpdateToolbarAnchoring("topRightToolbar", "RIGHT")
+	self:UpdateToolbarAnchoring("bottomRightToolbar", "RIGHT")
 
 	-- Disable unusable stuff in Edit Mode.
 	local editModeState = (self.editMode) and "Disable" or "Enable"
@@ -2088,9 +2182,10 @@ end
 
 
 --- Toolbar icons need their anchors updated based on what's shown.
----@param widgetList (table|number)[] WoW UI widgets, in display order. Numbers are spacing directives that override the default.
+---@param widgetOrderTable string Name of table in `self.ui.ordering`, which is an array of WoW UI widgets, in display order. Can also include numbers as spacing directives that override the default.
 ---@param anchorPoint "LEFT"|"RIGHT" Place to anchor each widget. This point will be anchored to the opposing point of the previous widget.
-function Inventory:UpdateToolbarAnchoring(widgetList, anchorPoint)
+function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
+	local widgetList = self.ui.ordering[widgetOrderTable]
 	local invert = (anchorPoint == "RIGHT" and -1 or 1)
 	local defaultOffset = invert * BsSkin.toolbarSpacing
 	local nextOffset

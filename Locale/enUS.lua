@@ -316,6 +316,8 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Accessibility"] = "Accessibility",
 ["Menu_Settings_Advanced"] = "Advanced",
 ["Menu_Settings_Anchoring"] = "Anchoring",
+["Menu_Settings_BagUsage"] = "Utilization",
+["Menu_Settings_BagUsage_TooltipText"] = "Display of available slots and overall capacity.",
 ["Menu_Settings_Behaviors"] = "Behaviors",
 ["Menu_Settings_Badges"] = "Item Badges",
 ["Menu_Settings_Buttons"] = "Buttons",
@@ -326,6 +328,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_DefaultProfiles"] = "Default Profiles",
 ["Menu_Settings_Defaults"] = "Defaults",
 ["Menu_Settings_Etcetera"] = "Etcetera",
+["Menu_Settings_Format"] = "Format",
 ["Menu_Settings_General"] = "General",
 ["Menu_Settings_GroupDefaults"] = "Group Defaults",
 ["Menu_Settings_Groups"] = "Groups",
@@ -339,8 +342,10 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Overrides"] = "Overrides",
 ["Menu_Settings_Open"] = "!!Open!!",
 ["Menu_Settings_Options"] = "Options",
+["Menu_Settings_PerBag"] = "Per-Bag",
 ["Menu_Settings_Profile"] = "Profile",
 ["Menu_Settings_Size"] = "Sizing",
+["Menu_Settings_Summary"] = "Summary",
 ["Menu_Settings_Tinting"] = "Item Tinting",
 ["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
@@ -348,6 +353,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
 ["Menu_Settings_StockBadgeColors"] = "Stock Colors",
 ["Menu_Settings_View"] = "View",
+["Menu_Settings_Visibility"] = "Visibility",
 ["Menu_Settings_Window"] = "Window",
 
 -- Category Menu.
@@ -920,12 +926,38 @@ BsLocalization:AddLocale("enUS", {
 ["Setting_Reset_TooltipText"] = "Reset to default: Ctrl+Alt+Shift+Click.",
 ["Setting_Profile_Use"] = "Make this the active %s %s profile.",  -- Make this the active Bags Design profile.
 
+["Setting_BagUsageDisplay_Always"] = "Always",
+["Setting_BagUsageDisplay_Always_TooltipTitle"] = "Summary Always Visible",
+["Setting_BagUsageDisplay_Always_TooltipText"] = "Show utilization summary regardless of any other setting.",
+["Setting_BagUsageDisplay_Smart"] = "Automatic",
+["Setting_BagUsageDisplay_Smart_TooltipTitle"] = "Automatic Summary Visibility",
+["Setting_BagUsageDisplay_Smart_TooltipText"] = "Show utilization summary when empty slot stacking is off (or hovering over bag slots).",
+["Setting_BagUsageDisplay_Never"] = "Never",
+["Setting_BagUsageDisplay_Never_TooltipTitle"] = "Summary Never Visible",
+["Setting_BagUsageDisplay_Never_TooltipText"] = "Utilization summary will never be displayed (except when hovering over bag slots).",
+
+["Setting_BagUsageFormat_Empty"] = "Empty",
+["Setting_BagUsageFormat_Empty_Total"] = "Empty/Total",
+["Setting_BagUsageFormat_Empty_Used_Total"] = "Empty (Used/Total)",
+["Setting_BagUsageFormat_Used"] = "Used",
+["Setting_BagUsageFormat_Used_Total"] = "Used/Total",
+["Setting_BagUsageFormat_Used_Empty_Total"] = "Used (Empty/Total)",
 
 -- ### Settings ###
 -- Keys are settingName, settingName_TooltipTitle, or settingName_TooltipText.
 -- See localization notes in the declaration of `Settings:InitSettingsInfo()` for more information.
 
 ["aboutBagshui_TooltipTitle"] = "About Bagshui",
+
+["bagUsageAlwaysShow"] = "Always Show",
+["bagUsageAlwaysShow_TooltipTitle"] = "Per-Bag Usage Always Visible",
+["bagUsageAlwaysShow_TooltipText"] = "Always display utilization over each bag (only applies if bag slots are visible).",
+
+["bagUsageDisplay"] = "Show",
+["bagUsageDisplay_TooltipText"] = "Control when the inventory consumption display is visible.",
+
+["bagUsageFormat"] = "Utilization Summary Format",
+["bagUsageFormat_TooltipText"] = "Control which numbers are shown in the inventory consumption display.",
 
 ["colorblindMode"] = "Colorblind Mode",
 ["colorblindMode_TooltipText"] = "Always show item quality and unusable badges regardless of Design settings.",

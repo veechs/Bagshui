@@ -558,6 +558,30 @@ local bagshuiEnvironment = {
 		NO_CHANGE = "",
 	},
 
+	
+	---@enum BS_INVENTORY_BAG_USAGE_DISPLAY
+	-- Control when bag usage is displayed.
+	-- Values must match Setting_BagUsageDisplay_* localization entries.
+	---@type table<string, string>
+	BS_INVENTORY_BAG_USAGE_DISPLAY = {
+		ALWAYS = "Always",
+		SMART = "Smart",
+		NEVER = "Never",
+	},
+
+	---@enum BS_INVENTORY_BAG_USAGE_FORMAT
+	-- Control how bag usage is displayed.
+	-- Values must match Setting_BagUsageFormat_* localization entries.
+	---@type table<string, string>
+	BS_INVENTORY_BAG_USAGE_FORMAT = {
+		EMPTY = "Empty",
+		EMPTY_TOTAL = "Empty_Total",
+		EMPTY_USED_TOTAL = "Empty_Used_Total",
+		USED = "Used",
+		USED_TOTAL = "Used_Total",
+		USED_EMPTY_TOTAL = "Used_Empty_Total",
+	},
+
 
 	---@enum BS_RULE_ENVIRONMENT_VARIABLES
 	-- Variables that are pre-populated into the Rule evaluation environment.
