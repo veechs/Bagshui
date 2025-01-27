@@ -137,6 +137,7 @@ BsLocalization:AddLocale("enUS", {
 ["NoRuleFunction"] = "(No Rule Function)",
 ["NoValue"] = "(No Value)",
 ["Open"] = "Open",
+["Openable"] = "Openable",
 ["PleaseWait"] = "Please wait...",
 ["Profile"] = "Profile",
 ["Prefix_Add"] = "Add %s",
