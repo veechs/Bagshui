@@ -492,6 +492,7 @@ function Inventory:UpdateWindow()
 		self.hasOpenables = false  -- Updated in AssignItemsToSlots().
 		self.nextOpenableItemBagNum = nil  -- Updated in AssignItemsToSlots().
 		self.nextOpenableItemSlotNum = nil  -- Updated in AssignItemsToSlots().
+		self.nextOpenableItemSlotButton = nil  -- Updated in AssignItemsToSlots().
 
 		-- Full reset of empty slot stack counts is needed so that the tracking of which
 		-- bag they represent is rebuilt.
@@ -1257,6 +1258,7 @@ function Inventory:AssignItemsToSlots(
 					if not self.nextOpenableItemBagNum then
 						self.nextOpenableItemBagNum = item.bagNum
 						self.nextOpenableItemSlotNum = item.slotNum
+						self.nextOpenableItemSlotButton = button
 					end
 				end
 
