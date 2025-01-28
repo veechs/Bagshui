@@ -370,6 +370,7 @@ function Inventory:New(newPropsOrInventoryType)
 		hasOpenables = false,
 		nextOpenableItemBagNum = nil,
 		nextOpenableItemSlotNum = nil,
+		nextOpenableItemSlotButton = nil,
 
 		-- Used to track changes that occur when bags are moved between slots (see `Bagshui:PickupInventoryItem()` for details).
 		pendingContainerChanges = {},
@@ -394,7 +395,7 @@ function Inventory:New(newPropsOrInventoryType)
 		dockingFrameVisibleOnLastOpen = false,
 
 		---@type boolean Make the bag utilization summary visible at all times - managed by UpdateWindow().
-		bagUsageAlwaysShow = false,
+		alwaysShowUsageSummary = false,
 
 		---@type table|nil Hearthstone cache entry tracking.
 		hearthstoneItemRef = nil,

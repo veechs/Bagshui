@@ -605,8 +605,8 @@ end
 
 
 --- OnLeave: Reset everything and hide the tooltip.
-function Inventory:ItemButton_OnLeave()
-	local itemButton = _G.this
+function Inventory:ItemButton_OnLeave(itemButton)
+	itemButton = itemButton or _G.this
 
 	-- Clear Edit Mode category highlighting.
 	if self.editState.cursorItemType ~= BS_INVENTORY_OBJECT_TYPE.CATEGORY or self.editState.cursorItem == nil then

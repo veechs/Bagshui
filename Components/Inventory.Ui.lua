@@ -264,6 +264,7 @@ function Inventory:InitUi()
 		_G.GameTooltip:SetOwner(_G.this, "ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint))
 		_G.GameTooltip:SetSpell(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
 		_G.GameTooltip:Show()
+		return false
 	end
 
 	--- Hide the tooltip.
@@ -271,6 +272,7 @@ function Inventory:InitUi()
 		if _G.GameTooltip:IsOwned(_G.this) then
 			_G.GameTooltip:Hide()
 		end
+		return false
 	end
 
 	-- Permanent variables for OnUpdate to keep the garbage collector happy.
@@ -832,6 +834,7 @@ function Inventory:InitUi()
 		anchorToPoint = "LEFT",
 		disable = false,
 		texture = "Clam",
+		tooltipTitle = L.OpenContainer,
 		onClick = function()
 			if
 				self.nextOpenableItemBagNum
@@ -841,34 +844,34 @@ function Inventory:InitUi()
 			end
 		end,
 		onEnter = function()
+			-- Actual work will be handled in OnUpdate.
 			_G.this.bagshuiData.mouseIsOver = true
-			if not self.hasOpenables then
-				return
-			end
-			-- Highlight targeted item.
-			self.highlightItemsInContainerId = self.nextOpenableItemBagNum
-			self.highlightItemsContainerSlot = self.nextOpenableItemSlotNum
-			self:UpdateItemSlotColors()
-			-- Show item tooltip. It's fine that the tooltip says "<Right Click to Open>"
-			-- since toolbar buttons respond to both left and right click.
-			_G.GameTooltip:SetOwner(_G.this, "ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint))
-			_G.GameTooltip:SetBagItem(self.nextOpenableItemBagNum, self.nextOpenableItemSlotNum)
-			_G.GameTooltip:Show()
 		end,
 		onLeave = function()
 			_G.this.bagshuiData.mouseIsOver = false
 			self.highlightItemsInContainerId = nil
 			self.highlightItemsContainerSlot = nil
 			self:UpdateItemSlotColors()
-			if _G.GameTooltip:IsOwned(_G.this) then
-				_G.GameTooltip:Hide()
+			if self.nextOpenableItemSlotButton then
+				self:ItemButton_OnLeave(self.nextOpenableItemSlotButton)
+			elseif self.lastHighlightedOpenableButton then
+				self:ItemButton_OnLeave(self.lastHighlightedOpenableButton)
 			end
+			self.lastHighlightedOpenableButton = nil
 		end,
 		onUpdate = function()
 			if not _G.this.bagshuiData.mouseIsOver then
+				-- We need to essentially fake an OnLeave event when the
+				-- last container is opened because the normal OnLeave
+				-- won't fire, which leads to the light highlighted item
+				-- slot button thinking it's still moused over.
+				if _G.this.bagshuiData.wasUpdated then
+					_G.this.bagshuiData.wasUpdated = false
+				end
 				return
 			end
-			_G.this:GetScript("OnEnter")()
+			self:HighlightNextOpenable()
+			_G.this.bagshuiData.wasUpdated = true
 		end,
 	})
 
@@ -1322,6 +1325,22 @@ function Inventory:HideUsageSummary(owner, attachedToBagBar, tooltip)
 	-- Decide whether to keep displaying slot available/used counts.
 	if attachedToBagBar and self.ui.frames.bagBar:IsVisible() then
 		self.ui.frames.bagBar:GetScript("OnLeave")()
+	end
+end
+
+
+
+--- Spotlights the item that will be targeted by clicking the Open Container button.
+function Inventory:HighlightNextOpenable()
+	-- Avoid firing OnEnter constantly.
+	if self.lastHighlightedOpenableButton ~= self.nextOpenableItemSlotButton then
+		self.highlightItemsInContainerId = self.nextOpenableItemBagNum
+		self.highlightItemsContainerSlot = self.nextOpenableItemSlotNum
+		if self.nextOpenableItemSlotButton then
+			self:ItemButton_OnEnter(self.nextOpenableItemSlotButton)
+		end
+		self:UpdateItemSlotColors()
+		self.lastHighlightedOpenableButton = self.nextOpenableItemSlotButton
 	end
 end
 
