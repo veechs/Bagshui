@@ -2061,7 +2061,13 @@ function Inventory:UpdateToolbar()
 			and self.settings.showClam
 			or false
 		),
-		self.hasOpenables and not self.editMode
+		(
+			self.hasOpenables
+			and not self.editMode
+			-- Don't allow at Bank because UseContainerItem() moves the item
+			-- instead of opening it.
+			and not Bagshui.components.Bank.atBank
+		)
 	)
 
 	-- Disenchant button.
