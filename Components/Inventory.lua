@@ -666,6 +666,7 @@ function Inventory:OnEvent(event, arg1, arg2)
 	then
 		self.cacheUpdateNeeded = true
 		self.windowUpdateNeeded = true
+		self.resortNeeded = true  -- Light up the resort icon if the window is open.
 		-- DO NOT force a resort here or things will move around when the inventory
 		-- window is open and one of the change events is raised.
 		self:QueueUpdate()
