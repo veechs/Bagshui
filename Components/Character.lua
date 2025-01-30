@@ -21,15 +21,16 @@ Bagshui:AddComponent(function()
 
 -- Events that will trigger `Character:OnEvent()`.
 local CHARACTER_EVENTS = {
-	BAGSHUI_INITIAL_CHARACTER_UPDATE = true,  -- Delayed processing at startup
-	CHAT_MSG_SKILL = true,  -- New skills learned or leveled up
+	BAGSHUI_INITIAL_CHARACTER_UPDATE = true,  -- Delayed processing at startup.
+	CHAT_MSG_SKILL = true,  -- New skills learned or leveled up.
 	CHAT_MSG_SYSTEM = true,  -- Messages to parse for important events.
-	CRAFT_SHOW = true,  -- Enchanting profession window is opened
+	CRAFT_SHOW = true,  -- Enchanting profession window is opened.
 	PLAYER_ENTERING_WORLD = true,  -- Trigger initial processing at startup
-	PLAYER_LEVEL_UP = true,  -- Level up
-	SPELLS_CHANGED = true,  -- Need to update spells
-	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting)
-	UPDATE_INVENTORY_ALERTS = true,  -- Equipped gear has changed
+	PLAYER_LEVEL_UP = true,  -- Level up.
+	SKILL_LINES_CHANGED = true,  -- Need to update skills.
+	SPELLS_CHANGED = true,  -- Need to update spells.
+	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting).
+	UPDATE_INVENTORY_ALERTS = true,  -- Equipped gear has changed.
 }
 
 -- Events that should trigger a money update.
@@ -155,7 +156,7 @@ Bagshui.components.Character = Character
 ---@param event string WoW API event
 ---@param arg1 any First event argument.
 function Character:OnEvent(event, arg1)
-	-- Bagshui:PrintDebug("Character event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
+	-- Bagshui:PrintDebug("Character event " .. event .. " // " .. tostring(arg1))
 
 	-- Initial processing at startup. The delayed event is necessary to ensure
 	-- we can actually get the data we need, which isn't available instantly.
@@ -187,6 +188,7 @@ function Character:OnEvent(event, arg1)
 			and (
 				event == "SPELLS_CHANGED"
 				or event == "CHAT_MSG_SKILL"
+				or event == "SKILL_LINES_CHANGED"
 			)
 		)
 		or event == "BAGSHUI_INITIAL_CHARACTER_UPDATE"
@@ -276,7 +278,7 @@ function Character:UpdateInfo(newLevel)
 		return
 	end
 
-	-- Raise an event if there wer changes.
+	-- Raise an event if there were changes.
 	if self.initialized then
 		for key, value in pairs(self.info) do
 			if self.info[key] ~= _updateInfo_oldValues[key] then
@@ -303,8 +305,18 @@ end
 
 
 
+-- Reusable tables for `UpdateSkillsAndSpells()`.
+
+local update_tempSpells = {}
+local update_tempSkills = {}
+
+
 --- Refresh the list of known skills and spells.
 function Character:UpdateSkillsAndSpells()
+
+	-- Backup copy to compare against so we know whether changes actually happened.
+	BsUtil.TableCopy(self.spells, update_tempSpells)
+	BsUtil.TableCopy(self.skills, update_tempSkills)
 
 	-- Rebuild the lists fresh each time.
 	BsUtil.TableClear(self.spells)
@@ -328,7 +340,7 @@ function Character:UpdateSkillsAndSpells()
 
 	-- Iterate skills and place them in the appropriate category.
 	local skillCategory
-	local skip = false
+	local skip  -- Will be either nil or true depending on whether the skill is in `IGNORE_SKILL_CATEGORY`.
 	for skillIndex = 1, _G.GetNumSkillLines() do
 		local skillName, isHeader, _, skillRank = _G.GetSkillLineInfo(skillIndex)
 		if isHeader then
@@ -344,10 +356,20 @@ function Character:UpdateSkillsAndSpells()
 		end
 	end
 
-	-- Being lazy and not checking for actual changes here.
-	if self.initialized then
+	-- Is anything different?
+	if
+		self.initialized
+		and (
+			not BsUtil.ObjectsEqual(self.spells, update_tempSpells)
+			or not BsUtil.ObjectsEqual(self.skills, update_tempSkills)
+		)
+	then
 		Bagshui:RaiseEvent("BAGSHUI_CHARACTER_UPDATE")
 	end
+
+	-- Don't need to keep contents (but do keep the tables).
+	BsUtil.TableClear(update_tempSpells)
+	BsUtil.TableClear(update_tempSkills)
 end
 
 
@@ -528,8 +550,8 @@ end
 --- Add an item's ID to the given list.
 ---@param professionName string Name of the associated profession.
 ---@param itemLink string Link of item produced by the skill.
----@param list number[] List to add the item to.
----@return string? # Item ID, or nil if the itemLink wasn't able to be processed.
+---@param list table<number, table> List to add the item to.
+---@return boolean? # True if changes made to `list`, false if no changes made, or nil if the itemLink wasn't able to be processed.
 function Character:AddProfessionItemToList(professionName, itemLink, list)
 	if type(itemLink) ~= "string" then
 		return
@@ -545,9 +567,13 @@ function Character:AddProfessionItemToList(professionName, itemLink, list)
 	if not list[itemId] then
 		list[itemId] = {}
 	end
+	if list[itemId][professionName] == true then
+		-- Already linked to the profession.
+		return false
+	end
 	list[itemId][professionName] = true
-	-- Return the item ID to indicate that a change was made.
-	return itemId
+	-- A change was made.
+	return true
 end
 
 
