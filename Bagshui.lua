@@ -914,6 +914,9 @@ function Bagshui:Init()
 		self:ProcessEventQueue()
 	end)
 
+	-- Enable for event spelunking only.
+	-- self.eventFrame:RegisterAllEvents()
+
 
 	-- Bagshui itself needs these events. Other classes register their own events.
 	self:RegisterEvent("ADDON_LOADED")
@@ -1106,6 +1109,8 @@ end
 ---@param arg3 any? Third argument, if any.
 ---@param arg4 any? Fourth argument, if any.
 function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
+	-- Bagshui:PrintDebug("Bagshui event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
+
 	local downstreamEvent = event  --[[@as string|nil]]
 
 	if event == "ADDON_LOADED" then
