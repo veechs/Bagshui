@@ -43,6 +43,11 @@ function Inventory:Group_OnEnter(group)
 		-- Format the group name.
 		_G.GameTooltip:AddLine(Bagshui:FormatTooltipLine(groupName, string.format(L.Symbol_Colon, L.Group), true))
 
+		-- Group is hidden.
+		if inventory.groups[groupId] and inventory.groups[groupId].hide then
+			_G.GameTooltip:AddLine(GRAY_FONT_COLOR_CODE .. "«" .. L.Hidden .. "»" .. FONT_COLOR_CODE_CLOSE)
+		end
+
 		-- Build bulleted category list.
 		_G.GameTooltip:AddLine(string.format(L.Symbol_Colon, L.Categories), nil, nil, nil, true) -- "Categories:"
 		local categoryList = inventory.groups[groupId] and inventory.groups[groupId].categories
@@ -221,6 +226,18 @@ function InventoryUi:CreateGroup(groupNum)
 			-- This has to be in a frame so the full label can be revealed on mouseover.
 			group.bagshuiData.labelFrame, group.bagshuiData.text = ui:CreateLabel(group, ui.frames.main)
 
+			-- Add hidden indicator.
+			group.bagshuiData.hidden = group:CreateTexture(nil, "OVERLAY")
+			group.bagshuiData.hidden:SetTexture(BsUtil.GetFullTexturePath("Icons\\Mask"))
+			group.bagshuiData.hidden:SetHeight(10)
+			group.bagshuiData.hidden:SetWidth(10)
+			-- Adjust position based on border inset.
+			local backdrop = group:GetBackdrop()
+			local inset = ((backdrop.insets and backdrop.insets.top) or 0) + 1
+			group.bagshuiData.hidden:SetPoint("TOPRIGHT", group, "TOPRIGHT", -inset, 2 - inset)
+			-- Will be displayed by `Inventory:SetGroupColors()` when appropriate.
+			group.bagshuiData.hidden:Hide()
+
 			-- Add group behaviors
 			group:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			group:RegisterForDrag("LeftButton")
@@ -296,6 +313,14 @@ function InventoryUi:SetGroupColors(uiGroup, mouseDown)
 		-- Use configured label opacity outside Edit Mode.
 		if not inventory.editMode then
 			textOpacity = textColor[4]
+		end
+
+		-- Display hidden indicator in Edit Mode.
+		if inventory.editMode and inventory.groups[groupId].hide then
+			uiGroup.bagshuiData.hidden:Show()
+			uiGroup.bagshuiData.hidden:SetAlpha(uiGroup.bagshuiData.mouseIsOver and 0.8 or 0.5)
+		else
+			uiGroup.bagshuiData.hidden:Hide()
 		end
 	end
 

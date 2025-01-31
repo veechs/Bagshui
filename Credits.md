@@ -55,6 +55,7 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 * [Floppy Disk](https://www.flaticon.com/free-icon/check_9403270) - [Pixel perfect - Flaticon](https://www.flaticon.com/authors/pixel-perfect)
 * [Hammer](https://www.flaticon.com/free-icon/hammer_3998325) - [Mehwish - Flaticon](https://www.flaticon.com/authors/mehwish)
 * [Lock Picking](https://thenounproject.com/icon/lock-picking-5627779/) - [Juicy Fish - Noun Project](https://thenounproject.com/creator/admin885/)
+* [Masquerade](https://www.flaticon.com/free-icon/masquerade_2959796) - [Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
 * [Magnifying Glass](https://www.flaticon.com/free-icon/magnifying-glass_3626504) - [Icon home - Flaticon](https://www.flaticon.com/authors/icon-home)
 * [Pearl](https://www.flaticon.com/free-icon/pearl_3092943) - [Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
 * [Priest](https://www.flaticon.com/free-icon/priest_4263904) - [Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
