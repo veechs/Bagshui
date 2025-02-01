@@ -647,7 +647,7 @@ end
 --- Initiate the restacking process.
 --- This doesn't do the actual work; it just sets up a queue of restack operations,
 --- which is necessary because there needs to be a slight delay between each operation.
---- That process is handled by ProcessRestackQueue().
+--- That process is handled by ProcessMoveQueue().
 function Inventory:Restack()
 	-- Ensure inventory cache is up to date.
 	self.cacheUpdateNeeded = true
@@ -655,7 +655,7 @@ function Inventory:Restack()
 
 	-- This function can be called when a docked inventory has partial stacks
 	-- but this one doesn't. The case where this one has partials and the docked
-	-- one may or may not is handled once Inventory:ProcessRestackQueue() is done.
+	-- one may or may not is handled once Inventory:ProcessMoveQueue() is done.
 	if not self.multiplePartialStacks then
 		if self.dockedInventory then
 			self.dockedInventory:Restack()
@@ -671,10 +671,10 @@ function Inventory:Restack()
 	end
 
 	-- Reset restack queues.
-	BsUtil.TableClear(self.restackQueue.sources)
-	BsUtil.TableClear(self.restackQueue.targets)
+	BsUtil.TableClear(self.queuedMoveSources)
+	BsUtil.TableClear(self.queuedMoveTargets)
 
-	-- Reset restack retry count (used by ProcessRestackQueue() to decide when to give up if items are locked).
+	-- Reset restack retry count (used by ProcessMoveQueue() to decide when to give up if items are locked).
 	self.restackRetryCount = 0
 
 	-- Find all the partial stacks.
@@ -742,8 +742,8 @@ function Inventory:Restack()
 					then
 
 						-- Queue move of source stacks onto target.
-						table.insert(self.restackQueue.sources, source)
-						table.insert(self.restackQueue.targets, target)
+						table.insert(self.queuedMoveSources, source)
+						table.insert(self.queuedMoveTargets, target)
 						--self:PrintDebug(string.format(">>> queued %s:%s (%s) to %s:%s (%s)", source.bagNum, source.slotNum, source.count, target.bagNum, target.slotNum, target.count))
 
 						-- Calculate the changes.
@@ -769,39 +769,53 @@ function Inventory:Restack()
 			end
 		end
 	end
-	--self:PrintDebug(table.getn(self.restackQueue.sources) .. " moves queued")
+	--self:PrintDebug(table.getn(self.queuedMoveSources) .. " moves queued")
+
+	-- The only callback needed for restack is to also restack a docked Inventory class.
+	-- It's fine to let self.restack_DoneCallback be nil otherwise.
+	if self.dockedInventory and not self.restack_DoneCallback then
+		self.restack_DoneCallback = function()
+			self.dockedInventory:Restack()
+		end
+	end
 
 	-- Make the actual moves.
-	self:ProcessRestackQueue()
+	self:ProcessMoveQueue(self.restack_DoneCallback)
 end
 
 
 
--- Perform the restack operations queued up by Restack().
-function Inventory:ProcessRestackQueue()
+--- Perform the item move operations queued by restacking or bag swapping.
+---@param doneCallback function? 
+function Inventory:ProcessMoveQueue(doneCallback)
 
-	--self:PrintDebug("Starting ProcessRestackQueue()")
+	--self:PrintDebug("Starting ProcessMoveQueue()")
+
+	-- Store callback for when we've finished.
+	if type(doneCallback) == "function" then
+		self.processMoveQueue_Callback = doneCallback
+	end
 
 	-- Are we done?
-	if table.getn(self.restackQueue.sources) <= 0 then
+	if table.getn(self.queuedMoveSources) <= 0 then
 		--self:PrintDebug("Nothing left to do")
-		Bagshui:QueueClassCallback(self, self.Update, 0.1)
-		-- Trigger docked inventory restack.
-		if self.dockedInventory then
-			self.dockedInventory:Restack()
+		self:QueueUpdate(0.1)
+		-- Trigger callback.
+		if type(self.processMoveQueue_Callback) == "function" then
+			self.processMoveQueue_Callback()
 		end
 		return
 	end
 
-	--self:PrintDebug("starting move # " .. table.getn(self.restackQueue.sources))
+	--self:PrintDebug("starting move # " .. table.getn(self.queuedMoveSources))
 
 	-- Defaults.
 	local queueDelay = 0.15
 	local removeFromQueue = false
 
 	-- Get info about the current operation.
-	local source = self.restackQueue.sources[1]
-	local target = self.restackQueue.targets[1]
+	local source = self.queuedMoveSources[1]
+	local target = self.queuedMoveTargets[1]
 
 	-- Empty the cursor just in case, since we're technically picking up and putting down items.
 	_G.ClearCursor()
@@ -891,14 +905,14 @@ function Inventory:ProcessRestackQueue()
 
 	-- Once we're done with this set, take them out of the queue.
 	if removeFromQueue then
-		table.remove(self.restackQueue.sources, 1)
-		table.remove(self.restackQueue.targets, 1)
+		table.remove(self.queuedMoveSources, 1)
+		table.remove(self.queuedMoveTargets, 1)
 	end
 
 	-- Queue either the next restack operation.
 	-- The check at the beginning of this function will stop things when we're done.
-	--self:PrintDebug("Remaining: " .. table.getn(self.restackQueue.sources))
-	Bagshui:QueueClassCallback(self, self.ProcessRestackQueue, queueDelay)
+	--self:PrintDebug("Remaining: " .. table.getn(self.queuedMoveSources))
+	Bagshui:QueueClassCallback(self, self.ProcessMoveQueue, queueDelay)
 
 end
 

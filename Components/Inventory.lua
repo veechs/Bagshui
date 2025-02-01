@@ -328,11 +328,9 @@ function Inventory:New(newPropsOrInventoryType)
 		shadowStockState = {},
 		shadowBagshuiDate = {},
 
-		-- Restack queue -- see Restack() for details.
-		restackQueue = {
-			sources = {},
-			targets = {},
-		},
+		-- Item move queue -- used for restacking and bag swapping.
+		queuedMoveSources = {},
+		queuedMoveTargets = {},
 
 		-- Tracking tables used in UpdateCache().
 		preUpdateItemCounts = {},
