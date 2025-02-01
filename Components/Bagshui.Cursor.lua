@@ -93,7 +93,12 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 
 
 	-- Empty slot stack / normal handling.
-	if inventoryClass and itemSlotButton and itemSlotButton.bagshuiData and itemSlotButton.bagshuiData.isEmptySlotStack then
+	if
+		inventoryClass
+		and itemSlotButton
+		and itemSlotButton.bagshuiData
+		and itemSlotButton.bagshuiData.isEmptySlotStack
+	then
 		-- This is an empty slot stack.
 		-- Instead of just putting the item in whatever slot happens to represent the empty slot stack, we're
 		-- going to iterate all containers and find the first one with an empty slot. This also gives us a chance
