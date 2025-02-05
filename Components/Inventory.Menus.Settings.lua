@@ -80,6 +80,8 @@ function Inventory:FixSettingsMenuPosition(secondPass)
 			-- Trigger second pass position check on next frame update.
 			Bagshui:QueueClassCallback(self, self.FixSettingsMenuPosition, nil, nil, true)
 		else
+			local positionChanged = false
+
 			-- Check to see if the Settings menu has been positioned offscreen horizontally
 			-- or is overlapping the Inventory window, and if so, move it to the other side.
 			if
@@ -90,14 +92,21 @@ function Inventory:FixSettingsMenuPosition(secondPass)
 				)
 			then
 				self.lastSettingsAnchor = BsUtil.FlipAnchorPointComponent(self.lastSettingsAnchor, 2)
-				self.lastSettingsXOffset = self.lastSettingsXOffset * -1
+				self.lastSettingsXOffset = -self.lastSettingsXOffset
+				positionChanged = true
+			end
+
+			-- Vertical adjustment to keep the entire menu onscreen.
+			local yOffset = BsUtil.GetFrameOffscreenAmount(menu, "y")		
+
+			if positionChanged or yOffset ~= 0 then
 				menu:ClearAllPoints()
 				menu:SetPoint(
 					self.lastSettingsAnchor,
 					self.uiFrame,
 					BsUtil.FlipAnchorPointComponent(self.lastSettingsAnchor, 2),
 					self.lastSettingsXOffset,
-					0
+					yOffset
 				)
 			end
 		end
