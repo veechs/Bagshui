@@ -1047,6 +1047,7 @@ function Inventory:UiFrame_OnDragStop()
 	elseif not self.settings.windowLocked then
 		-- Has to be self instead of "this" because it can be called from docked windows.
 		self.uiFrame:StopMovingOrSizing()
+		self:FixSettingsMenuPosition()
 		self:SaveWindowPosition()
 	end
 end
