@@ -1,12 +1,16 @@
 # Bagshui Changelog
 
+## [1.2.22] - 2025-02-05
+### Fixed
+* [Don't reset window position while drag is in progress](https://github.com/veechs/Bagshui/issues/69). <sup>🪲 [@Nikki1993](https://github.com/Nikki1993)</sup>
+
 ## [1.2.21] - 2025-02-04
 ### Changed
-* Added `Lock` and `Unlock` parameters to `/Bagshui Bags/Bank`. <sup>🪲 leiaravdenheilagekyrkja</sup>
+* Added `Lock` and `Unlock` parameters to `/Bagshui Bags/Bank`.
 
 ### Fixed
 * Significant improvements to Settings menu positioning to keep it onscreen at all times. <sup>🪲 leiaravdenheilagekyrkja</sup>
-
+* Resetting the window position via `/Bagshui Bags/Bank ResetPosition` now works correctly regardless of window anchoring. <sup>🪲 leiaravdenheilagekyrkja</sup>
 
 ## [1.2.20] - 2025-01-25
 ### Fixed
