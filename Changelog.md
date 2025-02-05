@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.22] - 2025-02-05
+### Fixed
+* [Don't reset window position while drag is in progress](https://github.com/veechs/Bagshui/issues/69). <sup>🪲 [@Nikki1993](https://github.com/Nikki1993)</sup>
+
 ## [1.2.21] - 2025-02-04
 ### Changed
 * Added `Lock` and `Unlock` parameters to `/Bagshui Bags/Bank`.
