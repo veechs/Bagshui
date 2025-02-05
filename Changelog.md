@@ -6,7 +6,7 @@
 
 ### Fixed
 * Significant improvements to Settings menu positioning to keep it onscreen at all times. <sup>🪲 leiaravdenheilagekyrkja</sup>
-* Resetting the window position `/Bagshui Bags/Bank ResetPosition` now works correctly regardless of window anchoring. <sup>🪲 leiaravdenheilagekyrkja</sup>
+* Resetting the window position via `/Bagshui Bags/Bank ResetPosition` now works correctly regardless of window anchoring. <sup>🪲 leiaravdenheilagekyrkja</sup>
 
 ## [1.2.20] - 2025-01-25
 ### Fixed
