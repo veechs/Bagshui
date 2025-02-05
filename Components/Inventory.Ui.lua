@@ -1222,6 +1222,12 @@ function Inventory:RescueWindow(requested)
 		or self.uiFrame:GetBottom() >= Bagshui.boundaryFrames.TOP:GetTop() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
 	then
 		self.settings:SetDefaults(true, nil, nil, "windowAnchorYOffset", true)
+		if
+			(self.settings.windowAnchorYPoint == "TOP" and self.settings.windowAnchorYOffset > 0)
+			or (self.settings.windowAnchorYPoint == "BOTTOM" and self.settings.windowAnchorYOffset < 0)
+		then
+			self.settings.windowAnchorYOffset = -self.settings.windowAnchorYOffset
+		end
 		rescued = true
 	end
 
@@ -1231,6 +1237,12 @@ function Inventory:RescueWindow(requested)
 		or self.uiFrame:GetLeft() >= Bagshui.boundaryFrames.RIGHT:GetRight() - BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD
 	then
 		self.settings:SetDefaults(true, nil, nil, "windowAnchorXOffset", true)
+		if
+			(self.settings.windowAnchorXPoint == "RIGHT" and self.settings.windowAnchorXOffset > 0)
+			or (self.settings.windowAnchorXPoint == "LEFT" and self.settings.windowAnchorXOffset < 0)
+		then
+			self.settings.windowAnchorXOffset = -self.settings.windowAnchorXOffset
+		end
 		rescued = true
 	end
 
