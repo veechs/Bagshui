@@ -497,19 +497,37 @@ function Inventory:New(newPropsOrInventoryType)
 	end
 
 	-- Register slash command handler with additional verbs.
-	BsSlash:AddOpenCloseHandler(classObj.inventoryType, classObj, {L.Settings, L.ResetPosition}, function(tokens)
-		if BsUtil.MatchLocalizedOrNon(tokens[2], "settings") then
-			classObj:Open()
-			classObj.menus:OpenMenu("Settings")
-			return true
-		end
+	BsSlash:AddOpenCloseHandler(
+		classObj.inventoryType,
+		classObj,
+		{
+			L.Settings,
+			L.ResetPosition,
+			L.Lock,
+			L.Unlock,
+		},
+		function(tokens)
+			if BsUtil.MatchLocalizedOrNon(tokens[2], "settings") then
+				classObj:Open()
+				classObj.menus:OpenMenu("Settings")
+				return true
+			end
 
-		if BsUtil.MatchLocalizedOrNon(tokens[2], "resetposition") then
-			classObj:Open()
-			classObj:RescueWindow(true)
-			return true
+			if BsUtil.MatchLocalizedOrNon(tokens[2], "resetposition") then
+				classObj:Open()
+				classObj:RescueWindow(true)
+				return true
+			end
+
+			if
+				BsUtil.MatchLocalizedOrNon(tokens[2], "lock")
+				or BsUtil.MatchLocalizedOrNon(tokens[2], "unlock")
+			then
+				classObj.settings.windowLocked = BsUtil.MatchLocalizedOrNon(tokens[2], "lock")
+				return true
+			end
 		end
-	end)
+)
 
 	-- Expose as `Bagshui.<inventoryType>`.
 	Bagshui.components[classObj.inventoryType] = classObj
