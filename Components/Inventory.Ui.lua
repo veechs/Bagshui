@@ -1034,6 +1034,7 @@ function Inventory:UiFrame_OnDragStart()
 		Bagshui.components[self.dockTo]:UiFrame_OnDragStart()
 	elseif not self.settings.windowLocked then
 		-- Has to be self instead of "this" because it can be called from docked windows.
+		self.dragInProgress = true
 		self.uiFrame:StartMoving()
 	end
 end
@@ -1046,6 +1047,7 @@ function Inventory:UiFrame_OnDragStop()
 		Bagshui.components[self.dockTo]:UiFrame_OnDragStop()
 	elseif not self.settings.windowLocked then
 		-- Has to be self instead of "this" because it can be called from docked windows.
+		self.dragInProgress = false
 		self.uiFrame:StopMovingOrSizing()
 		self:FixSettingsMenuPosition()
 		self:SaveWindowPosition()
@@ -1175,6 +1177,9 @@ end
 --- Keep the window in the right place.
 ---@param noRescueAttempts boolean? Don't call `Inventory:RescueWindow()`.
 function Inventory:FixWindowPosition(noRescueAttempts)
+	if self.dragInProgress then
+		return
+	end
 
 	-- As soon as a frame is dragged, its anchor changes to TOPLEFT, which leads to undesirable behavior
 	-- when the frame is resized. We have to reset the anchor and position to keep things happy.
