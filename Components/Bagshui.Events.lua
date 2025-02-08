@@ -173,7 +173,8 @@ function Bagshui:RaiseEvent(event, returnStatus, arg1, arg2, arg3, arg4)
 			self.queuedEvents.class[event],
 			arg1,
 			arg2,
-			arg3
+			arg3,
+			arg4
 		)
 
 	elseif type(event) == "function" then
