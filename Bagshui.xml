@@ -130,7 +130,6 @@ Bags and Bank (i.e. both can just specify a template).
 	<Frames>
 		<!--
 		PaperDollItemSlotButtonTemplate doesn't include the animation model.
-		Must be named this way so Blizzard code will work..
 		Must be named this way so Blizzard code will work.
 		-->
 		<Model name="$parentItemAnim" inherits="ItemAnimTemplate">
