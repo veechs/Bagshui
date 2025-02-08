@@ -114,6 +114,8 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 		-- this, we iterate all empty slots that belong to non-profession bags looking for somewhere to
 		-- place the bag that's on the cursor.
 		local bagNumToAvoid
+
+		-- Special handling when a bag has been picked up.
 		if
 			self.cursorBagSlotNum
 			and _G.CursorHasItem()
@@ -139,7 +141,7 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 						and not slotContents._bagshuiPreventEmptySlotStack
 					then
 						-- Update tracking variables so that inventory classes know that this item should
-						-- have its stocks state restored.
+						-- have its stock state restored.
 						self.putDownItemBagNum = bagNum
 						self.putDownItemSlotNum = slotNum
 						-- Move the item.
@@ -189,7 +191,7 @@ end
 
 
 --- Reset our cursor item tracking when the cursor is emptied.
----@param wowApiFunctionName string Hooked WoW API function that triggered this call.
+---@param wowApiFunctionName string? Hooked WoW API function that triggered this call.
 function Bagshui:ClearCursor(wowApiFunctionName)
 	self.cursorItem = nil
 	if self.cursorItemOwningFrame then
