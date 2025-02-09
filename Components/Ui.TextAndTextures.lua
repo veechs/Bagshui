@@ -80,6 +80,21 @@ end
 
 
 
+--- Create a lightly shadowed font string. Use the `:SetText()` method on the returned object to display text.
+---@param parent table Parent frame.
+---@param name string Name of the font string object.
+---@param fontObject string|table? Font object or identifier string (defaults to GameFontHighlight).
+---@return table fontString
+function Ui:CreateShadowedFontString(parent, name, fontObject)
+	local text = parent:CreateFontString(name, nil, fontObject or "GameFontHighlight")
+	text:SetJustifyH("LEFT")
+	text:SetJustifyV("MIDDLE")
+	text:SetShadowColor(0, 0, 0, 0.25)
+	text:SetShadowOffset(0.25, -0.25)
+	return text
+end
+
+
 
 --- Create a frame that holds both the texture and a desaturated version of the texture,
 --- stacked appropriately to create a shadow effect. Manipulation of these textures
@@ -195,22 +210,6 @@ function Ui:SetShadowedTextureShadowAlpha(textureFrame, alpha)
 		textureFrame.bagshuiData.shadow:SetAlpha(alpha < textureFrame.bagshuiData.shadowOpacity and alpha or textureFrame.bagshuiData.shadowOpacity)
 		textureFrame.bagshuiData.shadow:Show()
 	end
-end
-
-
-
---- Create a lightly shadowed font string. Use the `:SetText()` method on the returned object to display text.
----@param parent table Parent frame.
----@param name string Name of the font string object.
----@param fontObject string|table? Font object or identifier string (defaults to GameFontHighlight).
----@return table fontString
-function Ui:CreateShadowedFontString(parent, name, fontObject)
-	local text = parent:CreateFontString(name, nil, fontObject or "GameFontHighlight")
-	text:SetJustifyH("LEFT")
-	text:SetJustifyV("MIDDLE")
-	text:SetShadowColor(0, 0, 0, 0.25)
-	text:SetShadowOffset(0.25, -0.25)
-	return text
 end
 
 
