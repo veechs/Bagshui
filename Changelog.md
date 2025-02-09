@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.23] - 2025-02-09
+### Fixed
+* Unequipping a bag now [correctly unlocks slot highlighting](https://github.com/veechs/Bagshui/issues/70). <sup>🪲 [@Nikki1993](https://github.com/Nikki1993)</sup>
+
 ## [1.2.22] - 2025-02-05
 ### Fixed
 * [Don't reset window position while drag is in progress](https://github.com/veechs/Bagshui/issues/69). <sup>🪲 [@Nikki1993](https://github.com/Nikki1993)</sup>
