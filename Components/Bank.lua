@@ -156,6 +156,9 @@ end
 ---@param allSlotsPurchased boolean? Whether all bank slots have been purchased.
 ---@return number numSlotsPurchased
 function Bank:UpdateBagSlotPurchaseStatus(bagSlotButton, numSlotsPurchased, allSlotsPurchased)
+	if not self.online then
+		return
+	end
 	if numSlotsPurchased == nil then
 		numSlotsPurchased, allSlotsPurchased = _G.GetNumBankSlots()
 	end
