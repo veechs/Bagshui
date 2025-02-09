@@ -178,6 +178,18 @@ function InventoryUi:CreateBagSlotButtons()
 		bagSlotButton:SetScript("OnUpdate", function(elapsed)
 			onUpdate_refreshTooltip = false
 
+			-- Remove item highlighting if there's no longer a container in the slot.
+			if
+				inventory.highlightItemsInContainerLocked == _G.this.bagshuiData.bagNum
+				and not inventory:BagSlotButtonHasBag(_G.this)
+			then
+				inventory:PrintDebug("Clearing highlight")
+				inventory.highlightItemsInContainerLocked = nil
+				inventory.highlightItemsInContainerId = nil
+				inventory:UpdateBagBar()
+				inventory:UpdateItemSlotColors()
+			end
+
 			-- Safeguard to prevent tooltips from popping up when the mouse has already left.
 			if not _G.this.bagshuiData.mouseIsOver then
 				_G.this.bagshuiData.tooltipCooldownUpdate = nil
@@ -213,9 +225,11 @@ function InventoryUi:CreateBagSlotButtons()
 			local this = _G.this
 			local bagNum = this.bagshuiData.bagNum
 
+			local hasBag = inventory:BagSlotButtonHasBag(this)
+
 			-- Alt-click highlight lock.
 			if
-				inventory:BagSlotButtonHasBag(this)
+				hasBag
 				and (
 					_G.IsAltKeyDown()
 					-- Normal clicking needs to remove the highlight lock since the bag might be getting picked up.
@@ -269,6 +283,12 @@ function InventoryUi:CreateBagSlotButtons()
 
 			if oldOnClick then
 				oldOnClick()
+			end
+
+			-- Equipping a new bag should highlight slots immediately.
+			if not hasBag then
+				-- Need a short delay for inventory cache to update.
+				Bagshui:QueueEvent(this:GetScript("OnEnter"), 0.25, nil, this)
 			end
 
 		end)
