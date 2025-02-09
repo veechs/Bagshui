@@ -447,6 +447,19 @@ function Inventory:UpdateWindow()
 		self.borderColor[4]
 	)
 
+	-- self.ui.frames.busyStandalone:SetBackdropColor(
+	-- 	self.windowColor[1],
+	-- 	self.windowColor[2],
+	-- 	self.windowColor[3],
+	-- 	self.windowColor[4]
+	-- )
+	-- self.ui.frames.busyStandalone:SetBackdropBorderColor(
+	-- 	self.borderColor[1],
+	-- 	self.borderColor[2],
+	-- 	self.borderColor[3],
+	-- 	self.borderColor[4]
+	-- )
+
 	-- Update the utilization display setting.
 	-- Done here because it's consumed in `UpdateBagBar()` and `UpdateToolbar()`.
 	self.alwaysShowUsageSummary = (
@@ -482,8 +495,15 @@ function Inventory:UpdateWindow()
 		local firstFrame, widestRowLastFrame, topmostFrame
 
 		-- Window component visibility.
-		local showHeader = (self.settings.showHeader and not self.dockTo) or self.temporarilyShowWindowHeader
-		local showFooter = (self.settings.showFooter and not self.dockTo) or self.temporarilyShowWindowFooter
+		local showHeader = (
+			(self.settings.showHeader and not self.dockTo)
+			or self.temporarilyShowWindowHeader
+		)
+		local showFooter =(
+			(self.settings.showFooter and not self.dockTo)
+			or self.temporarilyShowWindowFooter
+			or self.temporarilyShowBagBar
+		)
 
 		-- Reset hidden group and item tracking.
 		self.hasHiddenGroups = false  -- Updated in this function.
@@ -1010,7 +1030,7 @@ function Inventory:UpdateWindow()
 			uiFrames.main:SetPoint("BOTTOM", uiFrames.footer, "TOP", 0, 0)
 
 			-- Show/hide Bag Bar and mini utilization summary.
-			if self.settings.showBagBar then
+			if self.settings.showBagBar or self.temporarilyShowBagBar then
 				uiFrames.bagBar:Show()
 				self.ui.frames.miniSpaceSummaryBottom:Hide()
 			else
@@ -2160,26 +2180,31 @@ function Inventory:SetToolbarButtonState(
 	end
 	button[visible and "Show" or "Hide"](button)
 
-	if enable == nil then
-		enable = true
+	if button.Enable then
+		if enable == nil then
+			enable = true
+		end
+		button[enable and "Enable" or "Disable"](button)
 	end
-	button[enable and "Enable" or "Disable"](button)
 
-	if lockHighlight then
-		if lockedHighlightTooltip then
-			button.bagshuiData.tooltipTitle = lockedHighlightTooltip
+	if button.LockHighlight then
+		if lockHighlight then
+			if lockedHighlightTooltip then
+				button.bagshuiData.tooltipTitle = lockedHighlightTooltip
+			end
+			button:LockHighlight()
+		else
+			if unlockedHighlightTooltip then
+				button.bagshuiData.tooltipTitle = unlockedHighlightTooltip
+			end
+			button:UnlockHighlight()
 		end
-		button:LockHighlight()
-	else
-		if unlockedHighlightTooltip then
-			button.bagshuiData.tooltipTitle = unlockedHighlightTooltip
-		end
-		button:UnlockHighlight()
 	end
 
 	-- Update tooltip if it's visible so that text stays current.
 	if
-		button.bagshuiData.mouseIsOver
+		button.bagshuiData.isIconButton
+		and button.bagshuiData.mouseIsOver
 		and BsIconButtonTooltip:IsVisible()
 		and BsIconButtonTooltip:IsOwned(button)
 	then

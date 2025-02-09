@@ -828,6 +828,16 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				return
 			end
 
+			-- Bag swapping.
+			if
+				Bagshui.cursorBagSlotNum
+				and BsItemInfo:IsContainer(item)
+				and self.inventoryIdsToContainerIds[Bagshui.cursorBagSlotNum]
+			then
+				self:SwapBag(item, self.inventoryIdsToContainerIds[Bagshui.cursorBagSlotNum])
+				return
+			end
+
 			-- Try to do something with the item. When that fails, go on to default actions.
 			local clickHandled = true
 			local callPickupContainerItemFromBagshuiPickupItem = false

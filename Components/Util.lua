@@ -353,7 +353,7 @@ end
 ---@param template table? Table that defines the allowable structure of `source`. Anything not found in the template won't be copied.
 ---@param tableWildcard table? When the pointer to this table appears in the template, anything in the corresponding `source` location will be copied over.
 ---@param parentHadTableWildcard boolean? Will be `true` when a recursive call is made and the `tableWildcard` was found as the value.
----@return table? newDest Newly created copy if `dest` was not provided..
+---@return table? newDest Newly created copy if `dest` was not provided.
 function Util.TableCopy(source, dest, forceKeyValueCopy, template, tableWildcard, parentHadTableWildcard)
 	assert(type(source) == "table", "TableCopy(): type(source) = " .. type(source) .. " instead of table")
 	assert(dest == nil or type(dest) == "table", "TableCopy:() type(dest) = " .. type(dest) .. " instead of table or nil")
@@ -441,6 +441,37 @@ function Util.TableCopy(source, dest, forceKeyValueCopy, template, tableWildcard
 	end
 
 	-- Only return if dest was nil.
+	if not dest then
+		return target
+	end
+end
+
+
+
+--- Non-recursive table copy; just loop through the first level.
+--- Useful when it's important to preserve an array of table pointers.
+--- `TableCopy()` could be refactored to handle this too, but it's not worth it.
+---@param source table Table to copy from.
+---@param dest table? Table to copy into, or `nil` to copy into a new table and return that.
+---@param forceKeyValueCopy boolean? Use key-value copy even when `table.getn(source) > 0`.
+---@return table? newDest Newly created copy if `dest` was not provided.
+function Util.TableCopyFlat(source, dest, forceKeyValueCopy)
+	assert(type(source) == "table", "TableCopy(): type(source) = " .. type(source) .. " instead of table")
+	assert(dest == nil or type(dest) == "table", "TableCopy:() type(dest) = " .. type(dest) .. " instead of table or nil")
+
+	local target = (dest and dest ~= source) and dest or {}
+	Util.TableClear(target)
+
+	if table.getn(source) > 0 and not forceKeyValueCopy then
+		for _, value in ipairs(source) do
+			table.insert(target, value)
+		end
+	else
+		for key, value in pairs(source) do
+			target[key] = value
+		end
+	end
+
 	if not dest then
 		return target
 	end
@@ -765,6 +796,41 @@ end
 --- ones (like `DELETE_GOOD_ITEM`) don't do it OnShow.
 function Util.StaticPopupDialogs_ClearTextOnHide()
 	_G[_G.this:GetName().."EditBox"]:SetText("")
+end
+
+
+
+--- Pause code execution until a dialog is dismissed.
+---@param dialogName string Static popup name to wait for.
+---@param timeoutSec number? Maximum wait time in seconds.
+---@param callback function? Called once waiting is completed. Will receive a boolean indicating whether the dialog closed within timeout. *Technically* optional but without it this function is kind of meaningless.
+---@param checkCount number? Number of checks performed. Don't pass this in during the initial call.
+---@return boolean? dialogWasOpen `true` if popup was on screen during the *initial* call.
+function Util.WaitForStaticPopupClose(dialogName, timeoutSec, callback, checkCount)
+	timeoutSec = timeoutSec or 30
+	if _G.StaticPopup_FindVisible(dialogName) then
+		if ((checkCount or 0) * 0.1) >= timeoutSec then
+			-- Dialog did NOT close within timeout (failure).
+			if type(callback) == "function" then
+				callback(true)
+			end
+		end
+		Bagshui:QueueEvent(
+			Util.WaitForStaticPopupClose,
+			0.1,
+			nil,
+			dialogName,
+			timeoutSec,
+			callback,
+			(checkCount or 0) + 1
+		)
+		return true
+	end
+
+	-- Dialog closed (success).
+	if type(callback) == "function" then
+		callback(true)
+	end
 end
 
 

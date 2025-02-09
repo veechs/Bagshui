@@ -173,6 +173,7 @@ BsLocalization:AddLocale("enUS", {
 ["Search"] = "Search",
 ["Settings"] = "Settings",
 ["Share"] = "Share",
+["ShiftClick"] = "Shift+Click",
 ["Show"] = "Show",
 ["SortOrder"] = "Sort Order",
 ["SortOrders"] = "Sort Orders",
@@ -187,6 +188,7 @@ BsLocalization:AddLocale("enUS", {
 ["Symbol_Brackets"] = "[%s]",
 ["Symbol_Colon"] = "%s:",
 ["Symbol_Ellipsis"] = "%s…",  -- Used in menus to indicate that clicking it will open another dialog or menu
+["Symbol_Parentheses"] = "(%s)",
 ["Templates"] = "Templates",
 ["Text"] = "Text",
 ["Toggle"] = "Toggle",  -- Verb
@@ -270,6 +272,10 @@ BsLocalization:AddLocale("enUS", {
 ["Spell_Disenchant"] = "Disenchant",
 ["Spell_PickLock"] = "Pick Lock",
 
+-- Bag tooltips.
+["Bag_SlotsNeededToSwap"] = "%d more free slot(s) required to swap.",
+["Bag_SupplementalSpaceAvailable"] = "You may be to swap at the %s without cleaning your %s.",
+
 -- Toolbar.
 ["Toolbar_Menu_TooltipTitle"] = "Menu",
 ["Toolbar_ExitEditMode"] = "Exit Edit Mode",
@@ -291,6 +297,7 @@ BsLocalization:AddLocale("enUS", {
 ["Toolbar_UnHighlightChanges_TooltipTitle"] = "Don't Highlight Changes",
 
 -- Action Tooltips.
+["Tooltip_Inventory_PlaceBagInBagHint"] = "%s to move into bag instead of swapping.",  -- "Shift-Click to lock/unlock slot highlighting"
 ["Tooltip_Inventory_ToggleBagSlotHighlightLockHint"] = "%s to %s slot highlighting.",  -- "Alt-Click to lock/unlock slot highlighting"
 ["Tooltip_Inventory_ToggleEmptySlotStacking"] = "%s to %s empty slots.",  -- "Click to stack/unstack empty slots"
 ["Tooltip_Inventory_TradeShortcut"] = "%s to trade with %s.",  -- "Alt-Click to trade with <Player Name>"
@@ -400,6 +407,8 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "Assign the item to a new custom category.",
 ["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "Built-in Categories are read-only - see FAQ on the Bagshui Wiki for reasoning.",
 ["Menu_Item_AssignToClassCategory"] = "Direct Assignment to",
+["Menu_Item_EquipBag"] = "Equip Bag",
+["Menu_Item_EquipBag_TooltipText"] = "Replace one of the currently equipped bags.",
 ["Menu_Item_Information_TooltipTitle"] = "Item Information",
 ["Menu_Item_Information_TooltipText"] = "View details about this item's properties and access the Item Information window.",
 ["Menu_Item_Information_Submenu_TooltipText"] = "Click to open the Item Information window.",
@@ -859,6 +868,9 @@ BsLocalization:AddLocale("enUS", {
 ["Error_AddonDependency_Generic"] = "An additional addon is required to enable this rule function (refer to the Rules page on the Bagshui wiki).",
 ["Error_AddonDependency_Generic_FunctionName"] = "An additional addon is required to enable the use of %s (refer to the Rules page on the Bagshui wiki).",
 ["Error_AddonDependency"] = "%s is not installed or enabled.",
+["Error_BagSwap_EmptyOldFailed"] = "Failed to empty the old bag.",
+["Error_BagSwap_EmptyOldInsufficientSpace"] = "Not enough free slots to empty the old bag.",
+["Error_BagSwap_EquipNewFailed"] = "Failed to equip the new bag.",
 ["Error_CategoryEvaluation"] = "%s: %s",  -- "<Category Name>: <Error Message>"
 ["Error_DuplicateName"] = "There is already a %s named %s.",  -- "There is already a <Object Type> named <Name>."
 ["Error_GroupNotFound"] = "Group ID %s not found.",
@@ -880,6 +892,8 @@ BsLocalization:AddLocale("enUS", {
 ["Compat_ReloadUIPrompt"] = "A UI reload is required.",
 ["Compat_pfUIBags"] = "Disabling the pfUI Bags module is strongly recommended to avoid multiple Bank windows.",
 ["Compat_pfUIBagsInfo"] = "If you change your mind, the pfUI Bags module can be managed in pfUI Config > Components > Modules.",
+["Compat_Swapper"] = "Swapper interferes with Bagshui's bag swapping functionality and must be disabled.",
+["Compat_SwapperInfo"] = "Swapper has been disabled.",
 ["Compat_tDFAllInOneBags"] = "Disabling the tDF All-In-One-Bag module is recommended if you want to use Bagshui as your default bags.",
 ["Compat_tDFAllInOneBagsInfo"] = "If you change your mind, the tDF All-In-One-Bag module can be managed in tDF Options.",
 

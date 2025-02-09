@@ -154,7 +154,6 @@ end
 ---@param bagSlotButton table Bag slot button object.
 ---@param numSlotsPurchased number? How many bank slots have been purchased so far.
 ---@param allSlotsPurchased boolean? Whether all bank slots have been purchased.
----@return number numSlotsPurchased
 function Bank:UpdateBagSlotPurchaseStatus(bagSlotButton, numSlotsPurchased, allSlotsPurchased)
 	if not self.online then
 		return
@@ -171,7 +170,9 @@ function Bank:UpdateBagSlotPurchaseStatus(bagSlotButton, numSlotsPurchased, allS
 			not allSlotsPurchased
 			and bagSlotButton.bagshuiData.bagSlotNum == numSlotsPurchased + 1
 		)
-	return numSlotsPurchased
+	-- `usable` is consumed by the "Equip Bag" item menu entry to determine when
+	-- a slot should be disabled.
+	self.containers[bagSlotButton.bagshuiData.bagNum].usable = self.containers[bagSlotButton.bagshuiData.bagNum].purchased
 end
 
 

@@ -82,6 +82,11 @@ Bagshui.config.Inventory = {
 			["^OpenAllBags$"] = "hookBag0",
 		},
 
+		-- Can use Bank if there isn't enough space to swap a bag.
+		bagSwappingSupplementalStorage = {
+			"Bank"
+		},
+
 		-- Bags get all the special toolbar buttons.
 
 		hearthButton = true,
@@ -139,6 +144,11 @@ Bagshui.config.Inventory = {
 		},
 
 		opensViaHooks = false,
+
+		-- Can use Bags if there isn't enough space to swap a bag.
+		bagSwappingSupplementalStorage = {
+			"Bags"
+		},
 
 		-- Bank can't have the Clam button because `UseContainerItem()` just moves
 		-- items to Bags.

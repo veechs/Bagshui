@@ -81,6 +81,7 @@ Don't move things around unless you're sure it won't break anything.
 
 <!-- Inventory class prototype -->
 <Include file="Components\Inventory.lua" />
+<Include file="Components\Inventory.Actions.lua" />
 <Include file="Components\Inventory.Cache.lua" />
 <Include file="Components\Inventory.EditMode.lua" />
 <Include file="Components\Inventory.Layout.lua" />

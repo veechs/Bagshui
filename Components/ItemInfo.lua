@@ -593,6 +593,20 @@ end
 
 
 
+--- Is the given item a bag?
+---@param item table Inventory cache entry.
+---@return boolean
+function ItemInfo:IsContainer(item)
+	return (
+		type(item) == "table"
+		and (
+			item.type == L.Container
+			or item.type == L.Quiver
+		)
+	)
+end
+
+
 --- Parse an item's tooltip to determine whether a specific skill is required to use it.
 --- Relies on the correct localized search pattern being defined in TooltipParse_RequiresLevel.
 ---@param itemTooltip string Item tooltip as a single string.

@@ -191,7 +191,6 @@ function Inventory:New(newPropsOrInventoryType)
 		-- ```
 		primaryContainer = {},
 
-		
 		---@type function? Called as the second parameter to <tooltip>:SetInventoryItem() 
 		--- and passed the item's slotNum. This is necessary because some containers'
 		--- contents can't be loaded into tooltips using SetBagItem().
@@ -225,8 +224,11 @@ function Inventory:New(newPropsOrInventoryType)
 
 		--#region Additional subclass override properties. --------------------------------
 
-		---@type BS_INVENTORY_TYPE to attach frame to.
+		---@type BS_INVENTORY_TYPE? to attach frame to.
 		dockTo = nil,
+
+		---@type BS_RULE_MATCH_TYPE[]? Inventory classes to use as temporary space when swapping bags.
+		bagSwappingSupplementalStorage = nil,
 
 		---@type boolean Should the special toolbar buttons be available?
 
@@ -278,6 +280,7 @@ function Inventory:New(newPropsOrInventoryType)
 			BagSlotButton_OnClick = "BagSlotButton_OnHook",
 			BagSlotButton_OnDrag = "BagSlotButton_OnHook",
 			TradeFrame_OnShow = "TradeFrame_OnShow",
+			UIErrorsFrame_OnEvent = "UIErrorsFrame_OnEvent",  -- See Inventory.Actions.lua.
 		},
 
 		---@type table<string,string> See Inventory:GetHookSettingName() for details.
@@ -331,6 +334,10 @@ function Inventory:New(newPropsOrInventoryType)
 		-- Item move queue -- used for restacking and bag swapping.
 		queuedMoveSources = {},
 		queuedMoveTargets = {},
+		tempMoveTargets = {},
+
+		-- Available empty slots (excluding profession bags -- see `Inventory:SwapBag()` comments).
+		emptyGenericContainerSlots = {},
 
 		-- Tracking tables used in UpdateCache().
 		preUpdateItemCounts = {},
@@ -431,13 +438,14 @@ function Inventory:New(newPropsOrInventoryType)
 		-- `containers` stores the following information about equipped/available bags (subclasses may add more):
 		-- ```
 		-- <ContainerId> = {
-		-- 	name = <Name of bag>
-		-- 	numSlots = <Number of slots>
-		--  genericType = <Bag Subclass or "Bag"> -- (A bag's "genericType" is the the item class returned by GetItemInfo for profession bags or the localized version of "Bag" for any other bag and the primary container)
-		--  isProfessionBag = <true/false>
-		-- 	slotsFilled = <Number of slots filled>
-		-- 	texture = <Bag texture>
-		-- 	type = <Container type>
+		-- 	name = "<Name of bag>",
+		-- 	numSlots = <Number of slots>,
+		--  genericType = "<Bag Subclass or 'Bag'>",  -- (A bag's "genericType" is the the item class returned by GetItemInfo for profession bags or the localized version of "Bag" for any other bag and the primary container)
+		--  isProfessionBag = <true/false>,
+		-- 	slotsFilled = <Number of slots filled>,
+		-- 	texture = "<Bag texture>",
+		-- 	type = "<Container type>",
+		--  usable = <true/false>,  -- OPTIONAL value. Will disable the slot in the "Equip Bag" item menu if `false`.
 		-- }
 		-- ```
 		containers = nil,   -- `Bagshui.characters[<characterId>][self.inventoryTypeSavedVars].containers`

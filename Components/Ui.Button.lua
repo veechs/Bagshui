@@ -274,6 +274,7 @@ function Ui:CreateIconButton(buttonOpts)
 
 	-- Initialize Bagshui info table.
 	button.bagshuiData = {
+		isIconButton = true,
 		xOffset = buttonOpts.xOffset or -6,
 		yOffset = buttonOpts.yOffset or 0,
 		tooltipTitle = buttonOpts.tooltipTitle,
@@ -431,7 +432,7 @@ end
 
 
 
---- Set icon button (toolbar buttons, etc) texture.
+--- Set icon button (toolbar buttons, etc) texture colors.
 ---@param button table Return value from `Ui:CreateIconButton()`.
 ---@param vertexColor number?[] { r, g, b, [a] }
 ---@param hoverVertexColor number?[] { r, g, b, [a] }

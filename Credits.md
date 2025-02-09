@@ -25,6 +25,7 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 * Icon button cooldown completion shine based on code from [OmniCC](https://github.com/anzz1/OmniCC) by Tuller & kebabstorm (which in turn adapted it from ABInfo by Ombres)
 * Import/export based on code from [pfUI](https://github.com/shagu/pfUI/) (modules/share.lua) by Shagu.
 * Money string formatting from [pfUI](https://github.com/shagu/pfUI/) (`CreateGoldString()` in api/api.lua).
+* Error-triggered bag swapping based on methodology from [Swapper](https://github.com/gabrielecimolino/Swapper) by Gabriele Cimolino.
 * Guidance for hooking some tooltips taken from [aux](https://github.com/shirsig/aux-addon-vanilla/) (core/tooltip.lua) by shirsig and [pfUI](https://github.com/shagu/pfUI/) (libs/libtooltip.lua).
 * Object comparison based on [`deep_equals`](https://gist.github.com/sapphyrus/fd9aeb871e3ce966cc4b0b969f62f539?permalink_comment_id=4563041#gistcomment-4563041) by sapphyrus.
 * RGB conversion to hex uses [`RGBPercToHex`](https://warcraft.wiki.gg/wiki/RGBPercToHex).

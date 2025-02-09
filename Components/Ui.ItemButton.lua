@@ -192,6 +192,47 @@ end
 
 
 
+--- Helper function to create a cooldown model for a button.
+--- Broken out so it can be used by Item and BagSlot buttons.
+---@param button table Parent frame.
+---@return table cooldown
+function Ui:CreateItemButtonCooldown(button, disableText)
+	local cooldown = _G.CreateFrame("Model", button:GetName() .. "Cooldown", button, "CooldownFrameTemplate")
+	cooldown:SetFrameLevel(cooldown:GetFrameLevel() + 1)  -- Move above NormalTexture.
+	-- Enable pfUI cooldown display. The pfUI check is needed because
+	-- Turtle Dragonflight will double the text when pfCooldownType is present.
+	-- (`pfUI` is added to the Bagshui environment in Bagshui.lua).
+	if pfUI then
+		cooldown.pfCooldownType = "ALL"
+	end
+	return cooldown
+end
+
+
+
+--- Display progress using the cooldown radar animation.
+--- Basically a dupe of `CooldownFrame_SetTimer()`.
+--- Needed for two reasons:
+--- 1. The Vanilla version of OmniCC doesn't support the `noCooldownCount` property
+---    and essentially provides no way to prevent number display. It works by hooking
+---    `CooldownFrame_SetTimer()`, so we need to avoid that call.
+--- 2. It's cleaner than calculating these numbers inline.
+---@param cooldown table Cooldown frame.
+---@param progressPercent number 0-100.
+function Ui:ShowProgressViaCooldown(cooldown, progressPercent)
+	if type(progressPercent) == "number" and progressPercent > 0 then
+		cooldown.start = _G.GetTime() - (1000 - ((100 - progressPercent) * 10))
+		cooldown.duration = 1000
+		cooldown.stopping = 0
+		cooldown:SetSequence(0)
+		cooldown:Show()
+	else
+		cooldown:Hide()
+	end
+end
+
+
+
 --- Apply all our visual customizations to an item slot (or bag slot) button.
 ---@param button table Button to skin.
 function Ui:SkinItemButton(button, buttonType)
@@ -343,14 +384,7 @@ function Ui:SkinItemButton(button, buttonType)
 	if buttonType == BS_UI_ITEM_BUTTON_TYPE.ITEM then
 
 		-- Cooldown.
-		buttonComponents.cooldown = _G.CreateFrame("Model", nil, button, "CooldownFrameTemplate")
-		buttonComponents.cooldown:SetFrameLevel(buttonComponents.cooldown:GetFrameLevel() + 1)  -- Move above NormalTexture.
-		-- Enable pfUI cooldown display. The pfUI check is needed because
-		-- Turtle Dragonflight will double the text when pfCooldownType is present.
-		-- (`pfUI` is added to the Bagshui environment in Bagshui.lua).
-		if pfUI then
-			buttonComponents.cooldown.pfCooldownType = "ALL"
-		end
+		buttonComponents.cooldown = self:CreateItemButtonCooldown(button)
 
 		-- All badges need to be 2 levels above the border so the cooldown can be below them.
 		local badgeFrameLevel = buttonComponents.border:GetFrameLevel() + 2

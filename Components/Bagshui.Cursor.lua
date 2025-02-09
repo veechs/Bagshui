@@ -92,7 +92,6 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 	owningFrame.bagshuiData.hasCursorItem = false
 
 
-	-- Empty slot stack / normal handling.
 	if
 		inventoryClass
 		and itemSlotButton
@@ -120,10 +119,34 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 			self.cursorBagSlotNum
 			and _G.CursorHasItem()
 			and inventoryClass
-			-- This is the check to see if we're incorrectly trying to put the bag into itself.
-			and item.bagNum == inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
 		then
-			bagNumToAvoid = item.bagNum
+			local bagNum = inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
+			if inventoryClass.containers[bagNum].slotsFilled > 0 then
+				-- Bag needs to be emptied before it can be unequipped.
+				if inventoryClass:GetAdjustedEmptySlotCount(bagNum) > inventoryClass.containers[bagNum].slotsFilled then
+					-- Empty the bag.
+					local bagSlotNum = self.cursorBagSlotNum
+					local targetBagNum = item.bagNum
+					local targetSlotNum = item.slotNum
+					_G.ClearCursor()
+					inventoryClass:EmptyBag(
+						inventoryClass.inventoryIdsToContainerIds[bagSlotNum],
+						nil,
+						function(success)
+							if success then
+								_G.PickupBagFromSlot(bagSlotNum)
+								self:PickupItem(item, inventoryClass, itemSlotButton, callPickupContainerItem)
+							end
+						end
+					)
+				else
+					-- Not enough empty slots.
+					self:ShowErrorMessage(_G.INVENTORY_FULL, (inventoryClass and inventoryClass.inventoryType))
+				end
+				return
+			end
+			-- Skip this bag when finding empty slots.
+			bagNumToAvoid = inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
 		end
 
 		-- Find the best slot to use.
@@ -163,6 +186,25 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 		end
 
 	else
+		-- Avoid some "can't put a bag in itself" type bag-related errors.
+		-- This is sort of a duplicate of some of the empty slot stack code but
+		-- I can't be bothered to refactor at the moment.
+		-- It's worth doing this check instead of letting the game catch it because
+		-- there can be weird cursor behavior right afterwards where picking up
+		-- a bag with the left mouse button equips it, at least on local VMaNGOS.
+		if
+			self.cursorBagSlotNum
+			and _G.CursorHasItem()
+			and inventoryClass
+		then
+			local bagNum = inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
+			if item.bagNum == bagNum then
+				self:ShowErrorMessage(_G.ERR_BAG_IN_BAG, (inventoryClass and inventoryClass.inventoryType))
+				_G.ClearCursor()
+				return
+			end
+		end
+
 		-- Not an empty slot stack (normal behavior).
 		if callPickupContainerItem then
 			_G.PickupContainerItem(item.bagNum, item.slotNum)
@@ -185,6 +227,8 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 		self.lastCursorItemUniqueId = BsItemInfo:GetUniqueItemId(self.cursorItem)
 		self.pickedUpItemBagNum = item.bagNum
 		self.pickedUpItemSlotNum = item.slotNum
+	else
+		self:ClearCursor()
 	end
 end
 
@@ -207,6 +251,15 @@ function Bagshui:ClearCursor(wowApiFunctionName)
 		self.lastCursorItemUniqueId = nil
 	end
 	self.hooks:OriginalHook(wowApiFunctionName)
+end
+
+
+
+--- Clear our cursor tracking if nothing is held.
+function Bagshui:CheckCursor()
+	if not _G.CursorHasItem() then
+		self:ClearCursor()
+	end
 end
 
 
@@ -262,9 +315,21 @@ function Bagshui:PickupInventoryItem(wowApiFunctionName, invSlotId)
 	local ret = self.hooks:OriginalHook(wowApiFunctionName, invSlotId)
 
 	-- A bag was picked up.
-	if _G.CursorHasItem() and self.cursorItem == nil then
+	if
+		(
+			wowApiFunctionName == "PickupBagFromSlot"
+			or wowApiFunctionName == "PickupInventoryItem"
+		)
+		and _G.CursorHasItem()
+		and self.cursorItem == nil
+	then
 		self.cursorBagSlotNum = invSlotId
 	end
+
+	-- PutItemInBag() doesn't trigger any of our normal cursor clearing methods,
+	-- so a manual check on the next frame is needed to ensure accuracy.
+	-- (Just calling it for all the hooks to be safe).
+	self:QueueClassCallback(self, self.CheckCursor)
 
 	-- Some of the API functions expect return values, so always return what we got back from the original call.
 	return ret
