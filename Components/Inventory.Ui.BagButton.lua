@@ -200,18 +200,14 @@ function InventoryUi:CreateBagSlotButtons()
 				inventory.highlightItemsInContainerLocked == _G.this.bagshuiData.bagNum
 				and not inventory:BagSlotButtonHasBag(_G.this)
 			then
-				inventory:PrintDebug("Clearing highlight")
 				inventory.highlightItemsInContainerLocked = nil
 				inventory.highlightItemsInContainerId = nil
 				inventory:UpdateBagBar()
 				inventory:UpdateItemSlotColors()
 			end
 
-			-- Honestly not even sure if bag cooldowns are something that need to be
-			-- accounted for, but I guess we'll handle it just in case.
-
+			-- "Progress bar" for bag swapping using the cooldown animation.
 			if type(_G.this.bagshuiData.progressPercent) == "number" then
-				-- "Progress bar" mode for bag swapping.
 				-- Use this by setting the bagButton.bagshuiData.progressPercent property to a value 0-100.
 				-- At 100, the completion shine animation will trigger.
 
@@ -232,10 +228,15 @@ function InventoryUi:CreateBagSlotButtons()
 					_G.this.bagshuiData.progressFinishing = nil
 				end
 
-			elseif this.bagshuiData.inventorySlotId then
+			-- elseif this.bagshuiData.inventorySlotId then
+				-- Normal cooldown checking is disabled because I don't think bag cooldowns are even a thing.
+				-- Easy enough to restore if needed.
+				-- If it does get enabled, there will also need to be something added to
+				-- Ui:ShowProgressViaCooldown() to hide any cooldown text that was present.
+				--
 				-- Normal cooldown behavior (primary containers can't have cooldowns so they're excluded.)
-				onUpdate_cooldownStart, onUpdate_cooldownDuration, onUpdate_cooldownEnable = _G.GetInventoryItemCooldown("player", _G.this.bagshuiData.inventorySlotId)
-				_G.CooldownFrame_SetTimer(_G.this.bagshuiData.cooldown, onUpdate_cooldownStart, onUpdate_cooldownDuration, onUpdate_cooldownEnable);
+				-- onUpdate_cooldownStart, onUpdate_cooldownDuration, onUpdate_cooldownEnable = _G.GetInventoryItemCooldown("player", _G.this.bagshuiData.inventorySlotId)
+				-- _G.CooldownFrame_SetTimer(_G.this.bagshuiData.cooldown, onUpdate_cooldownStart, onUpdate_cooldownDuration, onUpdate_cooldownEnable);
 			end
 
 			-- Safeguard to prevent tooltips from popping up when the mouse has already left.
