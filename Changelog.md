@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.24] - 2025-02-10
+### Fixed
+* Multiple objects (Categories, Sort Orders, etc.) created simultaneously will no longer run the risk of overwriting each other.
+
 ## [1.2.23] - 2025-02-09
 ### Fixed
 * Unequipping a bag now [correctly unlocks slot highlighting](https://github.com/veechs/Bagshui/issues/70). <sup>🪲 [@Nikki1993](https://github.com/Nikki1993)</sup>

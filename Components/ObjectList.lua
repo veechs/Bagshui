@@ -114,8 +114,6 @@ function ObjectList:New(instanceProperties)
 		-- Prevent import/export.
 		disableObjectSharing = false,
 
-
-
 		---@type function(objectId) -> boolean
 		-- Prevent creation of objects matching specific criteria.
 		disableObjectCreationFunc = nil,
@@ -176,6 +174,12 @@ function ObjectList:New(instanceProperties)
 		importIgnoreKeys = {
 			name = true,
 		},
+
+		---@type table<number, true>
+		-- When an ID is requested for a new object but it hasn't been saved yet,
+		-- that ID is temporarily stored here so that we won't issue the same
+		-- ID multiple times.
+		reservedObjectIds = {},
 
 		---@type table
 		-- ObjectManager instance that will be initialized when Open() is called.
@@ -702,10 +706,14 @@ function ObjectList:SaveObject(objectId, objectInfo)
 	-- Filter the provided information using the template.
 	BsUtil.TableCopy(objectInfo, self.list[objectId], nil, self.objectSkeleton, BS_OBJECT_LIST_TEMPLATE_TABLE_WILDCARD)
 
+	-- Update saved date.
 	self.list[objectId].dateModified = _G.time()
 
 	-- Allow subclasses to perform operations after saving.
 	self:DoPostSaveOperations(objectId, self.list[objectId])
+
+	-- Release from pending IDs.
+	self.reservedObjectIds[objectId] = nil
 
 	-- There's been a change.
 	self:ObjectsChanged(objectId)
@@ -919,7 +927,9 @@ end
 --- Obtain the next available sequential object ID.
 ---@return number
 function ObjectList:GetNewObjectId()
-	return self:GetNextId()
+	local newID = self:GetNextId()
+	self.reservedObjectIds[newID] = true
+	return newID
 end
 
 
@@ -928,16 +938,21 @@ end
 --- * Doing it this way instead of tracking the next ID in a config file since working
 ---   backwards from 1 million barely takes any time.
 --- * `table.getn()` won't work here because the tables we're using are associative, not array-type.
---- **Warning:** This requires any references to object IDs to be cleaned up when objects
+--- * An extra table is used to track IDs that have been reserved by new objects
+---   that aren't yet saved.
+--- 
+--- ⛔️ **Warning:** This requires any references to object IDs to be cleaned up when objects
 --- are deleted. Otherwise, for example, if object 4 is the last in the list and
 --- it is removed, this function will return 4 when asked for the next ID. Any
 --- leftover references to object 4 will then point to the newly created object.
 ---@param existingObjects table? Defaults to `self.list`.
+---@param reservedObjectIds table? Defaults to `self.reservedObjectIds`.
 ---@return integer
-function ObjectList:GetNextId(existingObjects)
+function ObjectList:GetNextId(existingObjects, reservedObjectIds)
 	existingObjects = existingObjects or self.list
+	reservedObjectIds = reservedObjectIds or self.reservedObjectIds
 	for i = 1000000, 1, -1 do
-		if existingObjects[i] then
+		if existingObjects[i] or reservedObjectIds[i] then
 			return i + 1
 		end
 	end
