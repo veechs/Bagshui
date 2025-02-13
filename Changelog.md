@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.25] - 2025-02-10
+### Changed
+* Added zh-CN localization. Many thanks to [@Sunelegy](https://github.com/Sunelegy)!
+
 ## [1.2.24] - 2025-02-10
 ### Fixed
 * Multiple objects (Categories, Sort Orders, etc.) created simultaneously will no longer run the risk of overwriting each other.
