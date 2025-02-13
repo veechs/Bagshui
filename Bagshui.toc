@@ -1,8 +1,10 @@
 ## Interface: 11200
 ## Title: Bagshui
 ## Notes: All-in-one autosorting inventory
+## Title-zhCN:|CFF00FF00[|r|CFFDD66DD界面|r|CFF00FF00] 乾坤袋
+## Notes-zhCN: 自带离线银行等功能的一体化自动分拣背包插件。
 ## Author: veechs
-## Version: 1.2.24
+## Version: 1.2.25
 ## OptionalDeps: AtlasLoot, ItemRack, Outfitter, pfUI
 ## SavedVariables: BagshuiData
 
