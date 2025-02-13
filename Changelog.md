@@ -1,6 +1,10 @@
 # Bagshui Changelog
 
-## [1.2.25] - 2025-02-10
+## [1.2.26] - 2025-02-13
+### Fixed
+* Avoid [errors](https://github.com/veechs/Bagshui/issues/73) when making bulk purchases at merchants. <sup>🪲 Roido</sup>
+
+## [1.2.25] - 2025-02-12
 ### Changed
 * Added zh-CN localization. Many thanks to [@Sunelegy](https://github.com/Sunelegy)!
 
