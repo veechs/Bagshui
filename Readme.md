@@ -3,7 +3,7 @@
 <div width="100%">&nbsp;</div>
 </h1>
 
-**A Vanilla WoW 1.12 (and Turtle WoW) inventory addon.**<br><sup><small>Not for Classic or Retail; you have [so](https://www.curseforge.com/wow/addons/better-bags) [many](https://www.curseforge.com/wow/addons/ark-inventory) [options](https://www.curseforge.com/wow/search?class=addons&categories=bags-inventory&sortBy=popularity).</small></sup>
+**Feng shui for your bags:** A Vanilla WoW 1.12 (and Turtle WoW) inventory addon.<br><sup>Not for Classic or Retail; you have [so](https://www.curseforge.com/wow/addons/better-bags) [many](https://www.curseforge.com/wow/addons/ark-inventory) [options](https://www.curseforge.com/wow/search?class=addons&categories=bags-inventory&sortBy=popularity).</sup>
 
 [![Bagshui](https://github.com/veechs/Bagshui/wiki/images/BagshuiScreenshots.png)](https://github.com/veechs/Bagshui/wiki/Screenshots)  
 <sup>[More screenshots](https://github.com/veechs/Bagshui/wiki/Screenshots)</sup>
