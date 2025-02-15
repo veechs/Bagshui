@@ -823,7 +823,7 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			buttonInfo.qualityColor.g,
 			buttonInfo.qualityColor.b,
 			(
-				((inventory or buttonInfo.colorBorders) and item and item.quality > -1 and item.locked == 1) and (opacityOverride or BsSkin.itemSlotBorderOpacity)
+				((inventory or buttonInfo.colorBorders) and item and item.quality > -1 and item.locked ~= 1) and (opacityOverride or BsSkin.itemSlotBorderOpacity)
 				or (buttonInfo.forceBorderDisplay and opacityOverride or buttonInfo.qualityColor.a)
 				or 0
 			)
