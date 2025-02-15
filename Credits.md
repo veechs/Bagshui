@@ -67,3 +67,8 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 ### Fonts
 * [Bagnard Sans](https://github.com/sebsan/Bagnard-Sans)
 * [Inconsolata Condensed](https://github.com/googlefonts/Inconsolata)
+
+
+## GitHub templates
+* [Contributing](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62)
+* [Pull request](https://www.talater.com/open-source-templates/)

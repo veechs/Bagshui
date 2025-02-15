@@ -475,6 +475,7 @@ Bagshui.config.Categories = {
 				15138,  -- Onyxia Scale Cloak
 				21986,  -- Banner of Provocation
 				22014,  -- Hallowed Brazier
+				50545,  -- Gemstone of Ysera (Turtle WoW).
 			}
 		},
 
