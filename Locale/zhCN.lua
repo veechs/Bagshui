@@ -465,7 +465,6 @@ BsLocalization:AddLocale("zhCN", {
 ["TooltipParse_Charges"] = [[^(% d+) 次使用 $]],  -- 必须包含 (% d) 捕获组。
 -- ItemInfo:IsUsable() Tooltip parsing
 ["TooltipParse_AlreadyKnown"] = _G.ITEM_SPELL_KNOWN,
-["TooltipParse_RequiresLevel"] = [[需要 (% a [^\s]*) %((% d+)%)]],  -- 旨在匹配 “需要钓鱼 (10)” 并提取 “钓鱼”，“10”。（可能可以使用_G.ITEM_MIN_SKILL 并用捕获组替换其占位符。）
 
 
 -- Shared Category/Group Names.

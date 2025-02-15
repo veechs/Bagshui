@@ -21,7 +21,7 @@ Bagshui started life as a rewrite of EngBags and therefore would not exist witho
 ### Reuse
 * Active quest item detection based on [QuestItem](https://github.com/wow-vanilla-addons/QuestItem) by Shagoth.
 * Item borders use code from [ShaguTweaks](https://github.com/shagu/ShaguTweaks) `AddBorder()` by Shagu and [ShaguTweaks-Mods](https://github.com/GryllsAddons/ShaguTweaks-mods) `AddTexture()` by Grylls.
-* Unusable item tinting based on logic from [EquipColor](https://github.com/mrrosh/EquipColor) by Mr_Rosh.
+* Unusable item dyeing based on logic from [pfUI](https://github.com/shagu/pfUI) by shagu.
 * Icon button cooldown completion shine based on code from [OmniCC](https://github.com/anzz1/OmniCC) by Tuller & kebabstorm (which in turn adapted it from ABInfo by Ombres)
 * Import/export based on code from [pfUI](https://github.com/shagu/pfUI/) (modules/share.lua) by Shagu.
 * Money string formatting from [pfUI](https://github.com/shagu/pfUI/) (`CreateGoldString()` in api/api.lua).
