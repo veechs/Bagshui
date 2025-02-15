@@ -301,7 +301,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Main_ManageSortOrders_TooltipText"] = "Open the Sort Order manager.",
 ["Menu_Main_Toggle_TooltipText"] = "Toggle the %s window.",
 
--- Settings Menu (localizations for settings themselves are configured in `settingsStrings`).
+-- Settings Menu (localizations for settings themselves are configured at the end of this file).
 ["Menu_Settings"] = "%s Settings",  -- "Bags Settings"
 ["Menu_Settings_About"] = "About Bagshui",
 ["Menu_Settings_Accessibility"] = "Accessibility",
