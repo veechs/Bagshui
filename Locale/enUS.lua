@@ -457,8 +457,8 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
 ["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
 ["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
-["TooltipIdentifier_PotionHealth"] = [[/Restores [%d.]+ to [%d.]+ health\./]],  -- Wrap in slashes to activate pattern matching.
-["TooltipIdentifier_PotionMana"] = [[/Restores [%d.]+ to [%d.]+ mana\./]],  -- Wrap in slashes to activate pattern matching.
+["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
+["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
 
 -- Tooltip parsing -- extracting data from tooltips.
