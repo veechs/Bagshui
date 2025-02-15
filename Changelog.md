@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.27] - 2025-02-15
+### Changed
+* Add [Gemstone of Ysera](https://github.com/veechs/Bagshui/issues/84) to default Keys Category. <sup>🗃️ [@Mats391](https://github.com/Mats391)</sup>
+
 ## [1.2.26] - 2025-02-13
 ### Fixed
 * Avoid [errors](https://github.com/veechs/Bagshui/issues/73) when making bulk purchases at merchants. <sup>🪲 Roido</sup>
