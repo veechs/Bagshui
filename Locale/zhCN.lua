@@ -505,7 +505,6 @@ BsLocalization:AddLocale("zhCN", {
 -- ItemInfo:IsUsable() Tooltip parsing
 -- ItemInfo:IsUsable() 提示框解析
 ["TooltipParse_AlreadyKnown"] = _G.ITEM_SPELL_KNOWN,
-["TooltipParse_RequiresLevel"] = [[需要(%a-)%((%d+)%)]],  -- 旨在匹配 "需要 钓鱼 (10)" 并提取 "钓鱼"、"10"。（可能可以使用 _G.ITEM_MIN_SKILL 并将其占位符替换为捕获组。）    
 
 
 -- Shared Category/Group Names.
