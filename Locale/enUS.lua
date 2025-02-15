@@ -247,7 +247,7 @@ BsLocalization:AddLocale("enUS", {
 ["ItemPropFriendly_soulbound"] = "Soulbound",
 ["ItemPropFriendly_stacks"] = "Stacks",
 ["ItemPropFriendly_subtype"] = "Subtype",
-["ItemPropFriendly_SuffixName"] = "Suffix Name",
+["ItemPropFriendly_suffixName"] = "Suffix Name",
 ["ItemPropFriendly_tooltip"] = "Tooltip",
 ["ItemPropFriendly_type"] = "Type",
 ["ItemPropFriendly_uncategorized"] = "Uncategorized",
