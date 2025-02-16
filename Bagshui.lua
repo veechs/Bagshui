@@ -648,6 +648,10 @@ local bagshuiEnvironment = {
 	},
 
 
+	-- Output indentation.
+	BS_INDENT = "  ",
+
+
 	---@enum BS_LOG_MESSAGE_TYPE
 	-- Log message severities.
 	-- ```

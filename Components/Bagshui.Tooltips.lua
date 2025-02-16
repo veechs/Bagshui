@@ -152,7 +152,7 @@ function Bagshui:FormatTooltipLine(text, label, title, indent)
 		)
 	end
 	if indent then
-		tooltipText = "  " .. tooltipText
+		tooltipText = BS_INDENT .. tooltipText
 	end
 	return tooltipText
 end
