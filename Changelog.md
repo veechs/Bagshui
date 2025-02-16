@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.28] - 2025-02-16
+### Fixed
+* The rule function menu in the Category editor has been broken since 1.1. Big oops.
+
 ## [1.2.27] - 2025-02-15
 ### Changed
 * Add [Gemstone of Ysera](https://github.com/veechs/Bagshui/issues/84) to default Keys Category. <sup>🗃️ [@Mats391](https://github.com/Mats391)</sup>
