@@ -816,6 +816,18 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Quality_ExampleExtra1"] = 'Quality(qual1, qual2, qualN)',
 ["RuleFunction_Quality_ExampleDescriptionExtra1"] = "Check if the item is of any of the specified qualities.",
 
+["RuleFunction_RecentlyChanged_GenericDescription"] = "Check if the item's stock state has changed.",
+["RuleFunction_RecentlyChanged_Example1"] = 'RecentlyChanged()',
+["RuleFunction_RecentlyChanged_ExampleDescription1"] = 'Check if the stock state has changed in any way.',
+["RuleFunction_RecentlyChanged_Example2"] = 'RecentlyChanged(New)',
+["RuleFunction_RecentlyChanged_ExampleDescription2"] = 'Check if the item is considered new.',
+["RuleFunction_RecentlyChanged_Example3"] = 'RecentlyChanged(Up)',
+["RuleFunction_RecentlyChanged_ExampleDescription3"] = 'Check if the stock has increased.',
+["RuleFunction_RecentlyChanged_Example4"] = 'RecentlyChanged(Down)',
+["RuleFunction_RecentlyChanged_ExampleDescription4"] = 'Check if the stock has decreased.',
+["RuleFunction_RecentlyChanged_Example5"] = 'RecentlyChanged(New, Up)',
+["RuleFunction_RecentlyChanged_ExampleDescription5"] = 'Check if the item is new or stock has increased, but ignore stock decreases.',
+
 ["RuleFunction_RequiresClass_GenericDescription"] = "Check if the item is usable by the specified class.",
 ["RuleFunction_RequiresClass_ExampleDescription"] = "Check if the item is usable by the %s class.",
 ["RuleFunction_RequiresClass_ExampleExtra1"] = 'RequiresClass("class1", "class2", "classN")',
