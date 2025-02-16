@@ -1,5 +1,21 @@
 # Bagshui Changelog
 
+## [1.2.28] - 2025-02-16
+### Fixed
+* The rule function menu in the Category editor has been broken since 1.1. Big oops.
+
+## [1.2.27] - 2025-02-15
+### Changed
+* Add [Gemstone of Ysera](https://github.com/veechs/Bagshui/issues/84) to default Keys Category. <sup>🗃️ [@Mats391](https://github.com/Mats391)</sup>
+
+## [1.2.26] - 2025-02-13
+### Fixed
+* Avoid [errors](https://github.com/veechs/Bagshui/issues/73) when making bulk purchases at merchants. <sup>🪲 Roido</sup>
+
+## [1.2.25] - 2025-02-12
+### Changed
+* Added zh-CN localization. Many thanks to [@Sunelegy](https://github.com/Sunelegy)!
+
 ## [1.2.24] - 2025-02-10
 ### Fixed
 * Multiple objects (Categories, Sort Orders, etc.) created simultaneously will no longer run the risk of overwriting each other.

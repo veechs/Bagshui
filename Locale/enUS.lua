@@ -247,7 +247,7 @@ BsLocalization:AddLocale("enUS", {
 ["ItemPropFriendly_soulbound"] = "Soulbound",
 ["ItemPropFriendly_stacks"] = "Stacks",
 ["ItemPropFriendly_subtype"] = "Subtype",
-["ItemPropFriendly_SuffixName"] = "Suffix Name",
+["ItemPropFriendly_suffixName"] = "Suffix Name",
 ["ItemPropFriendly_tooltip"] = "Tooltip",
 ["ItemPropFriendly_type"] = "Type",
 ["ItemPropFriendly_uncategorized"] = "Uncategorized",
@@ -301,7 +301,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Main_ManageSortOrders_TooltipText"] = "Open the Sort Order manager.",
 ["Menu_Main_Toggle_TooltipText"] = "Toggle the %s window.",
 
--- Settings Menu (localizations for settings themselves are configured in `settingsStrings`).
+-- Settings Menu (localizations for settings themselves are configured at the end of this file).
 ["Menu_Settings"] = "%s Settings",  -- "Bags Settings"
 ["Menu_Settings_About"] = "About Bagshui",
 ["Menu_Settings_Accessibility"] = "Accessibility",
@@ -457,8 +457,8 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
 ["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
 ["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
-["TooltipIdentifier_PotionHealth"] = [[/Restores [%d.]+ to [%d.]+ health\./]],  -- Wrap in slashes to activate pattern matching.
-["TooltipIdentifier_PotionMana"] = [[/Restores [%d.]+ to [%d.]+ mana\./]],  -- Wrap in slashes to activate pattern matching.
+["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
+["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
 
 -- Tooltip parsing -- extracting data from tooltips.
