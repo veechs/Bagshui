@@ -101,7 +101,7 @@ function Rules:LoadBuiltinRuleFunctions()
 		elseif type(rule.ruleFunction) ~= "function" then
 			Bagshui:PrintError("Built-in rules must have a ruleFunction = function(rules, ruleArguments) property")
 		else
-			rule.templates = rule.templates or Bagshui.config.RuleFunctionTemplates[rule.functionNames[1]]
+			rule.ruleTemplates = rule.ruleTemplates or Bagshui.config.RuleFunctionTemplates[rule.functionNames[1]]
 			self:AddFunction(rule)
 		end
 	end
