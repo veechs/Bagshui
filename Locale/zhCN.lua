@@ -495,8 +495,8 @@ BsLocalization:AddLocale("zhCN", {
 ["TooltipIdentifier_Food"] = [[必须在坐下时进食]],
 ["TooltipIdentifier_Mount"] = [[使用：召唤和解散一个可骑乘的]],
 ["TooltipIdentifier_MountAQ40"] = [[使用：发出高频声音]],
-["TooltipIdentifier_PotionHealth"] = [[/恢复[%d.]+到[%d.]+点生命值\。/]],  -- 用斜杠包裹以激活模式匹配。
-["TooltipIdentifier_PotionMana"] = [[/恢复[%d.]+到[%d.]+点法力值\。/]],  -- 用斜杠包裹以激活模式匹配。
+["TooltipIdentifier_PotionHealth"] = [[/恢复%d+到%d+点生命值\。/]],  -- 用斜杠包裹以激活模式匹配。
+["TooltipIdentifier_PotionMana"] = [[/恢复%d+到%d+点法力值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_QuestItem"] = [[任务物品]],
 
 -- Tooltip parsing -- extracting data from tooltips.
