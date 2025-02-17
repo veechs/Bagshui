@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.2.29] - 2025-02-16
+### Fixed
+* Another rule function menu fix. Hopefully the last one.
+
 ## [1.2.28] - 2025-02-16
 ### Fixed
 * The rule function menu in the Category editor has been broken since 1.1. Big oops.
