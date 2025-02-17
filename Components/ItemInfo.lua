@@ -42,9 +42,6 @@ Bagshui:AddConstants({
 		KNOWN = "AlreadyKnown",
 	},
 
-	-- Don't look any further than this line of the tooltip when determining usable status.
-	BS_ITEM_USABLE_STOP_AT_TOOLTIP_LINE = 6,
-
 })
 
 
@@ -510,7 +507,7 @@ end
 --- and `ItemInfo:IsUsable()`. By calling from the former, we can pre-cache
 --- usable status for many items and avoid loading the tooltip multiple times.
 --- 
---- Based on pfUI's `unusable:UpdateSlot()` and libtipscan `findColor()`.
+--- Based on techniques from pfUI's `unusable:UpdateSlot()` and libtipscan `findColor()`.
 ---@param item table Item information table in the format of BS_ITEM_SKELETON.
 ---@param needToLoadTooltip boolean? `true` if the item's tooltip is NOT currently loaded into `BsHiddenTooltip`.
 function ItemInfo:CacheUsableStatusFromHiddenTooltip(item, needToLoadTooltip)
@@ -524,21 +521,40 @@ function ItemInfo:CacheUsableStatusFromHiddenTooltip(item, needToLoadTooltip)
 		usable = BS_ITEM_USABLE.KNOWN
 	end
 
-	-- Look for red text in the first X lines of the tooltip, which indicates it's unusable.
+	-- Look for red text in the tooltip, which indicates it's unusable.
+	-- We're going to stop at the first blank line because recipes indicate usability
+	-- of the recipe itself, then an empty line, followed by information about the item
+	-- created by the recipe, which includes whether the item is usable. We only want
+	-- to know about the recipe's usability.
 	if not usable then
 		if needToLoadTooltip then
 			self:LoadTooltip(BsHiddenTooltip, item)
 		end
 
-		local ttTextFrame, r, g, b
+		local ttTextFrame, ttText, leftText, rightText, hasRedText, r, g, b
 		local ttBagshuiData = BsHiddenTooltip.bagshuiData
 
-		for ttLineNum = 1, math.min(BsHiddenTooltip:NumLines(), BS_ITEM_USABLE_STOP_AT_TOOLTIP_LINE) do
+		-- This duplicates code and logic in Inventory:ItemButton_OnEnter() as well
+		-- as ItemInfo:GetTooltip(), so it would be nice to refactor eventually.
+		for ttLineNum = 1, BsHiddenTooltip:NumLines() do
+			leftText = nil
+			rightText = nil
+			hasRedText = false
 			-- Left/Right
-			-- Don't use _ as a placeholder here since it's used inside the loop.
-			for __, lr in ipairs(ttBagshuiData.textFieldsPerLine) do
+			for i, lr in ipairs(ttBagshuiData.textFieldsPerLine) do
 				ttTextFrame = _G[ttBagshuiData.name .. "Text" .. lr .. ttLineNum]
 				if ttTextFrame ~= nil and ttTextFrame:IsVisible() then
+
+					ttText = ttTextFrame:GetText()
+
+					if ttText ~= nil and not string.find(ttText, "^" .. BS_NEWLINE) then
+						if i == 1 then
+							leftText = BsUtil.Trim(ttText)
+						else
+							rightText = BsUtil.Trim(ttText)
+						end
+					end
+
 					r, g, b = ttTextFrame:GetTextColor()
 					r, g, b = BsUtil.Round(r, 1), BsUtil.Round(g, 1), BsUtil.Round(b, 1)
 					if
@@ -546,9 +562,22 @@ function ItemInfo:CacheUsableStatusFromHiddenTooltip(item, needToLoadTooltip)
 						and g == _G.RED_FONT_COLOR.g
 						and b == _G.RED_FONT_COLOR.b
 					then
-						usable = BS_ITEM_USABLE.NO
+						-- Just track whether there's red text until we're sure it's
+						-- not a blank red line (hey, it could happen).
+						hasRedText = true
 					end
 				end
+			end
+
+			-- We found a blank line and need to stop.
+			if string.len(leftText or "") == 0 and string.len(rightText or "") == 0 then
+				break
+			end
+
+			-- Once we're sure it's not a blank line, we can take action if it's not usable.
+			if hasRedText then
+				usable = BS_ITEM_USABLE.NO
+				break
 			end
 		end
 	end
