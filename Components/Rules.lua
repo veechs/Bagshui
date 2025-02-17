@@ -142,6 +142,10 @@ end
 --- 	---@type table<string,any>?
 --- 	environmentVariables,
 --- 
+--- 	-- (Optional) Tooltip text for the top-level rule function menu item in the Category editor.
+--- 	---@type string?
+--- 	description,
+--- 
 --- 	-- (Optional) Don't display the function in the Category Editor rule function menu.
 --- 	---@type boolean?
 --- 	hideFromUi,
@@ -157,7 +161,6 @@ end
 --- 
 --- 	-- (Optional) Array of strings that will be used, in the order given,
 ---		-- to replace any %s placeholders in the templates pulled from localization.
----
 --- 	---@type string[]
 --- 	ruleFunctionTemplateFormatStrings,
 --- }
@@ -260,6 +263,9 @@ function Rules:AddFunction(params)
 
 	-- Add rule function examples for use in the Category Editor rule function menu.
 	if not hideFromUi then
+		-- Ensure we have a description for the menu item if possible.
+		self:AddRuleDescription(primaryName, desiredPrimaryName, params.description, params.ruleFunctionTemplateFormatStrings)
+
 		if ruleTemplates then
 			-- Templates were provided directly to the function.
 			self.ruleFunctionTemplates[primaryName] = ruleTemplates
@@ -349,7 +355,7 @@ end
 ---@param ruleFunctionName string Key to search for in localization.
 ---@param ruleFunctionTemplates table? If not provided, just get the count of examples.
 ---@param exampleSuffix string? "Extra" to get extra items.
----@param desiredRuleFunctionName? string Use this to search for examples instead of `ruleFunctionName`, then switch the code examples from this to `ruleFunctionName`.
+---@param desiredRuleFunctionName string? Use this to search for examples instead of `ruleFunctionName`, then switch the code examples from this to `ruleFunctionName`.
 ---@param exampleDescriptionFormatStrings table? Up to 5 strings that will be used as %s replacements in the rule example description.
 ---@return number exampleCount Number of examples that were added.
 function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTemplates, exampleSuffix, desiredRuleFunctionName, exampleDescriptionFormatStrings)
@@ -361,24 +367,6 @@ function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTem
 	local exampleCount = 0
 
 	local functionNameForLocalization = desiredRuleFunctionName or ruleFunctionName
-
-	-- Determine the generic description of this rule function that will be used
-	-- in the tooltip for the parent menu item in the Category Editor rule function menu.
-	if exampleSuffix == "" then
-		local genericDescription = L_nil["RuleFunction_" .. functionNameForLocalization .. "_GenericDescription"]
-		if type(exampleDescriptionFormatStrings) == "table" and genericDescription then
-			genericDescription = string.format(
-				genericDescription,
-				exampleDescriptionFormatStrings[1] or "",
-				exampleDescriptionFormatStrings[2] or "",
-				exampleDescriptionFormatStrings[3] or "",
-				exampleDescriptionFormatStrings[4] or "",
-				exampleDescriptionFormatStrings[5] or ""
-			)
-		end
-
-		self.ruleFunctionTemplateGenericDescriptions[ruleFunctionName] = genericDescription
-	end
 
 	-- Pull all the available examples from localization.
 	for i = 1, 20 do
@@ -425,6 +413,37 @@ function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTem
 	end
 
 	return exampleCount
+end
+
+
+
+--- Get the rule function description from localization that will be used for the top-level menu item.
+---@param ruleFunctionName string Key to search for in localization, if `description` is not provided.
+---@param desiredRuleFunctionName string? Use this to search for examples instead of `ruleFunctionName`, then switch the code examples from this to `ruleFunctionName`.
+---@param description string? Description to use instead of pulling from localization.
+---@param exampleDescriptionFormatStrings table? Up to 5 strings that will be used as %s replacements in the rule example description.
+function Rules:AddRuleDescription(ruleFunctionName, desiredRuleFunctionName, description, exampleDescriptionFormatStrings)
+	if self.ruleFunctionTemplateGenericDescriptions[ruleFunctionName] then
+		return
+	end
+
+	local functionNameForLocalization = desiredRuleFunctionName or ruleFunctionName
+
+	-- Determine the generic description of this rule function that will be used
+	-- in the tooltip for the parent menu item in the Category Editor rule function menu.
+	local genericDescription = description or L_nil["RuleFunction_" .. functionNameForLocalization .. "_GenericDescription"]
+	if type(exampleDescriptionFormatStrings) == "table" and type(genericDescription) == "string" then
+		genericDescription = string.format(
+			genericDescription,
+			exampleDescriptionFormatStrings[1] or "",
+			exampleDescriptionFormatStrings[2] or "",
+			exampleDescriptionFormatStrings[3] or "",
+			exampleDescriptionFormatStrings[4] or "",
+			exampleDescriptionFormatStrings[5] or ""
+		)
+	end
+
+	self.ruleFunctionTemplateGenericDescriptions[ruleFunctionName] = genericDescription
 end
 
 
