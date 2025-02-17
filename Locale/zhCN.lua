@@ -24,6 +24,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Explosives"] = "爆炸物",
 ["Junk"] = "垃圾",
 ["Key"] = "钥匙",
+["Miscellaneous"] = "其它",
 ["Parts"] = "零件",
 ["Quest"] = "任务",
 ["Trade Goods"] = "商品",
@@ -34,9 +35,9 @@ BsLocalization:AddLocale("zhCN", {
 -- 必须涵盖 `LOCALIZED_TO_EN_SKILL_ID` 和 `IGNORE_SKILL_CATEGORY` 中的所有键。
 ["Class Skills"] = "职业技能",
 ["Professions"] = "专业",
-["Secondary Skills"] = "次要技能",
+["Secondary Skills"] = "辅助技能",
 ["Weapon Skills"] = "武器技能",
-["Armor Proficiencies"] = "护甲熟练度",
+["Armor Proficiencies"] = "护甲精通",
 ["Languages"] = "语言",
 
 -- Skills.
@@ -44,18 +45,15 @@ BsLocalization:AddLocale("zhCN", {
 -- 技能。
 -- 必须涵盖游戏可以从 `GetSkillLineInfo()` 返回的任何技能。
 ["Axes"] = "单手斧",
-["Two-Handed Axes"] = "双手斧",
+--["Two-Handed Axes"] = "双手斧",
 ["Dual Wield"] = "双持",
 ["Fishing"] = "钓鱼",
 ["Maces"] = "单手锤",
-["Two-Handed Maces"] = "双手锤",
+--["Two-Handed Maces"] = "双手锤",
 ["Swords"] = "单手剑",
-["Two-Handed Swords"] = "双手剑",
+--["Two-Handed Swords"] = "双手剑",
 ["Plate Mail"] = "板甲",
 ["Shield"] = "盾牌",
-["Restoration"] = "图腾",
-["Miscellaneous"] = "其它",
-["Fishing Pole"] = "鱼竿",
 
 -- Professions that have their own bag types.
 -- Referenced in GameInfo.lua to build the `professionsToBags` table.
