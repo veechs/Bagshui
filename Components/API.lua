@@ -31,6 +31,10 @@ Bagshui:LoadComponent(function()
 --- 	---@type { code: string, description: string }[]?
 --- 	ruleTemplates,
 --- 
+--- 	-- (Optional) Tooltip text for the top-level rule function menu item in the Category editor.
+--- 	---@type string?
+--- 	description,
+--- 
 --- 	-- (Optional) List of variables to add to the rule environment.
 --- 	-- See the BagType rule in Config\RuleFunctions.lua for an example.
 --- 	---@type table<string,any>?
