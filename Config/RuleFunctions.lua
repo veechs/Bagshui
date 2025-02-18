@@ -828,7 +828,7 @@ Bagshui.config.RuleFunctions = {
 			"Useable",
 		},
 		ruleFunction = function(rules, ruleArguments)
-			return BsItemInfo:IsUsable(rules.item, rules.character)
+			return BsItemInfo:IsUsable(rules.item)
 		end,
 		-- Templates come from localization.
 	},

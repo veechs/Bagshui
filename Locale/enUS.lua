@@ -465,7 +465,6 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipParse_Charges"] = [[^(%d+) Charges$]],  -- MUST contain the (%d) capture group.
 -- ItemInfo:IsUsable() Tooltip parsing
 ["TooltipParse_AlreadyKnown"] = _G.ITEM_SPELL_KNOWN,
-["TooltipParse_RequiresLevel"] = [[Requires (%a[%a%s]-) %((%d+)%)]],  -- Aiming to match "Requires Fishing (10)" and pull out "Fishing", "10". (Could probably use _G.ITEM_MIN_SKILL and replace its placeholders with the capture groups.)
 
 
 -- Shared Category/Group Names.
