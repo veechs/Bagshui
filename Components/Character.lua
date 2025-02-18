@@ -25,9 +25,9 @@ local CHARACTER_EVENTS = {
 	CHAT_MSG_SKILL = true,  -- New skills learned or leveled up.
 	CHAT_MSG_SYSTEM = true,  -- Messages to parse for important events.
 	CRAFT_SHOW = true,  -- Enchanting profession window is opened.
-	PLAYER_ENTERING_WORLD = true,  -- Trigger initial processing at startup
+	PLAYER_ALIVE = true,  -- Trigger initial processing at startup.
 	PLAYER_LEVEL_UP = true,  -- Level up.
-	SKILL_LINES_CHANGED = true,  -- Need to update skills.
+	SKILL_LINES_CHANGED = true,  -- Need to update skills (needed to catch some weird skills like Fist Weapons).
 	SPELLS_CHANGED = true,  -- Need to update spells.
 	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting).
 	UPDATE_INVENTORY_ALERTS = true,  -- Equipped gear has changed.
@@ -175,6 +175,7 @@ function Character:OnEvent(event, arg1)
 		-- This seems to be the best way to know when a character learns a new recipe.
 		-- Handling it centrally so other classes just have to register for BAGSHUI_CHARACTER_LEARNED_RECIPE.
 		if string.find(arg1, L.ChatMsgIdentifier_LearnedRecipe) then
+			BsItemInfo:InvalidateUsableCache()
 			Bagshui:RaiseEvent("BAGSHUI_CHARACTER_LEARNED_RECIPE")
 		end
 		return
@@ -203,6 +204,10 @@ function Character:OnEvent(event, arg1)
 			self:UpdateGear()
 			self:UpdateMoney()
 		end
+		-- Whenever something major about the character changes, the usable cache must be updated.
+		-- This might be slightly overboard, but it's the easiest way to maximize
+		-- accuracy of usability status.
+		BsItemInfo:InvalidateUsableCache()
 		return
 	end
 
@@ -214,6 +219,7 @@ function Character:OnEvent(event, arg1)
 	-- Player level changed.
 	if event == "PLAYER_LEVEL_UP" then
 		self:UpdateInfo(arg1)
+		BsItemInfo:InvalidateUsableCache()
 		return
 	end
 
@@ -234,6 +240,7 @@ function Character:OnEvent(event, arg1)
 	if event == "CRAFT_SHOW" or event == "TRADE_SKILL_SHOW" then
 		-- Wait a smidgen before attempting the update so that game functions will return values.
 		Bagshui:QueueClassCallback(self, self.UpdateProfessionItems, 0.75, false, event)
+		BsItemInfo:InvalidateUsableCache()
 		return
 	end
 

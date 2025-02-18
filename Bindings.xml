@@ -9,28 +9,28 @@ Bindings are localized in Localization:Init().
 	<Binding name="Bagshui_Toggle_Bags" header="Bagshui">
 		Bagshui.components.Bags:Toggle()
 	</Binding>
-	<Binding name="Bagshui_Toggle_Bank" header="Bagshui">
+	<Binding name="Bagshui_Toggle_Bank">
 		Bagshui.components.Bank:Toggle()
 	</Binding>
-	<Binding name="Bagshui_Toggle_Keyring" header="Bagshui">
+	<Binding name="Bagshui_Toggle_Keyring">
 		Bagshui.components.Keyring:Toggle()
 	</Binding>
-	<Binding name="Bagshui_Toggle_Catalog" header="Bagshui">
+	<Binding name="Bagshui_Toggle_Catalog">
 		Bagshui.components.Catalog:Toggle()
 	</Binding>
-	<Binding name="Bagshui_Resort" header="Bagshui">
+	<Binding name="Bagshui_Resort">
 		Bagshui:ResortAll()
 	</Binding>
-	<Binding name="Bagshui_Restack" header="Bagshui">
+	<Binding name="Bagshui_Restack">
 		Bagshui:RestackAll()
 	</Binding>
-	<Binding name="Bagshui_Search_Bags" header="Bagshui">
+	<Binding name="Bagshui_Search_Bags">
 		Bagshui.components.Bags:Search()
 	</Binding>
-	<Binding name="Bagshui_Search_Bank" header="Bagshui">
+	<Binding name="Bagshui_Search_Bank">
 		Bagshui.components.Bank:Search()
 	</Binding>
-	<Binding name="Bagshui_Search_Catalog" header="Bagshui">
+	<Binding name="Bagshui_Search_Catalog">
 		Bagshui.components.Catalog:Search()
 	</Binding>
 </Bindings>

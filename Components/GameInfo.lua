@@ -38,13 +38,6 @@ Bagshui:AddConstants({
 		["Plate"] = "Plate Mail",
 		["Shields"] = "Shield",
 	},
-
-	-- Item subclasses that don't require a skill.
-	BS_ITEM_SUBCLASS_NO_SKILL_NEEDED = {
-		Idols = true,
-		Librams = true,
-		Miscellaneous = true,
-	}
 })
 
 
@@ -91,12 +84,6 @@ local GameInfo = {
 
 	-- List of inventory slot locations, used to generate rule function templates.
 	inventorySlots = {},
-
-	-- Localized version of BS_ITEM_SUBCLASS_TO_SKILL.
-	itemSubclassToSkill = {},
-
-	-- Localized version of BS_ITEM_SUBCLASS_NO_SKILL_NEEDED.
-	itemSubclassNoSkillNeeded = {},
 
 	-- Class translation helper tables.
 	reverseTranslatedCharacterClasses = {},
@@ -258,14 +245,6 @@ function GameInfo:PopulatePostLocalizationInfo()
 				value = class,
 			}
 		)
-	end
-
-	-- Used by ItemInfo:IsUsable().
-	for subclass, skill in pairs(BS_ITEM_SUBCLASS_TO_SKILL) do
-		self.itemSubclassToSkill[L[subclass]] = L[skill]
-	end
-	for subclass, _ in pairs(BS_ITEM_SUBCLASS_NO_SKILL_NEEDED) do
-		self.itemSubclassNoSkillNeeded[L[subclass]] = true
 	end
 
 	-- Used by RequiresClass.

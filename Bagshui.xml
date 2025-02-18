@@ -50,7 +50,6 @@ Don't move things around unless you're sure it won't break anything.
 <!-- UI -->
 <Include file="Components\Ui.lua" />
 <Include file="Components\Ui.Util.lua" />  <!-- Ui.Util MUST be loaded before other Ui files.-->
-<Include file="Components\Ui.Skin.lua" />
 <Include file="Components\Ui.Button.lua" />
 <Include file="Components\Ui.Dialog.lua" />
 <Include file="Components\Ui.EditBox.lua" />
