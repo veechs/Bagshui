@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2025 veechs [Based on the work of EngInventory/EngBags developers and maintainers, including (but probably not limited to) Engival, Requital, Hador, UniRing, Lars Kiesow (lkiesow), ahhh-reptar, laytya, and Baroque. /// pfUI serialize(), compress(), decompress(), enc(), dec() Copyright (c) 2016-2021 Eric Mauser (Shagu) /// ShaguTweaks AddBorder() Copyright (c) 2021 Eric Mauser (Shagu) /// ShaguTweaks-mods AddTexture() Copyright (c) 2022 GryllsAddons /// Usable item tinting based on EquipColor logic by mrrosh /// Error-triggered bag swapping based on Swapper Copyright (c) 2017 Gabriele Cimolino /// Refer to Credits.md for more.]
+Copyright (c) 2025 veechs [Based on the work of EngInventory/EngBags developers and maintainers, including (but probably not limited to) Engival, Requital, Hador, UniRing, Lars Kiesow (lkiesow), ahhh-reptar, laytya, and Baroque. /// pfUI serialize(), compress(), decompress(), enc(), dec(), libtipscan Copyright (c) 2016-2021 Eric Mauser (Shagu) /// ShaguTweaks AddBorder() Copyright (c) 2021 Eric Mauser (Shagu) /// ShaguTweaks-mods AddTexture() Copyright (c) 2022 GryllsAddons /// Refer to Credits.md for more.]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,5 +1,13 @@
 # Bagshui Changelog
 
+## [1.3.0] - 2025-02-17
+### Changed
+* Accuracy of unusable item tinting has been vastly improved (things like fist weapons that gave it fits before now work correctly).<br><sup><small>Thanks to [@Sunelegy](https://github.com/Sunelegy) for bringing the problems to my attention and [@shagu](https://github.com/shagu) for the pfUI code pointing me to the right solution.</small></sup>
+
+### Fixed
+* Significant zh-CN localization refinements by [@Sunelegy](https://github.com/Sunelegy).
+* No more errors in FrameXML.log. <sup><small>🪲 [@RetroCro](https://github.com/RetroCro)</small></sup>
+
 ## [1.2.29] - 2025-02-16
 ### Fixed
 * Another rule function menu fix. Hopefully the last one.
