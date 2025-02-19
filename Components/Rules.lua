@@ -38,6 +38,7 @@ local Rules = {
 	ruleFunctionTemplates = {},
 	ruleFunctionTemplatesExtra = {},
 	ruleFunctionTemplateGenericDescriptions = {},
+	ruleFunctionTemplateNotes = {},
 	sortedRuleFunctionTemplateNames = {},
 
 	-- Rule evaluation session tracking -- see `Rules:SetItemAndCharacter()`.
@@ -406,7 +407,7 @@ function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTem
 				ruleFunctionTemplates[ruleFunctionName],
 				{
 					code = code,
-					description = exampleDescription,
+					description = exampleDescription .. self.ruleFunctionTemplateNotes[ruleFunctionName],
 				}
 			)
 		end
@@ -417,7 +418,7 @@ end
 
 
 
---- Get the rule function description from localization that will be used for the top-level menu item.
+--- Get the rule function description and notes from localization that will be used for the top-level menu item.
 ---@param ruleFunctionName string Key to search for in localization, if `description` is not provided.
 ---@param desiredRuleFunctionName string? Use this to search for examples instead of `ruleFunctionName`, then switch the code examples from this to `ruleFunctionName`.
 ---@param description string? Description to use instead of pulling from localization.
@@ -429,18 +430,25 @@ function Rules:AddRuleDescription(ruleFunctionName, desiredRuleFunctionName, des
 
 	local functionNameForLocalization = desiredRuleFunctionName or ruleFunctionName
 
+	-- Check whether there's anything to append to all descriptions.
+	local note = L_nil["RuleFunction_" .. functionNameForLocalization .. "_Note"]
+	self.ruleFunctionTemplateNotes[ruleFunctionName] = note and (BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. note .. FONT_COLOR_CODE_CLOSE) or ""
+
 	-- Determine the generic description of this rule function that will be used
 	-- in the tooltip for the parent menu item in the Category Editor rule function menu.
 	local genericDescription = description or L_nil["RuleFunction_" .. functionNameForLocalization .. "_GenericDescription"]
-	if type(exampleDescriptionFormatStrings) == "table" and type(genericDescription) == "string" then
-		genericDescription = string.format(
-			genericDescription,
-			exampleDescriptionFormatStrings[1] or "",
-			exampleDescriptionFormatStrings[2] or "",
-			exampleDescriptionFormatStrings[3] or "",
-			exampleDescriptionFormatStrings[4] or "",
-			exampleDescriptionFormatStrings[5] or ""
-		)
+	if type(genericDescription) == "string" then
+		genericDescription = genericDescription .. self.ruleFunctionTemplateNotes[ruleFunctionName]
+		if type(exampleDescriptionFormatStrings) == "table" then
+			genericDescription = string.format(
+				genericDescription,
+				exampleDescriptionFormatStrings[1] or "",
+				exampleDescriptionFormatStrings[2] or "",
+				exampleDescriptionFormatStrings[3] or "",
+				exampleDescriptionFormatStrings[4] or "",
+				exampleDescriptionFormatStrings[5] or ""
+			)
+		end
 	end
 
 	self.ruleFunctionTemplateGenericDescriptions[ruleFunctionName] = genericDescription

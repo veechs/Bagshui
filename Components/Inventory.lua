@@ -265,6 +265,7 @@ function Inventory:New(newPropsOrInventoryType)
 			BAGSHUI_CHARACTER_LEARNED_RECIPE = true,
 			BAGSHUI_CHARACTER_UPDATE = true,
 			BAGSHUI_CHARACTERDATA_UPDATE = true,
+			BAGSHUI_GAME_UPDATE = true,
 			BAGSHUI_PROFESSION_ITEM_UPDATE = true,
 			BAGSHUI_PROFILE_UPDATE = true,
 			BAGSHUI_SETTING_UPDATE = true,
@@ -686,6 +687,7 @@ function Inventory:OnEvent(event, arg1, arg2)
 		event == "BAGSHUI_ACTIVE_QUEST_ITEM_UPDATE"
 		or event == "BAGSHUI_CHARACTER_UPDATE"
 		or event == "BAGSHUI_EQUIPPED_HISTORY_UPDATE"
+		or event == "BAGSHUI_GAME_UPDATE"
 		or event == "BAGSHUI_PROFESSION_ITEM_UPDATE"
 	then
 		self.cacheUpdateNeeded = true

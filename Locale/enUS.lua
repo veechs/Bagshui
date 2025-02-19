@@ -111,6 +111,7 @@ BsLocalization:AddLocale("enUS", {
 ["ImportSlashExport"] = "Import/Export",
 ["Info"] = "Info",
 ["Information"] = "Information",
+["Instance"] = "Instance",  -- Referring to a game instance, like a dungeon or raid.
 ["Inventory"] = "Inventory",
 ["Item"] = "Item",
 ["ItemId"] = "ItemId",
@@ -179,6 +180,7 @@ BsLocalization:AddLocale("enUS", {
 ["SortOrders"] = "Sort Orders",
 ["Sorting"] = "Sorting",
 ["Stack"] = "Stack",  -- Verb
+["Subzone"] = "Subzone",
 ["Suffix_Default"] = "%s " .. LIGHTYELLOW_FONT_COLOR_CODE .. " [Default]" .. FONT_COLOR_CODE_CLOSE,
 ["Suffix_EmptySlot"] = "%s Empty Slot",
 ["Suffix_Menu"] = "%s Menu",
@@ -205,6 +207,7 @@ BsLocalization:AddLocale("enUS", {
 ["Vertical"] = "Vertical",
 ["VersionNumber"] = "Version %s",
 ["Yes"] = "Yes",
+["Zone"] = "Zone",
 
 -- Inventory types.
 ["Bags"] = "Bags",
@@ -218,11 +221,13 @@ BsLocalization:AddLocale("enUS", {
 ["Abbrev_Keyring"] = "Key",
 ["Abbrev_Equipped"] = "Equip",
 
--- Slash command help messages.
+-- Slash command help messages and localizations.
 ["Slash_Help"] = "%s commands:",
 ["Slash_Help_Postscript"] = "For a list of subcommands, append Help to the command.",
 
 ["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! Examples:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444".. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
+
+["Slash_Game"] = "Game",
 
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 ["Binding_Resort"] = "Organize All",
@@ -755,6 +760,23 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Location_ExampleExtra1"] = 'Location("loc1", "loc2", "locN")',
 ["RuleFunction_Location_ExampleDescriptionExtra1"] = "Check if the item is stored in any of the specified locations.",
 
+["RuleFunction_LootMethod_GenericDescription"] = "Check the current loot method.",
+["RuleFunction_LootMethod_Note"] = "To view: /Bagshui Game Group",
+["RuleFunction_LootMethod_Example1"] = 'LootMethod("FreeForAll")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription1"] = "Check if loot method is Free For All (this is the default loot method).",
+["RuleFunction_LootMethod_Example2"] = 'LootMethod("RoundRobin")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription2"] = "Check if loot method is Round Robin.",
+["RuleFunction_LootMethod_Example3"] = 'LootMethod("Master")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription3"] = "Check if loot method is Master.",
+["RuleFunction_LootMethod_Example4"] = 'LootMethod("NeedBeforeGreed")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription4"] = "Check if loot method is Need Before Greed.",
+["RuleFunction_LootMethod_Example5"] = 'LootMethod("PersonalLoot")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription5"] = "Check if loot method is Personal Loot.",
+["RuleFunction_LootMethod_Example6"] = 'LootMethod("method1", "method2", "methodN")',
+["RuleFunction_LootMethod_ExampleDescription6"] = "Check if current loot method is any of the provided values.",
+["RuleFunction_LootMethod_Example7"] = 'LootMaster()',
+["RuleFunction_LootMethod_ExampleDescription7"] = "Check if you are the loot master.",
+
 ["RuleFunction_MinLevel_GenericDescription"] = "Check if the item is usable based on the specified level.",
 ["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
 ["RuleFunction_MinLevel_ExampleDescription1"] = "Check if the item is usable at <level> or above.",
@@ -793,6 +815,15 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_PeriodicTable_ExampleDescription"] = "Check if the item belongs to the '%s' PeriodicTable set.!!RuleFunction_PT_CaseSensitiveParameters!!",
 ["RuleFunction_PeriodicTable_ExampleExtra1"] = 'PeriodicTable("set1", "set2", "setN")',
 ["RuleFunction_PeriodicTable_ExampleDescriptionExtra1"] = "Check if the item belongs to any of the specified PeriodicTable sets.!!RuleFunction_PT_CaseSensitiveParameters!!",
+
+["RuleFunction_PlayerInGroup_GenericDescription"] = "Check if you are in a group.",
+["RuleFunction_PlayerInGroup_Note"] = "To view: /Bagshui Game Group",
+["RuleFunction_PlayerInGroup_Example1"] = 'PlayerInGroup()',
+["RuleFunction_PlayerInGroup_ExampleDescription1"] = "Check if you are in any group (party or raid).",
+["RuleFunction_PlayerInGroup_Example2"] = 'PlayerInGroup(Party)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription2"] = "Check if you are in a party group.",
+["RuleFunction_PlayerInGroup_Example3"] = 'PlayerInGroup(Raid)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription3"] = "Check if you are in a raid group.",
 
 ["RuleFunction_ProfessionCraft_GenericDescription"] = "Check if the item is crafted by the current character's professions (learned recipes only).",
 ["RuleFunction_ProfessionCraft_Example1"] = 'ProfessionCraft()',
@@ -843,6 +874,13 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Subtype_ExampleExtra1"] = 'Subtype("type1", "type2", "typeN")',
 ["RuleFunction_Subtype_ExampleDescriptionExtra1"] = "Check the item is of any of the the specified subtypes.",
 
+["RuleFunction_Subzone_GenericDescription"] = "Check the current subzone (locale-specific).",
+["RuleFunction_Subzone_Note"] = "To view: /Bagshui Game Location",
+["RuleFunction_Subzone_Example1"] = 'Subzone("Spirit Rise")',  -- DO localize the parameter.
+["RuleFunction_Subzone_ExampleDescription1"] = "Check if you are in Spirit Rise.",
+["RuleFunction_Subzone_Example2"] = 'Subzone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Subzone_ExampleDescription2"] = "Check if you are in any of the specified subzones.",
+
 ["RuleFunction_Tooltip_GenericDescription"] = "Check if the tooltip contains the specified string(s).!!RuleFunction_LuaStringPatternsSupported!!",
 ["RuleFunction_Tooltip_Example1"] = 'Tooltip("string")',
 ["RuleFunction_Tooltip_ExampleDescription1"] = "Check if the item tooltip contains the specified string.!!RuleFunction_LuaStringPatternsSupported!!",
@@ -868,6 +906,12 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Wishlist_Example1"] = 'Wishlist()',
 ["RuleFunction_Wishlist_ExampleDescription1"] = "Check if the item is on the %s wishlist.",
 
+["RuleFunction_Zone_GenericDescription"] = "Check the current zone (locale-specific).",
+["RuleFunction_Zone_Note"] = "To view: /Bagshui Game Location",
+["RuleFunction_Zone_Example1"] = 'Zone("Thunder Bluff")',  -- DO localize the parameter.
+["RuleFunction_Zone_ExampleDescription1"] = "Check if you are in Thunder Bluff.",
+["RuleFunction_Zone_Example2"] = 'Zone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Zone_ExampleDescription2"] = "Check if you are in any of the specified zones.",
 
 -- ### Tips/Help ###
 ["BagshuiTooltipIntro"] = "Show Bagshui Info Tooltip",
