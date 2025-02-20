@@ -419,7 +419,8 @@ function Inventory:UpdateWindow()
 	end
 
 
-	-- Always update window colors.
+	-- There are a few things that always need to happen even if we're not
+	-- doing a full layout update.
 
 	self.windowColor = self.settings.windowBackground
 	self.borderColor = self.settings.windowBorder
@@ -447,9 +448,7 @@ function Inventory:UpdateWindow()
 		self.borderColor[4]
 	)
 
-	-- if Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline then
-	-- 	Bagshui:PrintDebug("neverOnline")
-	-- end
+	self.uiFrame:SetFrameStrata(self.settings.windowStrata)
 
 
 	-- Only do the intensive work of redrawing the UI if we have to.

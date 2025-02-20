@@ -331,6 +331,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Options"] = "Options",
 ["Menu_Settings_Profile"] = "Profile",
 ["Menu_Settings_Size"] = "Sizing",
+["Menu_Settings_SizeAndLayering"] = "Sizing and Layering",
 ["Menu_Settings_Tinting"] = "Item Tinting",
 ["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
@@ -1102,6 +1103,14 @@ BsLocalization:AddLocale("enUS", {
 ["windowScale"] = "Scale",
 ["windowScale_TooltipTitle"] = "Window Scale",
 ["windowScale_TooltipText"] = "Relative size of entire window.",
+
+["windowStrata"] = "Strata",
+["windowStrata_TooltipTitle"] = "Window Strata",
+["windowStrata_TooltipText"] = "Control how Bagshui windows overlap with other frames (z-index).",
+["windowStrata_Choice_LOW"] = "Low",
+["windowStrata_Choice_MEDIUM"] = "Medium",
+["windowStrata_Choice_HIGH"] = "High",
+["windowStrata_Choice_DIALOG"] = "Very High",
 
 ["windowUseSkinColors"] = "Use %s Colors",
 ["windowUseSkinColors_TooltipTitle"] = "%s Colors for Window",
