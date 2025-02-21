@@ -362,8 +362,8 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					_G.GameTooltip:AddLine(_G.TEXT(_G.REPAIR_COST), 1, 1, 1)
 					_G.SetTooltipMoney(_G.GameTooltip, repairCost)
 
-				elseif self.ui:IsFrameVisible(_G.MerchantFrame) then
-					-- At merchant.
+				elseif self.ui:IsFrameVisible(_G.MerchantFrame) and _G.MerchantFrame.selectedTab ~= 2 then
+					-- At merchant (not on buyback tab).
 					_G.ShowContainerSellCursor(item.bagNum, item.slotNum)
 
 				elseif (item.readable or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
