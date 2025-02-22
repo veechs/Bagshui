@@ -583,6 +583,16 @@ local bagshuiEnvironment = {
 	},
 
 
+	---@enum BS_GAME_PLAYER_GROUP_TYPE
+	-- Used by GameInfo for the `playerGroupType` property.
+	---@type table<string, string>
+	BS_GAME_PLAYER_GROUP_TYPE = {
+		PARTY = "Party",
+		RAID = "Raid",
+		SOLO = "Solo",
+	},
+
+
 	---@enum BS_RULE_ENVIRONMENT_VARIABLES
 	-- Variables that are pre-populated into the Rule evaluation environment.
 	-- Rule functions can add their own as well.
@@ -646,6 +656,10 @@ local bagshuiEnvironment = {
 		UNREGISTER = "Unregister",
 		CHECK = "Check",
 	},
+
+
+	-- Output indentation.
+	BS_INDENT = "  ",
 
 
 	---@enum BS_LOG_MESSAGE_TYPE

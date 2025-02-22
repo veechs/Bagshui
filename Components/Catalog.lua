@@ -34,7 +34,7 @@ local SUBTOTAL_TYPE = {
 }
 
 -- How much to indent each tooltip line.
-local TOOLTIP_INDENT = "  "
+local TOOLTIP_INDENT = BS_INDENT
 
 
 

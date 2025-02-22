@@ -38,6 +38,7 @@ local Rules = {
 	ruleFunctionTemplates = {},
 	ruleFunctionTemplatesExtra = {},
 	ruleFunctionTemplateGenericDescriptions = {},
+	ruleFunctionTemplateNotes = {},
 	sortedRuleFunctionTemplateNames = {},
 
 	-- Rule evaluation session tracking -- see `Rules:SetItemAndCharacter()`.
@@ -406,7 +407,7 @@ function Rules:AddRuleExamplesFromLocalization(ruleFunctionName, ruleFunctionTem
 				ruleFunctionTemplates[ruleFunctionName],
 				{
 					code = code,
-					description = exampleDescription,
+					description = exampleDescription .. self.ruleFunctionTemplateNotes[ruleFunctionName],
 				}
 			)
 		end
@@ -417,7 +418,7 @@ end
 
 
 
---- Get the rule function description from localization that will be used for the top-level menu item.
+--- Get the rule function description and notes from localization that will be used for the top-level menu item.
 ---@param ruleFunctionName string Key to search for in localization, if `description` is not provided.
 ---@param desiredRuleFunctionName string? Use this to search for examples instead of `ruleFunctionName`, then switch the code examples from this to `ruleFunctionName`.
 ---@param description string? Description to use instead of pulling from localization.
@@ -429,18 +430,25 @@ function Rules:AddRuleDescription(ruleFunctionName, desiredRuleFunctionName, des
 
 	local functionNameForLocalization = desiredRuleFunctionName or ruleFunctionName
 
+	-- Check whether there's anything to append to all descriptions.
+	local note = L_nil["RuleFunction_" .. functionNameForLocalization .. "_Note"]
+	self.ruleFunctionTemplateNotes[ruleFunctionName] = note and (BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. note .. FONT_COLOR_CODE_CLOSE) or ""
+
 	-- Determine the generic description of this rule function that will be used
 	-- in the tooltip for the parent menu item in the Category Editor rule function menu.
 	local genericDescription = description or L_nil["RuleFunction_" .. functionNameForLocalization .. "_GenericDescription"]
-	if type(exampleDescriptionFormatStrings) == "table" and type(genericDescription) == "string" then
-		genericDescription = string.format(
-			genericDescription,
-			exampleDescriptionFormatStrings[1] or "",
-			exampleDescriptionFormatStrings[2] or "",
-			exampleDescriptionFormatStrings[3] or "",
-			exampleDescriptionFormatStrings[4] or "",
-			exampleDescriptionFormatStrings[5] or ""
-		)
+	if type(genericDescription) == "string" then
+		genericDescription = genericDescription .. self.ruleFunctionTemplateNotes[ruleFunctionName]
+		if type(exampleDescriptionFormatStrings) == "table" then
+			genericDescription = string.format(
+				genericDescription,
+				exampleDescriptionFormatStrings[1] or "",
+				exampleDescriptionFormatStrings[2] or "",
+				exampleDescriptionFormatStrings[3] or "",
+				exampleDescriptionFormatStrings[4] or "",
+				exampleDescriptionFormatStrings[5] or ""
+			)
+		end
 	end
 
 	self.ruleFunctionTemplateGenericDescriptions[ruleFunctionName] = genericDescription
@@ -450,16 +458,16 @@ end
 
 --- Test an item attribute to see if it matches.
 --- This is the function that most rules will use to perform their tests.
----@param attributeName string One of the properties in the `BS_ITEM_SKELETON` table.
+---@param value any One of the properties in the `BS_ITEM_SKELETON` table.
 ---@param argumentList any[] The list of arguments proved to the rule function.
 ---@param validArgumentTypes string? Key from `BS_RULE_ARGUMENT_TYPE` (case and whitespace insensitive). Defaults to "STRING". NOTE: When matchType is `BS_RULE_MATCH_TYPE.BETWEEN`, `validArgumentTypes` is forced to `BS_RULE_ARGUMENT_TYPE.NUMBER`.
 ---@param matchType BS_RULE_MATCH_TYPE? How will matching be performed (Equals/Contains/Between)? Defaults to EQUALS.
 ---@param betweenStartingPoint number? In BS_RULE_MATCH_TYPE.BETWEEN mode, use this to shift the lower lower (argumentList[1]) and upper (argumentList[2]) bounds: upper = betweenStartingPoint + upper, lower = betweenStartingPoint - lower (Primary use is for CharacterLevelRange()).
 ---@param betweenInfiniteUpperBound boolean? In BS_RULE_MATCH_TYPE.BETWEEN mode, when `table.getn(argumentList) == 11, any amount greater than lower will be a match.
 ---@param matchViaLocalization boolean? When true, also test to see if `L[<argument>]` matches.
----@return boolean itemAttributeMatches
-function Rules:TestItemAttribute(
-	attributeName,
+---@return boolean valueMatches
+function Rules:TestValue(
+	value,
 	argumentList,
 	validArgumentTypes,
 	matchType,
@@ -499,6 +507,12 @@ function Rules:TestItemAttribute(
 		validArgumentTypes = BS_RULE_ARGUMENT_TYPE[validArgumentTypes]
 	end
 
+	-- Make sure there's a value to work with.
+	-- This is intentionally placed here so that argument type error messages can be thrown.
+	if (value == nil or value == "") and not self.validationMode then
+		return false
+	end
+
 	-- Default to string.
 	if not validArgumentTypes then
 		validArgumentTypes = BS_RULE_ARGUMENT_TYPE.STRING
@@ -506,15 +520,6 @@ function Rules:TestItemAttribute(
 
 	-- Figure out whether we need to convert everything to lowercase strings.
 	local isString = validArgumentTypes.string
-
-
-	-- Make sure there's an attribute to work with.
-
-	local itemAttribute = self.item[attributeName]
-
-	if (itemAttribute == nil or itemAttribute == "") and not self.validationMode then
-		return false
-	end
 
 
 	-- Test.
@@ -554,9 +559,9 @@ function Rules:TestItemAttribute(
 		end
 
 		return
-			itemAttribute >= lower
+			value >= lower
 			and (
-				(upper and (itemAttribute <= upper))
+				(upper and (value <= upper))
 				or (not upper and infiniteUpperBound)
 			)
 
@@ -566,7 +571,7 @@ function Rules:TestItemAttribute(
 
 		-- Convert to lowercase string if needed.
 		if isString then
-			itemAttribute = string.lower(tostring(itemAttribute) or "")
+			value = string.lower(tostring(value) or "")
 		end
 
 		-- Compare arguments.
@@ -606,17 +611,17 @@ function Rules:TestItemAttribute(
 				end
 			end
 
-			-- Bagshui:PrintDebug("TESTING " .. itemAttribute .. " == " .. argument)
+			-- Bagshui:PrintDebug("TESTING " .. value .. " == " .. argument)
 
 			-- Do we have a match?
 			if matchType == BS_RULE_MATCH_TYPE.EQUALS then
 				-- Need to use L_nil here to avoid inaccurate localization miss messages when debug is on.
-				if itemAttribute == argument or (matchViaLocalization and itemAttribute == L_nil[argument]) then
+				if value == argument or (matchViaLocalization and value == L_nil[argument]) then
 					return true
 				end
 
 			elseif matchType == BS_RULE_MATCH_TYPE.CONTAINS then
-				if string.find(itemAttribute, argument) then
+				if string.find(value, argument) then
 					return true
 				end
 			end
@@ -627,6 +632,42 @@ function Rules:TestItemAttribute(
 
 	-- Default to false.
 	return false
+end
+
+
+
+
+--- Wrapper for `Rules:TestValue()` that pulls item attributes for testing.
+---@param attributeName string One of the properties in the `BS_ITEM_SKELETON` table.
+---@param argumentList any[] Parameter for `Rules:TestValue()`.
+---@param validArgumentTypes string? Parameter for `Rules:TestValue()`.
+---@param matchType BS_RULE_MATCH_TYPE? Parameter for `Rules:TestValue()`.
+---@param betweenStartingPoint number? Parameter for `Rules:TestValue()`.
+---@param betweenInfiniteUpperBound boolean? Parameter for `Rules:TestValue()`.
+---@param matchViaLocalization boolean? Parameter for `Rules:TestValue()`.
+function Rules:TestItemAttribute(
+	attributeName,
+	argumentList,
+	validArgumentTypes,
+	matchType,
+	betweenStartingPoint,
+	betweenInfiniteUpperBound,
+	matchViaLocalization
+)
+
+	if type(self.item) ~= "table" then
+		return false
+	end
+
+	return self:TestValue(
+		self.item[attributeName],
+		argumentList,
+		validArgumentTypes,
+		matchType,
+		betweenStartingPoint,
+		betweenInfiniteUpperBound,
+		matchViaLocalization
+	)
 end
 
 
