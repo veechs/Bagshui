@@ -621,11 +621,6 @@ function Inventory:UpdateWindow()
 			-- Use that information to figure out the number of the end group.
 			uiGroupNumEnd = uiGroupNumStart + numGroupsInRow - 1
 
-			-- Ensure all group UI elements exist.
-			for groupNum = uiGroupNumStart, uiGroupNumEnd do
-				self.ui:CreateGroup(groupNum)
-			end
-
 			-- Determine anchoring.
 			if anchorLeft then
 				rowGroupStart = 1
