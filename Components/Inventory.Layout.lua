@@ -419,7 +419,8 @@ function Inventory:UpdateWindow()
 	end
 
 
-	-- Always update window colors.
+	-- There are a few things that always need to happen even if we're not
+	-- doing a full layout update.
 
 	self.windowColor = self.settings.windowBackground
 	self.borderColor = self.settings.windowBorder
@@ -447,18 +448,7 @@ function Inventory:UpdateWindow()
 		self.borderColor[4]
 	)
 
-	-- self.ui.frames.busyStandalone:SetBackdropColor(
-	-- 	self.windowColor[1],
-	-- 	self.windowColor[2],
-	-- 	self.windowColor[3],
-	-- 	self.windowColor[4]
-	-- )
-	-- self.ui.frames.busyStandalone:SetBackdropBorderColor(
-	-- 	self.borderColor[1],
-	-- 	self.borderColor[2],
-	-- 	self.borderColor[3],
-	-- 	self.borderColor[4]
-	-- )
+	self.uiFrame:SetFrameStrata(self.settings.windowStrata)
 
 	-- Update the utilization display setting.
 	-- Done here because it's consumed in `UpdateBagBar()` and `UpdateToolbar()`.

@@ -5,20 +5,6 @@ local Inventory = Bagshui.prototypes.Inventory
 local InventoryUi = Bagshui.prototypes.InventoryUi
 
 
--- Disabled in favor of ContainerFrameItemButton_OnClick().
--- local function ItemButton_SplitStack(button, split)
--- 	-- These functions are NOT captured into the Bagshui environment to ensure that if they're
--- 	-- hooked by another addon, we call the hooked version instead of the original.
--- 	_G.SplitContainerItem(button.bagshuiData.bagNum, button.bagshuiData.slotNum, split)
--- 	-- Instead of redefining the button.SplitStack function every time,
--- 	-- we're using an additional property to track whether this is a
--- 	-- right-click sell split at the merchant or a normal one.
--- 	if button.bagshuiData.splitStackAtMerchant then
--- 		_G.MerchantItemButton_OnClick("LeftButton")
--- 	end
--- end
-
-
 --- Special OnHide for Inventory item slot buttons to also hide tooltips and
 --- the stack split frame.
 local function InventoryItemButton_OnHide()
@@ -103,9 +89,114 @@ function InventoryUi:CreateInventoryItemSlotButton(buttonNum)
 			slotButton:SetScript("OnLeave", inventory._itemSlotButton_ScriptWrapper_OnLeave)
 			slotButton:SetScript("OnHide", InventoryItemButton_OnHide)
 
-			-- SplitStack() as a button property is required to reuse Blizzard's OpenStackSplitFrame().
-			-- Disabled in favor of ContainerFrameItemButton_OnClick().
-			-- slotButton.SplitStack = ItemButton_SplitStack
+
+			-- Now it's time for fun with metatables!
+			-- 
+			-- We have a little problem when it comes to ensuring maximum interoperability
+			-- and compatibility with other addons and it's called GetID(). See, the
+			-- Blizzard code in ContainerFrameItemButton_OnClick/OnEnter uses
+			-- <itemButton>:GetParent():GetID()and <itemButton>:GetID() to determine
+			-- bag and slot number, respectively. We need to call those functions
+			-- because they're hooked by other addons (which probably should be hooking
+			-- other things instead, but we can't do anything about that).
+			-- 
+			-- Slot number isn't an issue -- we can easily and safely set that in
+			-- OnEnter (and OnClick). Bag number is a problem though, because slots
+			-- from different bags are going to share the same parent (Group) frame.
+			-- This means that if you click an item and then mouse over another before
+			-- the <itemButton>:GetParent():GetID() call is made, the wrong bag
+			-- number is likely to be returned.
+			-- 
+			-- The bag number problem was first identified with stack splitting,
+			-- so a solution that only applied to stack splitting was put in place.
+			-- A more generalized approach is desirable though, and so here it is.
+			-- 
+			-- The code below sets up two proxy frames that are outfitted with metatables
+			-- so that they act as if they are the item button, but with overridden
+			-- functions that give us what we need to ensure code outside our control
+			-- receives the correct bag and slot numbers.
+			--
+			-- These proxies are picked up by Inventory:ItemButton_OnClick/OnEnter()
+			-- and set up so Blizzard's GetID() calls will be intercepted and redirected
+			-- to our custom functions.
+			-- 
+			-- (Now it's entirely possible there's a simpler way to do this, and
+			-- if there is, I'd love to know it. There were past experiments with
+			-- intermediate parent frames, but frame levels between item buttons
+			-- and groups are slightly finicky and led to item buttons disappearing.
+			-- Another attempt was made along those lines in the disastrous 1.2.17
+			-- release. So having something that works is and doesn't seem to cause
+			-- any side effects is preferable.)
+
+			-- Proxy for `slotButton` that was created above.
+			-- Will override `GetID()` and `GetParent()`.
+			local slotButtonProxy = _G.CreateFrame("Frame")
+			-- Store the proxy so it can be used by `Inventory:ItemButton_OnClick/OnEnter()`
+			slotButton.bagshuiData.getIdProxy = slotButtonProxy
+			-- Proxy for `slotButton`'s parent frame.
+			-- Will override `GetID()` only.
+			local parentProxy = _G.CreateFrame("Frame")
+			-- Reference to `slotButton`'s actual parent frame, updated
+			-- by `getItemButtonParent()`.
+			local realParent
+
+			--- Proxy function for `slotButton:GetID()`.
+			--- Always returns the slot number of the item assigned to the button.
+			local function getItemSlot(_)
+				return slotButton.bagshuiData.item.slotNum
+			end
+
+			--- Proxy function for `slotButton:GetParent()`.
+			--- Stores the real parent frame so the metatable knows where to
+			--- redirect everything other than GetID().
+			local function getItemButtonParent(_)
+				realParent = slotButton:GetParent()
+				-- Update userdata property of proxy frame.
+				parentProxy[0] = realParent[0]
+				return parentProxy
+			end
+
+			--- Proxy function for `slotButton:GetParent():GetID()`.
+			--- Always returns the bag number of the item assigned to the button.
+			local function getItemBag(_)
+				return slotButton.bagshuiData.item.bagNum
+			end
+
+			-- Metatable that makes `slotButtonProxy` work.
+			local slotButtonMetatable = {
+				__index = function(_, key)
+					if key == "GetID" then
+						return getItemSlot
+					elseif key == "GetParent" then
+						return getItemButtonParent
+					else
+						return slotButton[key]
+					end
+				end,
+				__newindex = function(_, key, val)
+					slotButton[key] = val
+				end,
+			}
+			setmetatable(slotButtonProxy, slotButtonMetatable)
+			-- Redirect frame userdata to avoid errors.
+			-- Credit: https://www.wowinterface.com/forums/showthread.php?t=53928
+			slotButtonProxy[0] = slotButton[0]
+
+			-- Metatable that makes `parentProxy` work.
+			local parentMetatable = {
+				__index = function(_, key)
+					if key == "GetID" then
+						return getItemBag
+					else
+						return realParent[key]
+					end
+				end,
+				__newindex = function(_, key, val)
+					realParent[key] = val
+				end,
+			}
+			-- The userdata (table key 0) is updated in getItemButtonParent() since it changes.
+			setmetatable(parentProxy, parentMetatable)
 		end
 	)
 end
@@ -129,12 +220,6 @@ function Inventory:ItemButton_OnEnter(itemButton)
 
 	local buttonInfo = itemButton.bagshuiData
 	local item = itemButton.bagshuiData.item or self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
-
-	-- Update IDs so ContainerFrameItemButton_OnEnter() will work.
-	-- Disabled because we're currently not actually calling ContainerFrameItemButton_OnEnter,
-	-- but this could probably be added in the future if it's found to be necessary for compatibility
-	-- with other addons.
-	self:UpdateItemButtonIDs(itemButton, item)
 
 	-- Record that the mouse has moved over this button (used by OnUpdate to determine
 	-- whether the tooltip should be shown when the Edit Mode cursor puts down an item).
@@ -288,8 +373,11 @@ function Inventory:ItemButton_OnEnter(itemButton)
 				-- returns nil, throwing an error. We can work around their bug by
 				-- temporarily changing the value of global `this`, then restoring it.
 				local oldGlobalThis = _G.this
-				_G.this = itemButton
-				_G[self.itemSlotTooltipFunction](itemButton)
+				-- In addition to the above, we need to use our metatable'd proxy frame
+				-- (set up in InventoryUi:CreateInventoryItemSlotButton()) so the
+				-- GetID() and GetParent():GetID() functions will be overridden.
+				_G.this = itemButton.bagshuiData.getIdProxy
+				_G[self.itemSlotTooltipFunction](itemButton.bagshuiData.getIdProxy)
 				_G.this = oldGlobalThis
 				-- `ContainerFrameItemButton_OnEnter()` will change the tooltip position
 				-- to something that ignores our custom offsets, so we need to fix that.
@@ -362,8 +450,8 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					_G.GameTooltip:AddLine(_G.TEXT(_G.REPAIR_COST), 1, 1, 1)
 					_G.SetTooltipMoney(_G.GameTooltip, repairCost)
 
-				elseif self.ui:IsFrameVisible(_G.MerchantFrame) then
-					-- At merchant.
+				elseif self.ui:IsFrameVisible(_G.MerchantFrame) and _G.MerchantFrame.selectedTab ~= 2 then
+					-- At merchant (not on buyback tab).
 					_G.ShowContainerSellCursor(item.bagNum, item.slotNum)
 
 				elseif (item.readable == 1 or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
@@ -759,9 +847,6 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 	local buttonInfo = itemButton.bagshuiData
 	local item = self.inventory[buttonInfo.bagNum][buttonInfo.slotNum]
 
-	-- Update IDs so ContainerFrameItemButton_OnClick() will work.
-	self:UpdateItemButtonIDs(itemButton, item)
-
 	-- Nothing normal should happen in Edit Mode.
 	if self.editMode then
 
@@ -972,6 +1057,15 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 			-- action might want to fall through to default behavior when it fails.
 			if not clickHandled then
 
+				-- We need to ensure use our metatable'd proxy frame (set up in
+				-- InventoryUi:CreateInventoryItemSlotButton()) is used so the
+				-- GetID() and GetParent():GetID() functions will be overridden.
+				-- The best way to guarantee this is to temporarily change the
+				-- meaning of global this while any code outside our control
+				-- is executed.
+				local oldGlobalThis = _G.this
+				_G.this = itemButton.bagshuiData.getIdProxy
+
 				if mouseButton == "LeftButton" then
 					-- Normal left-click.
 					-- This will eventually become a call to ContainerFrameItemButton_OnClick(), which can handle:
@@ -991,6 +1085,8 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 					-- It also allows hooks to both ContainerFrameItemButton_OnClick() and UseContainerItem() to work.
 					_G.ContainerFrameItemButton_OnClick(mouseButton)
 				end
+				-- Restore global this.
+				_G.this = oldGlobalThis
 			end
 
 			-- Hide tooltip on click -- UpdateWindow() will call ItemSlotAndGroupMouseOverCheck(), which will show it again if needed.
@@ -999,17 +1095,6 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 			self:ForceUpdateWindow()
 		end
 	end
-end
-
-
-
---- Set item slot button and parent frame ID to the given item's bagNum and slotNum, respectively.
---- This provides compatibility with Blizzard's ContainerFrameItemButton_OnClick(), etc.
----@param button table Item slot button.
----@param item table Bagshui item.
-function Inventory:UpdateItemButtonIDs(button, item)
-	button:SetID(item and item.slotNum or -99)
-	button:GetParent():SetID(item and item.bagNum or -99)
 end
 
 
