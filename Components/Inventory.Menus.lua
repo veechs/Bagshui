@@ -979,9 +979,7 @@ function Inventory:InitMenus()
 					disabled = true,
 					keepShownOnClick = false,
 					func = function(item)
-						item.bagshuiDate = 0
-						item.bagshuiStockState = BS_ITEM_STOCK_STATE.NO_CHANGE
-						self:ForceUpdateWindow()
+						self:ResetStockState()
 					end,
 				},
 				-- Bag menu for equipping.

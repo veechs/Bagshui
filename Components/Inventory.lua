@@ -373,6 +373,7 @@ function Inventory:New(newPropsOrInventoryType)
 		hideItems = {},
 		hasHiddenItems = false,
 		hasChanges = false,
+		highlightChangesEnabled = false,
 		hasOpenables = false,
 		nextOpenableItemBagNum = nil,
 		nextOpenableItemSlotNum = nil,
@@ -617,10 +618,12 @@ end
 --- Calling this function means that an update is needed, but if other update-triggering
 --- events arrive within the delay period, go ahead and allow them to reset the delay.
 --- This allows us to minimize our updates while still staying responsive.
-function Inventory:QueueUpdate(delay)
+---@param delay number? Delay before update in seconds.
+---@param cascade boolean? Parameter for `Inventory:Update()`.
+function Inventory:QueueUpdate(delay, cascade)
 	-- Don't push the default delay too low on this or we'll end up performing updates too quickly
 	-- during things like moving bags between slots, and stock states will be lost.
-	Bagshui:QueueClassCallback(self, self.Update, delay or 0.07, false)
+	Bagshui:QueueClassCallback(self, self.Update, delay or 0.07, false, cascade)
 end
 
 

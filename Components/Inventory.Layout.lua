@@ -6,8 +6,12 @@ Bagshui:AddComponent(function()
 local Inventory = Bagshui.prototypes.Inventory
 
 
+-- Reusable variable for use in `Inventory:Update()`.
+local update_cascadeInventory
+
 --- This is the main workhorse for orchestrating UI changes; it's called when almost anything happens.
-function Inventory:Update()
+---@param cascade boolean? After completing the update process for this inventory, trigger it for any docked inventory.
+function Inventory:Update(cascade)
 	-- self:PrintDebug(string.format("Update() windowUpdateBlocked=%s", tostring(self.windowUpdateBlocked)))
 
 	-- Only update if we haven't been blocked from doing so.
@@ -21,6 +25,14 @@ function Inventory:Update()
 	if not self:Visible() and not self.forceCacheUpdate then
 		self.windowUpdateBlocked = false
 		return
+	end
+
+	-- Decide whether we'll need to cascade, and pass everything along.
+	update_cascadeInventory = cascade and (self.dockedInventory or self.dockedToInventory)
+	if update_cascadeInventory then
+		update_cascadeInventory.forceCacheUpdate = update_cascadeInventory.forceCacheUpdate or self.forceCacheUpdate
+		update_cascadeInventory.forceResort = update_cascadeInventory.forceResort or self.forceResort
+		update_cascadeInventory.windowUpdateNeeded = update_cascadeInventory.windowUpdateNeeded or self.windowUpdateNeeded
 	end
 
 	-- We're updating!
@@ -49,16 +61,23 @@ function Inventory:Update()
 
 	-- Reset status.
 	self.windowUpdateBlocked = false
+
+	-- Automatically cascade updates to docked inventory.
+	if update_cascadeInventory then
+		update_cascadeInventory:Update()
+	end
 end
 
 
 
---- Force a window redraw without updating the inventory cache.
-function Inventory:ForceUpdateWindow()
-	self.cacheUpdateNeeded = false
+--- Force a window redraw with optional cache update.
+---@param cascade boolean? Parameter for `Inventory:Update()`.
+---@param updateCache boolean? `true` to trigger a cache update.
+function Inventory:ForceUpdateWindow(cascade, updateCache)
+	self.cacheUpdateNeeded = updateCache or false
 	self.windowUpdateNeeded = true
 	self.forceResort = false
-	self:Update()
+	self:Update(cascade)
 end
 
 
@@ -413,8 +432,15 @@ function Inventory:UpdateWindow()
 		Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline = nil
 	end
 
+	-- Can only highlight changes if there's something to highlight.
+	self.highlightChangesEnabled = (
+		self.hasChanges
+		or (self.dockedInventory and self.dockedInventory.hasChanges)
+		or (self.dockedToInventory and self.dockedToInventory.hasChanges)
+	) or false
+
 	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
-	if not self.hasChanges and self.highlightChanges then
+	if not self.highlightChangesEnabled then
 		self.highlightChanges = false
 	end
 
@@ -498,7 +524,6 @@ function Inventory:UpdateWindow()
 		-- Reset hidden group and item tracking.
 		self.hasHiddenGroups = false  -- Updated in this function.
 		self.hasHiddenItems = false  -- Updated in GetGroupItemCountForLayout().
-		self.hasChanges = false  -- Updated in AssignItemsToSlots().
 		self.hasOpenables = false  -- Updated in AssignItemsToSlots().
 		self.nextOpenableItemBagNum = nil  -- Updated in AssignItemsToSlots().
 		self.nextOpenableItemSlotNum = nil  -- Updated in AssignItemsToSlots().
@@ -1251,11 +1276,6 @@ function Inventory:AssignItemsToSlots(
 				-- Add the item to the button (texture, tooltip, etc.).
 				self.ui:AssignItemToItemButton(button, item, groupId)
 
-				-- Update tracking of whether there are highlight-able items.
-				if item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE then
-					self.hasChanges = true
-				end
-
 				-- Should the Clam button be enabled?
 				if item.openable == 1 then
 					self.hasOpenables = true
@@ -1964,7 +1984,7 @@ function Inventory:UpdateToolbar()
 	self:SetToolbarButtonState(
 		toolbarButtons.highlightChanges,
 		nil,
-		self.hasChanges and not self.editMode,
+		self.highlightChangesEnabled and not self.editMode,
 		self.highlightChanges,
 		L.Toolbar_UnHighlightChanges_TooltipTitle,
 		L.Toolbar_HighlightChanges_TooltipTitle

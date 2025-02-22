@@ -12,7 +12,7 @@ local Inventory = Bagshui.prototypes.Inventory
 --- * If each empty slot is allowed to stack.
 --- * When toolbar icons that act on the inventory should be enabled (toolbar updates are performed in Inventory.layout.lua).
 function Inventory:UpdateCache()
-	--self:PrintDebug("UpdateCache()")
+	-- self:PrintDebug("UpdateCache()")
 
 	-- Don't even try any updates until they're permitted.
 	if not self.inventoryUpdateAllowed or not self.online then
@@ -59,6 +59,10 @@ function Inventory:UpdateCache()
 	-- Track whether there are multiple partial stacks of the same item to decide whether the
 	-- Restack button should be enabled.
 	self.multiplePartialStacks = false
+
+	-- Update this on every cache pass, since those happen fairly frequently.
+	-- Used to determine whether change highlighting should be enabled.
+	self.hasChanges = false
 
 	-- Bag (outer loop) variables.
 	local bagName, bagNumSlots, bagTexture, bagType, bagSlotLink, bagItemCode, bagInfo
@@ -527,6 +531,11 @@ function Inventory:UpdateCache()
 			item._proposedStockState = nil
 			item._proposedDate = nil
 			item._allowStockStateChange = nil
+
+			-- Update tracking of whether there are highlight-able items.
+			if item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE then
+				self.hasChanges = true
+			end
 		end
 	end
 	-- This update cycle's post-update counts become next cycle's pre-update counts.

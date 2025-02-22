@@ -13,7 +13,9 @@ function Inventory:ResetStockState()
 			item.bagshuiStockState = BS_ITEM_STOCK_STATE.NO_CHANGE
 		end
 	end
-	self:ForceUpdateWindow()
+	-- Update the window, cascade to docked inventory, and force cache update.
+	-- (Inventory:UpdateCache() is where hasChanges is updated).
+	self:ForceUpdateWindow(true, true)
 end
 
 
@@ -23,11 +25,7 @@ end
 function Inventory:Resort()
 	self.forceResort = true
 	-- Do NOT use QueueUpdate() here.
-	self:Update()
-	-- Trigger docked inventory resort.
-	if self.dockedInventory then
-		self.dockedInventory:Resort()
-	end
+	self:Update(true)
 end
 
 
