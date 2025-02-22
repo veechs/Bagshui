@@ -655,6 +655,21 @@ end
 
 
 
+--- Is the given item a bag?
+---@param item table Inventory cache entry.
+---@return boolean
+function ItemInfo:IsContainer(item)
+	return (
+		type(item) == "table"
+		and (
+			item.type == L.Container
+			or item.type == L.Quiver
+		)
+	)
+end
+
+
+
 --- Wrap an item's name in the appropriate color escape sequence for its quality level.
 ---@param item table<string,string|number> Item information table populated by ItemInfo:Get().
 ---@return string
