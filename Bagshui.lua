@@ -717,7 +717,6 @@ local Bagshui = {
 		CloseAllWindows = "CloseAllWindows",
 		DeleteCursorItem = "ClearCursor",
 		MoneyFrame_UpdateMoney = "MoneyFrame_UpdateMoney",
-		OpenStackSplitFrame = "OpenStackSplitFrame",
 		PickupBagFromSlot = "PickupInventoryItem",
 		PickupInventoryItem = "PickupInventoryItem",
 		PutItemInBag = "PickupInventoryItem",
