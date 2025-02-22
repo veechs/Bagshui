@@ -26,4 +26,28 @@ function Bagshui:MoneyFrame_UpdateMoney(wowApiFunctionName)
 end
 
 
+
+--- Ensure the stack split frame stays onscreen.
+---@param wowApiFunctionName string Hooked WoW API function that triggered this call. 
+---@param maxStack any `OpenStackSplitFrame()` parameter.
+---@param parent any `OpenStackSplitFrame()` parameter.
+---@param anchor any `OpenStackSplitFrame()` parameter.
+---@param anchorTo any `OpenStackSplitFrame()` parameter.
+function Bagshui:OpenStackSplitFrame(wowApiFunctionName, maxStack, parent, anchor, anchorTo)
+	-- Pass along to the normal `OpenStackSplitFrame()` to handle everything.
+	self.hooks:OriginalHook(wowApiFunctionName, maxStack, parent, anchor, anchorTo)
+	-- Reposition if needed.
+	if BsUtil.GetFrameOffscreenAmount(_G.StackSplitFrame, "y") < 0 then
+		self:PrintDebug(anchor)
+		self:PrintDebug(BsUtil.FlipAnchorPointComponent(anchor, 1))
+		_G.StackSplitFrame:ClearAllPoints()
+		_G.StackSplitFrame:SetPoint(
+			BsUtil.FlipAnchorPointComponent(anchor, 1),
+			parent,
+			BsUtil.FlipAnchorPointComponent(anchorTo, 1),
+			0, 0
+		)
+	end
+end
+
 end)
