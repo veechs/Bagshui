@@ -880,11 +880,13 @@ function ItemInfo:Init()
 	local itemInfoSlashCache = {}
 	BsSlash:AddHandler("Info", function(tokens)
 		if not tokens[2] then
-			BsSlash:PrintHandlers({L.ItemId}, "Info")
-			-- Character and Game will (probably) be added in a future update.
-			--BsSlash:PrintHandlers({L.ItemId, L.Character, L.Game}, "Info")
-		-- elseif BsUtil.MatchLocalizedOrNon(tokens[2], "character") then
-		-- 	Bs:PrintError("Not implemented yet.")
+			-- Character may be added in a future update.
+			BsSlash:PrintHandlers({L.Group, L.ItemId, L.Location}, "Info")
+
+		elseif BsGameInfo:HandleInfoSlash(tokens) then
+			-- Let GameInfo handle its own stuff.
+			return
+
 		elseif BsUtil.MatchLocalizedOrNon(tokens[2], "itemid") or BsUtil.MatchLocalizedOrNon(tokens[2], "help") then
 			Bs:PrintBare(L.Slash_Help_ItemInfo)
 		else

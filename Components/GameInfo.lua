@@ -396,48 +396,55 @@ function GameInfo:OnEvent(event, arg1)
 
 	if event == "BAGSHUI_LOCALIZATION_LOADED" then
 		self:PopulatePostLocalizationInfo()
-
-		BsSlash:AddHandler("Game", function(tokens)
-			if not tokens[2] then
-				BsSlash:PrintHandlers({L.Location, L.Group}, "Game")
-
-			elseif
-				BsUtil.MatchLocalizedOrNon(tokens[2], "location")
-				or BsUtil.MatchLocalizedOrNon(tokens[2], "instance")
-				or BsUtil.MatchLocalizedOrNon(tokens[2], "zone")
-			then
-				Bs:Print(string.format(L.Symbol_Colon, L.Location))
-
-				Bs:PrintBare(string.format(L.Symbol_Colon, L.Zone))
-				printNonNilZones(self.currentZone, self.currentSubZone)
-				Bs:PrintBare(string.format(L.Symbol_Colon, L.Subzone))
-				printNonNilZones(self.currentSubZone, self.currentMinimapZone)
-
-				Bs:PrintBare(string.format(L.Symbol_Colon, L.Instance))
-				if not self.isInInstance or self.instanceType == "none" then
-					Bs:PrintBare(BS_INDENT .. L.NoneParenthesis)
-				else
-					Bs:PrintBare(BS_INDENT .. self.instanceType)
-				end
-
-			elseif
-				BsUtil.MatchLocalizedOrNon(tokens[2], "group")
-				or BsUtil.MatchLocalizedOrNon(tokens[2], "party")
-				or BsUtil.MatchLocalizedOrNon(tokens[2], "loot")
-				or BsUtil.MatchLocalizedOrNon(tokens[2], "raid")
-			then
-				Bs:Print(string.format(L.Symbol_Colon, _G.GROUP))
-				Bs:PrintBare(BS_INDENT .. self.playerGroupType)
-
-				Bs:PrintBare(string.format(L.Symbol_Colon, _G.LOOT))
-				Bs:PrintBare(BS_INDENT .. string.format(L.Symbol_Colon, _G.LOOT_METHOD) .. " " .. self.lootMethod)
-				Bs:PrintBare(BS_INDENT .. "IsLootMaster? " .. tostring(self.isMasterLooter))
-			end
-		end)
-
 		return
 	end
 end
+
+
+
+--- Slash command helper called from `ItemInfo`'s slash handler.
+--- This lets us have `/Bagshui Info Location` etc.
+---@param tokens table Tokenized input from slash command.
+---@return boolean handled `true` if ItemInfo shouldn't continue processing.
+function GameInfo:HandleInfoSlash(tokens)
+
+	if
+		BsUtil.MatchLocalizedOrNon(tokens[2], "location")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "instance")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "zone")
+	then
+		Bs:Print(string.format(L.Symbol_Colon, L.Location))
+
+		Bs:PrintBare(string.format(L.Symbol_Colon, L.Zone))
+		printNonNilZones(self.currentZone, self.currentSubZone)
+		Bs:PrintBare(string.format(L.Symbol_Colon, L.Subzone))
+		printNonNilZones(self.currentSubZone, self.currentMinimapZone)
+
+		Bs:PrintBare(string.format(L.Symbol_Colon, L.Instance))
+		if not self.isInInstance or self.instanceType == "none" then
+			Bs:PrintBare(BS_INDENT .. L.NoneParenthesis)
+		else
+			Bs:PrintBare(BS_INDENT .. self.instanceType)
+		end
+		return true
+
+	elseif
+		BsUtil.MatchLocalizedOrNon(tokens[2], "group")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "party")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "loot")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "raid")
+	then
+		Bs:Print(string.format(L.Symbol_Colon, _G.GROUP))
+		Bs:PrintBare(BS_INDENT .. self.playerGroupType)
+
+		Bs:PrintBare(string.format(L.Symbol_Colon, _G.LOOT))
+		Bs:PrintBare(BS_INDENT .. string.format(L.Symbol_Colon, _G.LOOT_METHOD) .. " " .. self.lootMethod)
+		Bs:PrintBare(BS_INDENT .. "IsLootMaster? " .. tostring(self.isMasterLooter))
+		return true
+	end
+end
+
+
 
 Bagshui:RegisterEvent("BAGSHUI_LOCALIZATION_LOADED", GameInfo)
 -- Location events.
