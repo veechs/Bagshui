@@ -130,7 +130,7 @@ function InventoryUi:CreateInventoryItemSlotButton(buttonNum)
 
 			-- Proxy for `slotButton` that was created above.
 			-- Will override `GetID()` and `GetParent()`.
-			local slotButtonProxy = _G.CreateFrame("Frame")
+			local slotButtonProxy = _G.CreateFrame("Button")
 			-- Store the proxy so it can be used by `Inventory:ItemButton_OnClick/OnEnter()`
 			slotButton.bagshuiData.getIdProxy = slotButtonProxy
 			-- Proxy for `slotButton`'s parent frame.
