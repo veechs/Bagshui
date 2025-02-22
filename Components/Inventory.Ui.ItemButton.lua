@@ -115,15 +115,24 @@ function InventoryUi:CreateInventoryItemSlotButton(buttonNum)
 			-- so that they act as if they are the item button, but with overridden
 			-- functions that give us what we need to ensure code outside our control
 			-- receives the correct bag and slot numbers.
+			--
+			-- These proxies are picked up by Inventory:ItemButton_OnClick/OnEnter()
+			-- and set up so Blizzard's GetID() calls will be intercepted and redirected
+			-- to our custom functions.
 			-- 
 			-- (Now it's entirely possible there's a simpler way to do this, and
-			-- if there is, I'd love to know it. But this works, and that's what's important.)
+			-- if there is, I'd love to know it. There were past experiments with
+			-- intermediate parent frames, but frame levels between item buttons
+			-- and groups are slightly finicky and led to item buttons disappearing.
+			-- Another attempt was made along those lines in the disastrous 1.2.17
+			-- release. So having something that works is and doesn't seem to cause
+			-- any side effects is preferable.)
 
 			-- Proxy for `slotButton` that was created above.
 			-- Will override `GetID()` and `GetParent()`.
 			local slotButtonProxy = _G.CreateFrame("Frame")
 			-- Store the proxy so it can be used by `Inventory:ItemButton_OnClick/OnEnter()`
-			slotButton.bagshuiData.proxy = slotButtonProxy
+			slotButton.bagshuiData.getIdProxy = slotButtonProxy
 			-- Proxy for `slotButton`'s parent frame.
 			-- Will override `GetID()` only.
 			local parentProxy = _G.CreateFrame("Frame")
@@ -367,8 +376,8 @@ function Inventory:ItemButton_OnEnter(itemButton)
 				-- In addition to the above, we need to use our metatable'd proxy frame
 				-- (set up in InventoryUi:CreateInventoryItemSlotButton()) so the
 				-- GetID() and GetParent():GetID() functions will be overridden.
-				_G.this = itemButton.bagshuiData.proxy
-				_G[self.itemSlotTooltipFunction](itemButton.bagshuiData.proxy)
+				_G.this = itemButton.bagshuiData.getIdProxy
+				_G[self.itemSlotTooltipFunction](itemButton.bagshuiData.getIdProxy)
 				_G.this = oldGlobalThis
 				-- `ContainerFrameItemButton_OnEnter()` will change the tooltip position
 				-- to something that ignores our custom offsets, so we need to fix that.
@@ -1045,7 +1054,7 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				-- meaning of global this while any code outside our control
 				-- is executed.
 				local oldGlobalThis = _G.this
-				_G.this = itemButton.bagshuiData.proxy
+				_G.this = itemButton.bagshuiData.getIdProxy
 
 				if mouseButton == "LeftButton" then
 					-- Normal left-click.
