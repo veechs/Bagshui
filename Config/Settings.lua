@@ -402,7 +402,7 @@ Bagshui.config.Settings = {
 
 
 				{
-					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Size,
+					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_SizeAndLayering,
 				},
 
 				-- Scale of the entire window.
@@ -419,6 +419,33 @@ Bagshui.config.Settings = {
 					valueDisplayFunc = function(num)
 						return (num * 100) .. "%"
 					end,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+				-- Frame strata.
+				{
+					name = "windowStrata",
+					scope = BS_SETTING_SCOPE.CHARACTER,
+					type = BS_SETTING_TYPE.CHOICES,
+					defaultValue = "MEDIUM",
+					choices = {
+						{
+							value = "DIALOG",
+							text = L.windowStrata_Choice_DIALOG,
+						},
+						{
+							value = "HIGH",
+							text = L.windowStrata_Choice_HIGH,
+						},
+						{
+							value = "MEDIUM",
+							text = L.windowStrata_Choice_MEDIUM,
+						},
+						{
+							value = "LOW",
+							text = L.windowStrata_Choice_LOW,
+						},
+					},
 					inventoryWindowUpdateOnChange = true,
 				},
 
