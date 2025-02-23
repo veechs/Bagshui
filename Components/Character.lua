@@ -25,12 +25,13 @@ local CHARACTER_EVENTS = {
 	CHAT_MSG_SKILL = true,  -- New skills learned or leveled up.
 	CHAT_MSG_SYSTEM = true,  -- Messages to parse for important events.
 	CRAFT_SHOW = true,  -- Enchanting profession window is opened.
-	PLAYER_ALIVE = true,  -- Trigger initial processing at startup.
+	PLAYER_ENTERING_WORLD = true,  -- Trigger initial processing at startup.
 	PLAYER_LEVEL_UP = true,  -- Level up.
 	SKILL_LINES_CHANGED = true,  -- Need to update skills (needed to catch some weird skills like Fist Weapons).
 	SPELLS_CHANGED = true,  -- Need to update spells.
 	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting).
 	UPDATE_INVENTORY_ALERTS = true,  -- Equipped gear has changed.
+	UNIT_INVENTORY_CHANGED = true,  -- Equipped gear has changed.
 }
 
 -- Events that should trigger a money update.
@@ -224,7 +225,10 @@ function Character:OnEvent(event, arg1)
 	end
 
 	-- Equipped gear changed ("inventory" in this case is what's equipped, not what's in bags).
-	if event == "UPDATE_INVENTORY_ALERTS" then
+	if
+		event == "UPDATE_INVENTORY_ALERTS"
+		or event == "UNIT_INVENTORY_CHANGED"
+	then
 		self:UpdateGear()
 		return
 	end
@@ -383,6 +387,7 @@ end
 
 --- Refresh the list of equipped armor and weapons.
 function Character:UpdateGear()
+	-- Bs:PrintDebug("Character:UpdateGear()")
 	local historyChanged = false
 	local equippedChanged = false
 	local itemString, prevItemString
