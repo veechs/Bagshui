@@ -1151,6 +1151,10 @@ function Inventory:UiFrame_OnShow()
 	self.highlightChanges = false
 	self.queuedTradeItem = nil  -- Used by self:TradeFrame_OnShow().
 
+	-- Reset any item highlighting.
+	self.highlightItemsInContainerId = nil
+	self.highlightItemsContainerSlot = nil
+
 	-- Because Update() is called from the UI frame's OnShow function, self:Visible() becomes true
 	-- before CategorizeAndSort() executes. Normally, CategorizeAndSort() bails if self:Visible() is true,
 	-- so forceResort is set to true to ensure inventory is properly sorted whenever the window is opened.
