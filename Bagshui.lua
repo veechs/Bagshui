@@ -459,11 +459,11 @@ local bagshuiEnvironment = {
 		end,
 
 		soulbound = function(item)
-			return tostring(Bagshui.components.Rules:Match("soulbound()", item))
+			return tostring(Bagshui.components.Rules:Match("Soulbound()", item))
 		end,
 
 		stacks = function(item)
-			return tostring(Bagshui.components.Rules:Match("stacks()", item))
+			return tostring(Bagshui.components.Rules:Match("Stacks()", item))
 		end,
 
 		tooltip = function(item, displayType)
