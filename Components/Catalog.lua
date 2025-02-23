@@ -666,6 +666,10 @@ function Catalog:AddTooltipInfo(itemString, tooltip)
 	-- Populate the tooltip.
 	if table.getn(addTooltipInfo_LeftStrings) > 0 then
 
+		if tooltip:NumLines() > 0 then
+			tooltip:AddLine(" ")
+		end
+
 		-- Grand total for multi-realm.
 		if realmsWithItems > 1 then
 			tooltip:AddDoubleLine(
