@@ -737,6 +737,8 @@ function Inventory:InitUi()
 			self:ItemButton_OnUpdate(_G.arg1)
 		end,
 	})
+	-- Make the Hearthstone toolbar button compatible with our `ContainerFrameItemButton_` hackery.
+	ui:AddItemSlotButtonGetIdProxy(buttons.toolbar.hearthstone)
 
 	-- Store default positioning for later use in UpdateWindow().
 	_,
