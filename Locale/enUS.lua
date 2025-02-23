@@ -277,7 +277,7 @@ BsLocalization:AddLocale("enUS", {
 
 -- Special item tooltips.
 ["Inventory_Item_SellProtection_ConfirmSale"] = "Control+Right-Click to confirm sale.",
-["Inventory_Item_SellProtection_Reason"] = "Protected due to %s setting.",
+["Inventory_Item_SellProtection_Reason"] = "Protected due to %s.",
 ["Inventory_Item_SellProtection_OverrideHint"] = "Skip confirmation: Ctrl+Alt+Shift+Right-Click.",
 
 -- Bag tooltips.
