@@ -710,9 +710,13 @@ end
 
 
 
-
+-- Reusable table for `Inventory:GetSupplementalEmptySlotCount()`.
 local getSupplementalEmptySlotCount_inventoriesChecked = {}
 
+--- Determine how many slots are available in other inventories to help with bag swapping.
+---@param availableSlotTable table? Array to which additional slots should be added.
+---@return integer availableEmptySlotCount
+---@return table<string,true> inventoriesChecked Other inventory classes that were checked for available slots.
 function Inventory:GetSupplementalEmptySlotCount(availableSlotTable)
 	local availableEmptySlotCount = 0
 	BsUtil.TableClear(getSupplementalEmptySlotCount_inventoriesChecked)
@@ -741,7 +745,10 @@ end
 
 
 
-
+--- Calculate how many more slots are required before a swap of the specified bag can be performed.
+---@param bagNum number Container to check.
+---@return integer slotsNeeded
+---@return table<string, true>? inventoriesChecked Second return value from `Inventory:GetSupplementalEmptySlotCount()`.
 function Inventory:GetAdditionalSlotsNeededToSwapBag(bagNum)
 	local filledSlots = (self.containers[bagNum].slotsFilled or 0)
 
