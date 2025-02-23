@@ -253,7 +253,7 @@ BsLocalization:AddLocale("enUS", {
 ["ItemPropFriendly_name"] = "!!Name!!",
 ["ItemPropFriendly_periodicTable"] = "Periodic Table",
 ["ItemPropFriendly_quality"] = "!!Quality!!",
-["ItemPropFriendly_qualityLocalized"] = "Quality (Localized)",
+["ItemPropFriendly_qualityLocalized"] = "!!Quality!! (Localized)",
 ["ItemPropFriendly_readable"] = "Readable",
 ["ItemPropFriendly_slotNum"] = "Slot Number",
 ["ItemPropFriendly_soulbound"] = "Soulbound",
