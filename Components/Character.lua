@@ -51,6 +51,7 @@ local MONEY_EVENTS = {
 -- Array of property names for `currentCharacterInfo` whose values are tables.
 local CHARACTER_INFO_TABLES = {
 	"skills",
+	"spellNamesToIds",
 	"spells",
 	"professionCrafts",
 	"professionReagents",
@@ -116,10 +117,16 @@ end
 
 -- Build Character class.
 local Character = {
-	info = currentCharacterInfo,  -- `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
-	inventorySlots = {},  -- List of all inventory slots, including bags, and their localized names.
-	bagSlots = {},  -- Bag slot IDs so `Character:UpdateGear()` can differentiate.
-	startupRetries = 0,  -- When character info is nil, we'll retry a few times.
+	-- `Bagshui.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]`.
+	info = currentCharacterInfo,
+	-- List of all inventory slots, including bags, and their localized names.
+	---@type table<number,string>
+	inventorySlots = {},
+	-- Bag slot IDs so `Character:UpdateGear()` can differentiate.
+	---@type table<number,true>
+	bagSlots = {},
+	-- When character info is nil, we'll retry a few times.
+	startupRetries = 0,
 	initialized = false,
 }
 -- Add skills, spells, etc.
@@ -149,13 +156,13 @@ Bagshui.components.Character = Character
 ---@param event string WoW API event
 ---@param arg1 any First event argument.
 function Character:OnEvent(event, arg1)
-	-- Bagshui:PrintDebug("Character event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
+	-- Bagshui:PrintDebug("Character event " .. event .. " // " .. tostring(arg1))
 
 	-- Initial processing at startup. The delayed event is necessary to ensure
 	-- we can actually get the data we need, which isn't available instantly.
 	-- See comment above the initial call to Character:UpdateInfo() at the end of
 	-- this file for more information.
-	if event == "PLAYER_ALIVE" then
+	if event == "PLAYER_ENTERING_WORLD" then
 		if not self.initialized then
 			Bagshui:QueueEvent("BAGSHUI_INITIAL_CHARACTER_UPDATE", 1.5)
 		end
@@ -272,15 +279,13 @@ function Character:UpdateInfo(newLevel)
 	self.info.class = string.upper(self.info.class)
 
 	-- Retry at startup (when no `newLevel` parameter is passed) if needed due to empty values.
-	-- Using PLAYER_ALIVE instead of PLAYER_ENTERING_WORLD seems to mostly mitigate this,
-	-- but it seems like a good thing to account for just in case.
 	if not newLevel and not self.faction and self.infoRetries < 5 then
 		self.infoRetries = self.infoRetries + 1
 		Bagshui:QueueEvent("BAGSHUI_INITIAL_CHARACTER_UPDATE", 1)
 		return
 	end
 
-	-- Raise an event if there wer changes.
+	-- Raise an event if there were changes.
 	if self.initialized then
 		for key, value in pairs(self.info) do
 			if self.info[key] ~= _updateInfo_oldValues[key] then
@@ -307,11 +312,22 @@ end
 
 
 
+-- Reusable tables for `UpdateSkillsAndSpells()`.
+
+local update_tempSpells = {}
+local update_tempSkills = {}
+
+
 --- Refresh the list of known skills and spells.
 function Character:UpdateSkillsAndSpells()
 
+	-- Backup copy to compare against so we know whether changes actually happened.
+	BsUtil.TableCopy(self.spells, update_tempSpells)
+	BsUtil.TableCopy(self.skills, update_tempSkills)
+
 	-- Rebuild the lists fresh each time.
 	BsUtil.TableClear(self.spells)
+	BsUtil.TableClear(self.spellNamesToIds)
 	for _, skillTypeList in pairs(self.skills) do
 		BsUtil.TableClear(skillTypeList)
 	end
@@ -325,12 +341,13 @@ function Character:UpdateSkillsAndSpells()
 			break
 		end
 		self.spells[spellName] = spellRank
+		self.spellNamesToIds[spellName] = spellNum
 		spellNum = spellNum + 1
 	end
 
 	-- Iterate skills and place them in the appropriate category.
 	local skillCategory
-	local skip = false
+	local skip  -- Will be either nil or true depending on whether the skill is in `IGNORE_SKILL_CATEGORY`.
 	for skillIndex = 1, _G.GetNumSkillLines() do
 		local skillName, isHeader, _, skillRank = _G.GetSkillLineInfo(skillIndex)
 		if isHeader then
@@ -346,10 +363,20 @@ function Character:UpdateSkillsAndSpells()
 		end
 	end
 
-	-- Being lazy and not checking for actual changes here.
-	if self.initialized then
+	-- Is anything different?
+	if
+		self.initialized
+		and (
+			not BsUtil.ObjectsEqual(self.spells, update_tempSpells)
+			or not BsUtil.ObjectsEqual(self.skills, update_tempSkills)
+		)
+	then
 		Bagshui:RaiseEvent("BAGSHUI_CHARACTER_UPDATE")
 	end
+
+	-- Don't need to keep contents (but do keep the tables).
+	BsUtil.TableClear(update_tempSpells)
+	BsUtil.TableClear(update_tempSkills)
 end
 
 
@@ -530,8 +557,8 @@ end
 --- Add an item's ID to the given list.
 ---@param professionName string Name of the associated profession.
 ---@param itemLink string Link of item produced by the skill.
----@param list number[] List to add the item to.
----@return string? # Item ID, or nil if the itemLink wasn't able to be processed.
+---@param list table<number, table> List to add the item to.
+---@return boolean? # True if changes made to `list`, false if no changes made, or nil if the itemLink wasn't able to be processed.
 function Character:AddProfessionItemToList(professionName, itemLink, list)
 	if type(itemLink) ~= "string" then
 		return
@@ -547,9 +574,13 @@ function Character:AddProfessionItemToList(professionName, itemLink, list)
 	if not list[itemId] then
 		list[itemId] = {}
 	end
+	if list[itemId][professionName] == true then
+		-- Already linked to the profession.
+		return false
+	end
 	list[itemId][professionName] = true
-	-- Return the item ID to indicate that a change was made.
-	return itemId
+	-- A change was made.
+	return true
 end
 
 

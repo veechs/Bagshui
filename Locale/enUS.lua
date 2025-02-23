@@ -73,6 +73,7 @@ BsLocalization:AddLocale("enUS", {
 ["Catalog"] = "Catalog",
 ["Categories"] = "Categories",
 ["Category"] = "Category",
+["Character"] = "Character",
 ["CharacterData"] = "Character Data",
 ["CategorySlashItem"] = "Category/Item",
 ["ClassCategory"] = "Class Category",
@@ -110,8 +111,10 @@ BsLocalization:AddLocale("enUS", {
 ["ImportSlashExport"] = "Import/Export",
 ["Info"] = "Info",
 ["Information"] = "Information",
+["Instance"] = "Instance",  -- Referring to a game instance, like a dungeon or raid.
 ["Inventory"] = "Inventory",
 ["Item"] = "Item",
+["ItemId"] = "ItemId",
 ["ItemProperties"] = "Item Properties",
 ["KeepEditing"] = "Keep Editing",
 ["Label"] = "Label",
@@ -135,6 +138,8 @@ BsLocalization:AddLocale("enUS", {
 ["NoRuleFunction"] = "(No Rule Function)",
 ["NoValue"] = "(No Value)",
 ["Open"] = "Open",
+["OpenContainer"] = "Open Container",
+["Openable"] = "Openable",
 ["PleaseWait"] = "Please wait...",
 ["Profile"] = "Profile",
 ["Prefix_Add"] = "Add %s",
@@ -169,11 +174,13 @@ BsLocalization:AddLocale("enUS", {
 ["Search"] = "Search",
 ["Settings"] = "Settings",
 ["Share"] = "Share",
+["ShiftClick"] = "Shift+Click",
 ["Show"] = "Show",
 ["SortOrder"] = "Sort Order",
 ["SortOrders"] = "Sort Orders",
 ["Sorting"] = "Sorting",
 ["Stack"] = "Stack",  -- Verb
+["Subzone"] = "Subzone",
 ["Suffix_Default"] = "%s " .. LIGHTYELLOW_FONT_COLOR_CODE .. " [Default]" .. FONT_COLOR_CODE_CLOSE,
 ["Suffix_EmptySlot"] = "%s Empty Slot",
 ["Suffix_Menu"] = "%s Menu",
@@ -183,6 +190,7 @@ BsLocalization:AddLocale("enUS", {
 ["Symbol_Brackets"] = "[%s]",
 ["Symbol_Colon"] = "%s:",
 ["Symbol_Ellipsis"] = "%s…",  -- Used in menus to indicate that clicking it will open another dialog or menu
+["Symbol_Parentheses"] = "(%s)",
 ["Templates"] = "Templates",
 ["Text"] = "Text",
 ["Toggle"] = "Toggle",  -- Verb
@@ -199,6 +207,7 @@ BsLocalization:AddLocale("enUS", {
 ["Vertical"] = "Vertical",
 ["VersionNumber"] = "Version %s",
 ["Yes"] = "Yes",
+["Zone"] = "Zone",
 
 -- Inventory types.
 ["Bags"] = "Bags",
@@ -212,9 +221,11 @@ BsLocalization:AddLocale("enUS", {
 ["Abbrev_Keyring"] = "Key",
 ["Abbrev_Equipped"] = "Equip",
 
--- Slash command help message.
+-- Slash command help messages and localizations.
 ["Slash_Help"] = "%s commands:",
 ["Slash_Help_Postscript"] = "For a list of subcommands, append Help to the command.",
+
+["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! Examples:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444".. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
 
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 ["Binding_Resort"] = "Organize All",
@@ -231,6 +242,7 @@ BsLocalization:AddLocale("enUS", {
 ["ItemPropFriendly_count"] = "Count",
 ["ItemPropFriendly_equipLocation"] = "Equip Location",
 ["ItemPropFriendly_equipLocationLocalized"] = "Equip Location (Localized)",
+["ItemPropFriendly_equipLocationSort"] = "Equip Location",
 ["ItemPropFriendly_emptySlot"] = "Empty Slot",
 ["ItemPropFriendly_id"] = "Item ID",
 ["ItemPropFriendly_itemLink"] = "Item Link",
@@ -259,6 +271,14 @@ BsLocalization:AddLocale("enUS", {
 
 ["Inventory_NoData"] = "Offline inventory not available.",
 
+-- Spell names that enable special features.
+["Spell_Disenchant"] = "Disenchant",
+["Spell_PickLock"] = "Pick Lock",
+
+-- Bag tooltips.
+["Bag_SlotsNeededToSwap"] = "%d more free slot(s) required to swap.",
+["Bag_SupplementalSpaceAvailable"] = "You may be to swap at the %s without cleaning your %s.",
+
 -- Toolbar.
 ["Toolbar_Menu_TooltipTitle"] = "Menu",
 ["Toolbar_ExitEditMode"] = "Exit Edit Mode",
@@ -280,6 +300,7 @@ BsLocalization:AddLocale("enUS", {
 ["Toolbar_UnHighlightChanges_TooltipTitle"] = "Don't Highlight Changes",
 
 -- Action Tooltips.
+["Tooltip_Inventory_PlaceBagInBagHint"] = "%s to move into bag instead of swapping.",  -- "Shift-Click to lock/unlock slot highlighting"
 ["Tooltip_Inventory_ToggleBagSlotHighlightLockHint"] = "%s to %s slot highlighting.",  -- "Alt-Click to lock/unlock slot highlighting"
 ["Tooltip_Inventory_ToggleEmptySlotStacking"] = "%s to %s empty slots.",  -- "Click to stack/unstack empty slots"
 ["Tooltip_Inventory_TradeShortcut"] = "%s to trade with %s.",  -- "Alt-Click to trade with <Player Name>"
@@ -307,8 +328,11 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Accessibility"] = "Accessibility",
 ["Menu_Settings_Advanced"] = "Advanced",
 ["Menu_Settings_Anchoring"] = "Anchoring",
+["Menu_Settings_BagUsage"] = "Utilization",
+["Menu_Settings_BagUsage_TooltipText"] = "Display of available slots and overall capacity.",
 ["Menu_Settings_Behaviors"] = "Behaviors",
 ["Menu_Settings_Badges"] = "Item Badges",
+["Menu_Settings_Buttons"] = "Buttons",
 ["Menu_Settings_ChangeTiming"] = "Stock Change Timers",
 ["Menu_Settings_Colors"] = "Colors",
 ["Menu_Settings_ColorHistory_TooltipTitle"] = "Color Picker History",
@@ -316,6 +340,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_DefaultProfiles"] = "Default Profiles",
 ["Menu_Settings_Defaults"] = "Defaults",
 ["Menu_Settings_Etcetera"] = "Etcetera",
+["Menu_Settings_Format"] = "Format",
 ["Menu_Settings_General"] = "General",
 ["Menu_Settings_GroupDefaults"] = "Group Defaults",
 ["Menu_Settings_Groups"] = "Groups",
@@ -329,9 +354,11 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Overrides"] = "Overrides",
 ["Menu_Settings_Open"] = "!!Open!!",
 ["Menu_Settings_Options"] = "Options",
+["Menu_Settings_PerBag"] = "Per-Bag",
 ["Menu_Settings_Profile"] = "Profile",
 ["Menu_Settings_Size"] = "Sizing",
 ["Menu_Settings_SizeAndLayering"] = "Sizing and Layering",
+["Menu_Settings_Summary"] = "Summary",
 ["Menu_Settings_Tinting"] = "Item Tinting",
 ["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
@@ -339,6 +366,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
 ["Menu_Settings_StockBadgeColors"] = "Stock Colors",
 ["Menu_Settings_View"] = "View",
+["Menu_Settings_Visibility"] = "Visibility",
 ["Menu_Settings_Window"] = "Window",
 
 -- Category Menu.
@@ -383,6 +411,8 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "Assign the item to a new custom category.",
 ["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "Built-in Categories are read-only - see FAQ on the Bagshui Wiki for reasoning.",
 ["Menu_Item_AssignToClassCategory"] = "Direct Assignment to",
+["Menu_Item_EquipBag"] = "Equip Bag",
+["Menu_Item_EquipBag_TooltipText"] = "Replace one of the currently equipped bags.",
 ["Menu_Item_Information_TooltipTitle"] = "Item Information",
 ["Menu_Item_Information_TooltipText"] = "View details about this item's properties and access the Item Information window.",
 ["Menu_Item_Information_Submenu_TooltipText"] = "Click to open the Item Information window.",
@@ -456,8 +486,10 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipIdentifier_Companion"] = [[Right Click to summon and dismiss your]],
 ["TooltipIdentifier_Drink"] = [[Must remain seated while drinking]],
 ["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
+["TooltipIdentifier_Locked"] = [[Locked]],
 ["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
 ["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
+["TooltipIdentifier_Openable"] = [[<Right Click to Open>]],
 ["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
@@ -727,6 +759,23 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Location_ExampleExtra1"] = 'Location("loc1", "loc2", "locN")',
 ["RuleFunction_Location_ExampleDescriptionExtra1"] = "Check if the item is stored in any of the specified locations.",
 
+["RuleFunction_LootMethod_GenericDescription"] = "Check the current loot method.",
+["RuleFunction_LootMethod_Note"] = "To view: /Bagshui !!Info!! Group",
+["RuleFunction_LootMethod_Example1"] = 'LootMethod("FreeForAll")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription1"] = "Check if loot method is Free For All (this is the default loot method).",
+["RuleFunction_LootMethod_Example2"] = 'LootMethod("RoundRobin")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription2"] = "Check if loot method is Round Robin.",
+["RuleFunction_LootMethod_Example3"] = 'LootMethod("Master")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription3"] = "Check if loot method is Master.",
+["RuleFunction_LootMethod_Example4"] = 'LootMethod("NeedBeforeGreed")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription4"] = "Check if loot method is Need Before Greed.",
+["RuleFunction_LootMethod_Example5"] = 'LootMethod("PersonalLoot")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription5"] = "Check if loot method is Personal Loot.",
+["RuleFunction_LootMethod_Example6"] = 'LootMethod("method1", "method2", "methodN")',
+["RuleFunction_LootMethod_ExampleDescription6"] = "Check if current loot method is any of the provided values.",
+["RuleFunction_LootMethod_Example7"] = 'LootMaster()',
+["RuleFunction_LootMethod_ExampleDescription7"] = "Check if you are the loot master.",
+
 ["RuleFunction_MinLevel_GenericDescription"] = "Check if the item is usable based on the specified level.",
 ["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
 ["RuleFunction_MinLevel_ExampleDescription1"] = "Check if the item is usable at <level> or above.",
@@ -745,6 +794,14 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_NameExact_ExampleExtra1"] = 'NameExact("string1", "string2", "stringN")',
 ["RuleFunction_NameExact_ExampleDescriptionExtra1"] = "Check if the item name exactly matches any of the specified strings.",
 
+["RuleFunction_Openable_GenericDescription"] = "Check if the item can be opened.",
+["RuleFunction_Openable_Example1"] = 'Openable()',
+["RuleFunction_Openable_ExampleDescription1"] = "Check if the item is openable.",
+["RuleFunction_Openable_Example2"] = 'Openable(Locked)',
+["RuleFunction_Openable_ExampleDescription2"] = "Check if the item is openable, but locked.",
+["RuleFunction_Openable_Example3"] = 'Openable(Unlocked)',
+["RuleFunction_Openable_ExampleDescription3"] = "Check if the item is openable and unlocked.",
+
 ["RuleFunction_Outfit_GenericDescription"] = "Check if the item is part of an outfit in %s.",
 ["RuleFunction_Outfit_Example1"] = 'Outfit()',
 ["RuleFunction_Outfit_ExampleDescription1"] = "Check if the item is part of an outfit in %s.",
@@ -757,6 +814,15 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_PeriodicTable_ExampleDescription"] = "Check if the item belongs to the '%s' PeriodicTable set.!!RuleFunction_PT_CaseSensitiveParameters!!",
 ["RuleFunction_PeriodicTable_ExampleExtra1"] = 'PeriodicTable("set1", "set2", "setN")',
 ["RuleFunction_PeriodicTable_ExampleDescriptionExtra1"] = "Check if the item belongs to any of the specified PeriodicTable sets.!!RuleFunction_PT_CaseSensitiveParameters!!",
+
+["RuleFunction_PlayerInGroup_GenericDescription"] = "Check if you are in a group.",
+["RuleFunction_PlayerInGroup_Note"] = "To view: /Bagshui !!Info!! Group",
+["RuleFunction_PlayerInGroup_Example1"] = 'PlayerInGroup()',
+["RuleFunction_PlayerInGroup_ExampleDescription1"] = "Check if you are in any group (party or raid).",
+["RuleFunction_PlayerInGroup_Example2"] = 'PlayerInGroup(Party)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription2"] = "Check if you are in a party group.",
+["RuleFunction_PlayerInGroup_Example3"] = 'PlayerInGroup(Raid)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription3"] = "Check if you are in a raid group.",
 
 ["RuleFunction_ProfessionCraft_GenericDescription"] = "Check if the item is crafted by the current character's professions (learned recipes only).",
 ["RuleFunction_ProfessionCraft_Example1"] = 'ProfessionCraft()',
@@ -779,6 +845,18 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Quality_ExampleExtra1"] = 'Quality(qual1, qual2, qualN)',
 ["RuleFunction_Quality_ExampleDescriptionExtra1"] = "Check if the item is of any of the specified qualities.",
 
+["RuleFunction_RecentlyChanged_GenericDescription"] = "Check if the item's stock state has changed.",
+["RuleFunction_RecentlyChanged_Example1"] = 'RecentlyChanged()',
+["RuleFunction_RecentlyChanged_ExampleDescription1"] = 'Check if the stock state has changed in any way.',
+["RuleFunction_RecentlyChanged_Example2"] = 'RecentlyChanged(New)',
+["RuleFunction_RecentlyChanged_ExampleDescription2"] = 'Check if the item is considered new.',
+["RuleFunction_RecentlyChanged_Example3"] = 'RecentlyChanged(Up)',
+["RuleFunction_RecentlyChanged_ExampleDescription3"] = 'Check if the stock has increased.',
+["RuleFunction_RecentlyChanged_Example4"] = 'RecentlyChanged(Down)',
+["RuleFunction_RecentlyChanged_ExampleDescription4"] = 'Check if the stock has decreased.',
+["RuleFunction_RecentlyChanged_Example5"] = 'RecentlyChanged(New, Up)',
+["RuleFunction_RecentlyChanged_ExampleDescription5"] = 'Check if the item is new or stock has increased, but ignore stock decreases.',
+
 ["RuleFunction_RequiresClass_GenericDescription"] = "Check if the item is usable by the specified class.",
 ["RuleFunction_RequiresClass_ExampleDescription"] = "Check if the item is usable by the %s class.",
 ["RuleFunction_RequiresClass_ExampleExtra1"] = 'RequiresClass("class1", "class2", "classN")',
@@ -794,6 +872,13 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Subtype_ExampleDescription"] = "Check if the item's subtype is '%s'.",
 ["RuleFunction_Subtype_ExampleExtra1"] = 'Subtype("type1", "type2", "typeN")',
 ["RuleFunction_Subtype_ExampleDescriptionExtra1"] = "Check the item is of any of the the specified subtypes.",
+
+["RuleFunction_Subzone_GenericDescription"] = "Check the current subzone (locale-specific).",
+["RuleFunction_Subzone_Note"] = "To view: /Bagshui !!Info!! Location",
+["RuleFunction_Subzone_Example1"] = 'Subzone("Spirit Rise")',  -- DO localize the parameter.
+["RuleFunction_Subzone_ExampleDescription1"] = "Check if you are in Spirit Rise.",
+["RuleFunction_Subzone_Example2"] = 'Subzone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Subzone_ExampleDescription2"] = "Check if you are in any of the specified subzones.",
 
 ["RuleFunction_Tooltip_GenericDescription"] = "Check if the tooltip contains the specified string(s).!!RuleFunction_LuaStringPatternsSupported!!",
 ["RuleFunction_Tooltip_Example1"] = 'Tooltip("string")',
@@ -820,6 +905,12 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_Wishlist_Example1"] = 'Wishlist()',
 ["RuleFunction_Wishlist_ExampleDescription1"] = "Check if the item is on the %s wishlist.",
 
+["RuleFunction_Zone_GenericDescription"] = "Check the current zone (locale-specific).",
+["RuleFunction_Zone_Note"] = "To view: /Bagshui !!Info!! Location",
+["RuleFunction_Zone_Example1"] = 'Zone("Thunder Bluff")',  -- DO localize the parameter.
+["RuleFunction_Zone_ExampleDescription1"] = "Check if you are in Thunder Bluff.",
+["RuleFunction_Zone_Example2"] = 'Zone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Zone_ExampleDescription2"] = "Check if you are in any of the specified zones.",
 
 -- ### Tips/Help ###
 ["BagshuiTooltipIntro"] = "Show Bagshui Info Tooltip",
@@ -831,6 +922,9 @@ BsLocalization:AddLocale("enUS", {
 ["Error_AddonDependency_Generic"] = "An additional addon is required to enable this rule function (refer to the Rules page on the Bagshui wiki).",
 ["Error_AddonDependency_Generic_FunctionName"] = "An additional addon is required to enable the use of %s (refer to the Rules page on the Bagshui wiki).",
 ["Error_AddonDependency"] = "%s is not installed or enabled.",
+["Error_BagSwap_EmptyOldFailed"] = "Failed to empty the old bag.",
+["Error_BagSwap_EmptyOldInsufficientSpace"] = "Not enough free slots to empty the old bag.",
+["Error_BagSwap_EquipNewFailed"] = "Failed to equip the new bag.",
 ["Error_CategoryEvaluation"] = "%s: %s",  -- "<Category Name>: <Error Message>"
 ["Error_DuplicateName"] = "There is already a %s named %s.",  -- "There is already a <Object Type> named <Name>."
 ["Error_GroupNotFound"] = "Group ID %s not found.",
@@ -838,6 +932,7 @@ BsLocalization:AddLocale("enUS", {
 ["Error_ImportInvalidFormat"] = "Import failed: Data was in an unexpected format.`",
 ["Error_ImportVersionTooNew"] = "Import failed: Please upgrade to the latest version of Bagshui.",
 ["Error_ItemCategoryUnknown"] = "!Unknown! (This shouldn't happen).",  -- Placed in the tooltip if the item doesn't have a category.
+["Error_ItemNotFound"] = "Item %s not found.",
 ["Error_RestackFailed"] = "Failed to restack %s",
 ["Error_SaveFailed"] = "%s could not be saved: %s",
 ["Error_Suffix_Retrying"] = "%s; retrying…",  -- Appended to the end of an error message when an action has failed but is being attempted again.
@@ -851,6 +946,8 @@ BsLocalization:AddLocale("enUS", {
 ["Compat_ReloadUIPrompt"] = "A UI reload is required.",
 ["Compat_pfUIBags"] = "Disabling the pfUI Bags module is strongly recommended to avoid multiple Bank windows.",
 ["Compat_pfUIBagsInfo"] = "If you change your mind, the pfUI Bags module can be managed in pfUI Config > Components > Modules.",
+["Compat_Swapper"] = "Swapper interferes with Bagshui's bag swapping functionality and must be disabled.",
+["Compat_SwapperInfo"] = "Swapper has been disabled.",
 ["Compat_tDFAllInOneBags"] = "Disabling the tDF All-In-One-Bag module is recommended if you want to use Bagshui as your default bags.",
 ["Compat_tDFAllInOneBagsInfo"] = "If you change your mind, the tDF All-In-One-Bag module can be managed in tDF Options.",
 
@@ -907,12 +1004,38 @@ BsLocalization:AddLocale("enUS", {
 ["Setting_Reset_TooltipText"] = "Reset to default: Ctrl+Alt+Shift+Click.",
 ["Setting_Profile_Use"] = "Make this the active %s %s profile.",  -- Make this the active Bags Design profile.
 
+["Setting_BagUsageDisplay_Always"] = "Always",
+["Setting_BagUsageDisplay_Always_TooltipTitle"] = "Summary Always Visible",
+["Setting_BagUsageDisplay_Always_TooltipText"] = "Show utilization summary regardless of any other setting.",
+["Setting_BagUsageDisplay_Smart"] = "Automatic",
+["Setting_BagUsageDisplay_Smart_TooltipTitle"] = "Automatic Summary Visibility",
+["Setting_BagUsageDisplay_Smart_TooltipText"] = "Show utilization summary when empty slot stacking is off (or hovering over bag slots).",
+["Setting_BagUsageDisplay_Never"] = "Never",
+["Setting_BagUsageDisplay_Never_TooltipTitle"] = "Summary Never Visible",
+["Setting_BagUsageDisplay_Never_TooltipText"] = "Utilization summary will never be displayed (except when hovering over bag slots).",
+
+["Setting_BagUsageFormat_Empty"] = "Empty",
+["Setting_BagUsageFormat_Empty_Total"] = "Empty/Total",
+["Setting_BagUsageFormat_Empty_Used_Total"] = "Empty (Used/Total)",
+["Setting_BagUsageFormat_Used"] = "Used",
+["Setting_BagUsageFormat_Used_Total"] = "Used/Total",
+["Setting_BagUsageFormat_Used_Empty_Total"] = "Used (Empty/Total)",
 
 -- ### Settings ###
 -- Keys are settingName, settingName_TooltipTitle, or settingName_TooltipText.
 -- See localization notes in the declaration of `Settings:InitSettingsInfo()` for more information.
 
 ["aboutBagshui_TooltipTitle"] = "About Bagshui",
+
+["bagUsageAlwaysShow"] = "Always Show",
+["bagUsageAlwaysShow_TooltipTitle"] = "Per-Bag Usage Always Visible",
+["bagUsageAlwaysShow_TooltipText"] = "Always display utilization over each bag (only applies if bag slots are visible).",
+
+["bagUsageDisplay"] = "Show",
+["bagUsageDisplay_TooltipText"] = "Control when the inventory consumption display is visible.",
+
+["bagUsageFormat"] = "Utilization Summary Format",
+["bagUsageFormat_TooltipText"] = "Control which numbers are shown in the inventory consumption display.",
 
 ["colorblindMode"] = "Colorblind Mode",
 ["colorblindMode_TooltipText"] = "Always show item quality and unusable badges regardless of Design settings.",
@@ -1028,8 +1151,16 @@ BsLocalization:AddLocale("enUS", {
 ["resetStockState"] = "Mark Items Unchanged",
 ["resetStockState_TooltipText"] = "Set all items in this inventory as no longer new, increased, or decreased.",
 
-["showBagBar"] = "Bag Bar",
-["showBagBar_TooltipText"] = "Show the bag bar in the bottom left.",
+["showBagBar"] = "Bag Slots",
+["showBagBar_TooltipText"] = "Show bag bar in the bottom left.",
+
+["showClam"] = "Clam",
+["showClam_TooltipTitle"] = "Clam (Open Container) Button",
+["showClam_TooltipText"] = "Show the Clam button to enable rapid container opening." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["showDisenchant"] = "Disenchant",
+["showDisenchant_TooltipTitle"] = "Disenchant Button",
+["showDisenchant_TooltipText"] = "Show the Disenchant button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to characters who have Enchanting and Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["showFooter"] = "Bottom Toolbar",
 ["showFooter_TooltipTitle"] = "Bottom Toolbar",
@@ -1043,8 +1174,9 @@ BsLocalization:AddLocale("enUS", {
 ["showHeader_TooltipTitle"] = "Top Toolbar",
 ["showHeader_TooltipText"] = "Show the top toolbar." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Hiding this will conceal everything above the items, including the Close button, so you'll need to close via key bindings, action bar buttons, or macros." .. FONT_COLOR_CODE_CLOSE,
 
-["showHearthstone"] = "Hearthstone Button",
-["showHearthstone_TooltipText"] = "Show the hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+["showHearthstone"] = "Hearthstone",
+["showHearthstone_TooltipTitle"] = "Hearthstone Button",
+["showHearthstone_TooltipText"] = "Show the Hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["showInfoTooltipsWithoutAlt"] = "Show Without Alt",
 ["showInfoTooltipsWithoutAlt_TooltipText"] = "Always display the Bagshui Info Tooltip (hold Shift to temporarily hide it).",
@@ -1052,7 +1184,11 @@ BsLocalization:AddLocale("enUS", {
 ["showLogWindow_TooltipText"] = "Open the Bagshui log window.",
 
 ["showMoney"] = "Money",
-["showMoney_TooltipText"] = "Display money in the bottom right.",
+["showMoney_TooltipText"] = "Show money in the bottom right.",
+
+["showPickLock"] = "Pick Lock",
+["showPickLock_TooltipTitle"] = "Pick Lock Button",
+["showPickLock_TooltipText"] = "Show the Pick Lock button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Rogues and Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["stackEmptySlots"] = "Stack Empty",
 ["stackEmptySlots_TooltipTitle"] = "Stack Empty Slots",

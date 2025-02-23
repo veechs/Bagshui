@@ -701,6 +701,51 @@ function Inventory:InitMenus()
 	self._itemMenuMatchedCategoryList = {}
 	self._itemMenuAssignedCategoryList = { "Uncategorized" }
 
+	-- Generate menu items for equipping bags.
+	-- This needs to contain entries from all inventory classes that have equippable bags.
+	local bagSwapMenu = {}
+	for _, inventoryClassName in ipairs(BS_INVENTORY_TYPE_UI_ORDER) do
+		local inventoryClass = Bagshui.components[inventoryClassName]
+		if
+			inventoryClass
+			and	inventoryClass.containerIds
+			-- Need more than a primary container.
+			and table.getn(inventoryClass.containerIds) > 1
+		then
+			table.insert(
+				bagSwapMenu,
+				{
+					text = inventoryClass.inventoryTypeLocalized,
+					isTitle = true,
+					notCheckable = true,
+				}
+			)
+			for _, containerId in ipairs(inventoryClass.containerIds) do
+				if containerId ~= inventoryClass.primaryContainer.id then
+					table.insert(
+						bagSwapMenu,
+						{
+							text = containerId,
+							notCheckable = true,
+							-- arg1 will be the item.
+							arg2 = {
+								containerId = containerId,
+								inventoryClass = inventoryClass,
+							},
+							_bagshuiTextureR = 1,
+							_bagshuiTextureG = 1,
+							_bagshuiTextureB = 1,
+							func = function(item, bagInfo)
+								Bagshui:CloseMenus()
+								bagInfo.inventoryClass:SwapBag(item, bagInfo.containerId)
+							end,
+						}
+					)
+				end
+			end
+		end
+	end
+
 	self.menus:AddMenu(
 		"Item",
 		-- 1
@@ -926,7 +971,7 @@ function Inventory:InitMenus()
 						self:CloseMenusAndClearFocuses()
 					end,
 				},
-				-- Reset item stock state. 
+				-- Reset item stock state.
 				{
 					_bagshuiMenuItemId = "ItemResetStockState",
 					text = L.Menu_Item_ResetStockState,
@@ -934,16 +979,27 @@ function Inventory:InitMenus()
 					disabled = true,
 					keepShownOnClick = false,
 					func = function(item)
-						item.bagshuiDate = 0
-						item.bagshuiStockState = BS_ITEM_STOCK_STATE.NO_CHANGE
-						self:ForceUpdateWindow()
+						self:ResetStockState()
 					end,
+				},
+				-- Bag menu for equipping.
+				{
+					_bagshuiMenuItemId = "ItemEquipBag",
+					text = L.Menu_Item_EquipBag,
+					tooltipText = L.Menu_Item_EquipBag_TooltipText,
+					hasArrow = true,
+					disabled = true,
+					value = {
+						value = "bags",
+					},
 				},
 			}
 		},
 
 		-- 3
-		nil,
+		{
+			bags = bagSwapMenu
+		},
 
 		--- Item OpenMenu callback.
 		---@param menu table Menu table.
@@ -1030,10 +1086,41 @@ function Inventory:InitMenus()
 				-- Update Manage submenu.
 				for _, menuItem in pairs(itemMenu.levels[2].manage) do
 					menuItem.arg1 = item
+
 					if menuItem._bagshuiMenuItemId == "ItemRemoveFromWorn" then
 						menuItem.disabled = not BsCharacter.equippedHistory[item.itemString]
+
 					elseif menuItem._bagshuiMenuItemId == "ItemResetStockState" then
 						menuItem.disabled = item.bagshuiStockState == BS_ITEM_STOCK_STATE.NO_CHANGE
+
+					elseif menuItem._bagshuiMenuItemId == "ItemEquipBag" then
+						menuItem.disabled = not BsItemInfo:IsContainer(item)
+
+						-- Update the bag slot menu to reflect current bags.
+						if not menuItem.disabled then
+							for index, bagMenuItem in pairs(itemMenu.levels[3].bags) do
+								if not bagMenuItem.isTitle then
+									bagMenuItem.arg1 = item
+									local inventoryClass = bagMenuItem.arg2.inventoryClass
+									local containerInfo = inventoryClass.containers[bagMenuItem.arg2.containerId]
+									if containerInfo.numSlots > 0 then
+										bagMenuItem.text = containerInfo.name
+										bagMenuItem.icon = containerInfo.texture
+									else
+										bagMenuItem.text = string.format(L.Symbol_Parentheses, L.EmptyBagSlot)
+										bagMenuItem.icon = BsUtil.GetFullTexturePath(BS_INVENTORY_EMPTY_SLOT_TEXTURE[L.Bag])
+									end
+									bagMenuItem.tooltipTitle = containerInfo.name
+									bagMenuItem.tooltipText = inventoryClass:GetBagSlotSwappableText(bagMenuItem.arg2.containerId)
+									bagMenuItem.disabled = (
+										(not inventoryClass.online)
+										-- Disable if the slot isn't usable. This is primarily for the Bank to disable unpurchased slots.
+										or containerInfo.usable == false
+									)
+								end
+							end
+						end
+
 					end
 				end
 

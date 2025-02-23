@@ -191,9 +191,15 @@ function Inventory:BuildSettingsMenuFromConfig(configTable, menuBaseTable, menuL
 				)
 
 			else
+				assert(BsUtil.TableContainsValue(BS_SETTING_TYPE, settingInfo.type), tostring(settingInfo.name) .. " does not have a valid type.")
+
 				-- Now we've found a setting.
 				local settingName = settingInfo.name or ""
 				local settingFriendlyName = settingInfo.title or L[settingInfo.name] or settingInfo.name
+
+				-- There are situations (like an inline CHOICES setting) where we don't actually
+				-- want `menuItem` added because it will be taken care of already.
+				local skipAddingToMenu = false
 
 				-- Base menu item.
 				local menuItem = {
@@ -234,9 +240,12 @@ function Inventory:BuildSettingsMenuFromConfig(configTable, menuBaseTable, menuL
 
 					menuItem.hasArrow = true
 					local subLevel = level + 1
+					local subMenu
 
-					menuBaseTable.levels[subLevel][settingInfo.name] = {}
-					local subMenu = menuBaseTable.levels[subLevel][settingInfo.name]
+					if not settingInfo.inline then
+						menuBaseTable.levels[subLevel][settingInfo.name] = {}
+						subMenu = menuBaseTable.levels[subLevel][settingInfo.name]
+					end
 
 					if
 						settingInfo.type == BS_SETTING_TYPE.CHOICES
@@ -285,17 +294,37 @@ function Inventory:BuildSettingsMenuFromConfig(configTable, menuBaseTable, menuL
 						elseif settingInfo.choices then
 							-- Static list of choices.
 
-							for _, choice in ipairs(settingInfo.choices) do
-								table.insert(
-									subMenu,
-									{
-										_bagshuiSettingName = settingInfo.name,
-										text = choice.text or choice.value,
-										value = choice.value,
-										tooltipTitle = menuItem.tooltipTitle,
-										tooltipText = (menuItem.tooltipText or "") .. (choice.tooltip and " " .. choice.tooltip or ""),
-									}
-								)
+							if settingInfo.inline then
+								-- Add choices at the current level.
+								for _, choice in ipairs(settingInfo.choices) do
+									table.insert(
+										menuTable,
+										{
+											_bagshuiSettingName = settingInfo.name,
+											text = choice.text or choice.value,
+											value = choice.value,
+											tooltipTitle = choice.tooltipTitle or menuItem.tooltipTitle,
+											tooltipText = choice.tooltipText or ((menuItem.tooltipText or "") .. (choice.tooltip and " " .. choice.tooltip or "")),
+										}
+									)
+								end
+								-- Don't add `menuItem` because everything is already done.
+								skipAddingToMenu = true
+
+							else
+								-- Submenu.
+								for _, choice in ipairs(settingInfo.choices) do
+									table.insert(
+										subMenu,
+										{
+											_bagshuiSettingName = settingInfo.name,
+											text = choice.text or choice.value,
+											value = choice.value,
+											tooltipTitle = menuItem.tooltipTitle,
+											tooltipText = (menuItem.tooltipText or "") .. (choice.tooltip and " " .. choice.tooltip or ""),
+										}
+									)
+								end
 							end
 
 						end
@@ -356,10 +385,12 @@ function Inventory:BuildSettingsMenuFromConfig(configTable, menuBaseTable, menuL
 				menuItem._bagshuiOriginalTooltipTitle = menuItem.tooltipTitle
 				menuItem._bagshuiOriginalTooltipText = menuItem.tooltipText
 
-				table.insert(
-					menuTable,
-					menuItem
-				)
+				if not skipAddingToMenu then
+					table.insert(
+						menuTable,
+						menuItem
+					)
+				end
 			end
 		end
 
@@ -444,7 +475,7 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 		-- auto-split menu `func`'set up in `BuildSettingsMenuFromConfig()`.
 		menuItem.value.objectId = menuLevel
 
-	elseif settingInfo.type == BS_SETTING_TYPE.BOOL then
+	elseif settingInfo.type == BS_SETTING_TYPE.BOOLEAN then
 		-- Boolean -- checked/unchecked, toggle setting on click.
 
 		menuItem.checked = settingsStorage[settingName]
@@ -468,12 +499,12 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 			-- Inside submenu -- checked/unchecked based on current value, change setting on click.
 			-- Need to use tostring() here so we don't get caught by float nonsense where 1 somehow doesn't equal 1.
 			menuItem.checked = tostring(menuItem.value) == tostring(currentSettingValue)
-			menuItem.keepShownOnClick = false
+			menuItem.keepShownOnClick = true
 			menuItem.func = function()
-				Bagshui:CloseMenus(_G.UIDROPDOWNMENU_MENU_LEVEL, nil, true)
 				settingsStorage[settingName] = _G.this.value
 				settingUpdateFunction()
-				self.menus:Refresh(menuLevel, -1)
+				self.menus:Refresh()
+				self.menus:Refresh(menuLevel, true)
 			end
 		else
 			-- Parent menu item to open the submenu.
@@ -516,7 +547,7 @@ function Inventory:GenerateSettingsMenuItem(menuItem, menu, menuLevel, itemNum, 
 					Bagshui:CloseMenus(_G.UIDROPDOWNMENU_MENU_LEVEL, nil, true)
 					settingsStorage[settingName] = color
 					settingUpdateFunction()
-					self.menus:Refresh(menuLevel, -1)
+					self.menus:Refresh(menuLevel, true)
 					self:AddToColorHistory(color)
 				end
 				menuItem._bagshuiColorSwatchFunc = menuItem.func

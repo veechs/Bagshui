@@ -297,6 +297,14 @@ Bagshui.config.Categories = {
 		},
 
 
+		-- Openables (clams, locked chests, etc.).
+		{
+			id = "Openable",
+			name = L.Openable,
+			sequence = 76,  -- Allow openable quest items to be captured by Quest category.
+			rule = 'Openable()',
+		},
+
 
 		-- Profession Reagents for learned professions.
 		-- This includes profession bags so empty slots are grouped with the reagents.

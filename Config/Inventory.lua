@@ -10,7 +10,6 @@ Bagshui:AddComponent(function()
 Bagshui.config.Inventory = {
 
 	[BS_INVENTORY_TYPE.BAGS] = {
-		hearthButton = true,
 
 		-- Backpack (16) + (4 Bag Slots * 20 slot bags)
 		-- Some Vanilla implementations have larger bags available, but the
@@ -83,6 +82,18 @@ Bagshui.config.Inventory = {
 			["^OpenAllBags$"] = "hookBag0",
 		},
 
+		-- Can use Bank if there isn't enough space to swap a bag.
+		bagSwappingSupplementalStorage = {
+			"Bank"
+		},
+
+		-- Bags get all the special toolbar buttons.
+
+		hearthButton = true,
+		clamButton = true,
+		disenchantButton = true,
+		pickLockButton = true,
+
 		openSound = "igBackPackOpen",
 		closeSound = "igBackPackClose",
 
@@ -133,6 +144,15 @@ Bagshui.config.Inventory = {
 		},
 
 		opensViaHooks = false,
+
+		-- Can use Bags if there isn't enough space to swap a bag.
+		bagSwappingSupplementalStorage = {
+			"Bags"
+		},
+
+		-- Bank can't have the Clam button because `UseContainerItem()` just moves
+		-- items to Bags.
+		clamButton = false,
 
 		--debug = true,
 	},

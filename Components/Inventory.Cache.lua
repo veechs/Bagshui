@@ -12,7 +12,7 @@ local Inventory = Bagshui.prototypes.Inventory
 --- * If each empty slot is allowed to stack.
 --- * When toolbar icons that act on the inventory should be enabled (toolbar updates are performed in Inventory.layout.lua).
 function Inventory:UpdateCache()
-	--self:PrintDebug("UpdateCache()")
+	-- self:PrintDebug("UpdateCache()")
 
 	-- Don't even try any updates until they're permitted.
 	if not self.inventoryUpdateAllowed or not self.online then
@@ -60,6 +60,10 @@ function Inventory:UpdateCache()
 	-- Restack button should be enabled.
 	self.multiplePartialStacks = false
 
+	-- Update this on every cache pass, since those happen fairly frequently.
+	-- Used to determine whether change highlighting should be enabled.
+	self.hasChanges = false
+
 	-- Bag (outer loop) variables.
 	local bagName, bagNumSlots, bagTexture, bagType, bagSlotLink, bagItemCode, bagInfo
 
@@ -73,8 +77,9 @@ function Inventory:UpdateCache()
 	local shadowId, prevShadowId
 
 
-	-- Reset partial stack tracking table.
+	-- Reset tracking tables.
 	BsUtil.TableClear(self.partialStacks)
+	BsUtil.TableClear(self.emptyGenericContainerSlots)
 
 	-- Identify any container changes triggered by moving bags between slots.
 	if Bagshui.pickedUpBagSlotNum and Bagshui.putDownBagSlotNum then
@@ -288,8 +293,8 @@ function Inventory:UpdateCache()
 					if item.itemString ~= nil then
 						-- Slot contains an item.
 						item.count = nowCount
-						item.locked = nowLocked
-						item.readable = itemReadable
+						item.locked = nowLocked or BS_ITEM_SKELETON.locked
+						item.readable = itemReadable or BS_ITEM_SKELETON.readable
 						-- We got charges from GetContainerItemInfo() and need to restore
 						-- because ItemInfo:Get() might have wiped them.
 						if nowCharges > 0 then
@@ -298,7 +303,7 @@ function Inventory:UpdateCache()
 
 					else
 						-- Slot is empty.
-						self:InitializeEmptySlotItem(item)
+						BsItemInfo:InitializeEmptySlotItem(item)
 						if self.containers[bagNum].isProfessionBag then
 							item.name = item.bagType .. " " .. item.name
 						end
@@ -309,6 +314,11 @@ function Inventory:UpdateCache()
 							item._bagshuiPreventEmptySlotStack = true
 						end
 
+						-- Add to empty slot tracking table.
+						-- See `Inventory:SwapBag()` comments regarding the exclusion of profession bags.
+						if bagInfo.genericType == BsGameInfo.itemSubclasses["Container"]["Bag"] then
+							table.insert(self.emptyGenericContainerSlots, item)
+						end
 					end
 
 					-- Check for stock state changes.
@@ -521,6 +531,11 @@ function Inventory:UpdateCache()
 			item._proposedStockState = nil
 			item._proposedDate = nil
 			item._allowStockStateChange = nil
+
+			-- Update tracking of whether there are highlight-able items.
+			if item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE then
+				self.hasChanges = true
+			end
 		end
 	end
 	-- This update cycle's post-update counts become next cycle's pre-update counts.
@@ -598,32 +613,6 @@ end
 
 
 
---- Set the proper cache values for an empty slot item.
----@param item table self.inventory cache entry.
----@param isEmptySlotStack boolean? true for empty slot stack proxy entries.
-function Inventory:InitializeEmptySlotItem(item, isEmptySlotStack)
-	item.id = 0
-	-- Using 0/1 for ease of sorting.
-	item.emptySlot = 1
-	-- Add "[Profession Bag Type]" to the name when needed.
-	item.name =
-		(isEmptySlotStack and item.bagType ~= BsGameInfo.itemSubclasses.Container.Bag)
-		and string.format(L.Suffix_EmptySlot, item.bagType)
-		or L.ItemPropFriendly_emptySlot
-	item.subtype = item.bagType
-	item.quality = -1
-	item.charges = -1
-	item.texture = nil
-	item.readable = nil
-	if not item._bagsRepresented then
-		item._bagsRepresented = {}
-	else
-		BsUtil.TableClear(item._bagsRepresented)
-	end
-end
-
-
-
 --- Prepare an entry in the emptySlotStacks table for to track the empty slot count for a given bag.
 ---@param bagInfo table self.containers entry.
 function Inventory:InitializeEmptySlotStackTracking(bagInfo)
@@ -638,294 +627,7 @@ function Inventory:InitializeEmptySlotStackTracking(bagInfo)
 	-- Always re-initialize when called to ensure bag changes don't result in incorrect empty slot textures.
 	BsItemInfo:InitializeItem(self.emptySlotStacks[bagInfo.genericType])
 	self:AddItemBagInfo(self.emptySlotStacks[bagInfo.genericType], bagInfo, true)
-	self:InitializeEmptySlotItem(self.emptySlotStacks[bagInfo.genericType], true)
-end
-
-
-
---- Clear all stock change indicators.
-function Inventory:ResetStockState()
-	for _, container in pairs(self.inventory) do
-		for _, item in pairs(container) do
-			item.bagshuiDate = 0
-			item.bagshuiStockState = BS_ITEM_STOCK_STATE.NO_CHANGE
-		end
-	end
-	self:ForceUpdateWindow()
-end
-
-
-
---- Sort and organize inventory while the window is open.
---- Used from toolbars, menus, and key bindings.
-function Inventory:Resort()
-	self.forceResort = true
-	-- Do NOT use QueueUpdate() here.
-	self:Update()
-	-- Trigger docked inventory resort.
-	if self.dockedInventory then
-		self.dockedInventory:Resort()
-	end
-end
-
-
-
---- Initiate the restacking process.
---- This doesn't do the actual work; it just sets up a queue of restack operations,
---- which is necessary because there needs to be a slight delay between each operation.
---- That process is handled by ProcessRestackQueue().
-function Inventory:Restack()
-	-- Ensure inventory cache is up to date.
-	self.cacheUpdateNeeded = true
-	self:UpdateCache()
-
-	-- This function can be called when a docked inventory has partial stacks
-	-- but this one doesn't. The case where this one has partials and the docked
-	-- one may or may not is handled once Inventory:ProcessRestackQueue() is done.
-	if not self.multiplePartialStacks then
-		if self.dockedInventory then
-			self.dockedInventory:Restack()
-		end
-		return
-	end
-
-	-- Prepare the helper function for sorting partial stacks.
-	if not self._PartialStackSortHelper then
-		self._PartialStackSortHelper = function(itmA, itmB)
-			return itmA.count > itmB.count
-		end
-	end
-
-	-- Reset restack queues.
-	BsUtil.TableClear(self.restackQueue.sources)
-	BsUtil.TableClear(self.restackQueue.targets)
-
-	-- Reset restack retry count (used by ProcessRestackQueue() to decide when to give up if items are locked).
-	self.restackRetryCount = 0
-
-	-- Find all the partial stacks.
-	-- This will build out a table:
-	-- ```
-	-- {
-	--   [itemId1] = {
-	--     itemCacheReference1,
-	--     itemCacheReference2,
-	--     itemCacheReference3,
-	--   }
-	--   [itemId2] = {
-	--     itemCacheReference4,
-	--     itemCacheReference5,
-	--   }
-	-- }
-	-- ```
-	local allPartialStacks = {}
-	for _, bagContents in pairs(self.inventory) do
-		for _, item in ipairs(bagContents) do
-			if (self.partialStacks[item.id] or 0) > 1 and item.count < item.maxStackCount then
-				if allPartialStacks[item.id] == nil then
-					allPartialStacks[item.id] = {}
-				end
-				table.insert(allPartialStacks[item.id], item)
-			end
-		end
-	end
-
-	-- Sort partial stack lists for each item from largest to smallest.
-	for _, partialStacks in pairs(allPartialStacks) do
-		table.sort(partialStacks, self._PartialStackSortHelper)
-	end
-
-	local target, source, oldTargetCount, sourceLoopStart
-
-	-- Process each item's set of partial stacks in turn to create the restack queue.
-	for _, partialStacks in pairs(allPartialStacks) do
-		--self:PrintDebug("Restacking item ID " .. _)
-
-		-- Sources are obtained starting from the end of the list since it's
-		-- sorted largest to smallest and we're trying to move stacks with the
-		-- lowest counts onto those with the highest counts.
-		sourceLoopStart = table.getn(partialStacks)
-
-		-- Likewise, targets are obtained from the beginning of the list.
-		for targetIndex = 1, table.getn(partialStacks) - 1 do
-			target = partialStacks[targetIndex]
-			--self:PrintDebug("> starting target count: " .. target.count .. " (of max " .. target.maxStackCount .. " )")
-
-			if target.count < target.maxStackCount then
-
-				-- Work backwards through the list of partial stacks, potentially
-				-- up to the next-to-first (which is the initial target, so we
-				-- know we can never use it as a source).
-				for sourceIndex = sourceLoopStart, 2, -1 do
-					source = partialStacks[sourceIndex]
-					--self:PrintDebug(">> source count: " .. source.count)
-
-					if
-						source ~= target
-						and source.count > 0
-						and target.count < target.maxStackCount
-						and target.count > 0
-					then
-
-						-- Queue move of source stacks onto target.
-						table.insert(self.restackQueue.sources, source)
-						table.insert(self.restackQueue.targets, target)
-						--self:PrintDebug(string.format(">>> queued %s:%s (%s) to %s:%s (%s)", source.bagNum, source.slotNum, source.count, target.bagNum, target.slotNum, target.count))
-
-						-- Calculate the changes.
-						oldTargetCount = target.count
-						target.count = math.min(target.count + source.count, target.maxStackCount)
-						source.count = source.count - (target.count - oldTargetCount)
-						--self:PrintDebug(">> NEW source count: " .. source.count)
-						--self:PrintDebug(">> NEW target count: " .. target.count)
-
-						-- We're done with this source and can move on to the next one.
-						if source.count == 0 then
-							sourceLoopStart = sourceLoopStart - 1
-						end
-
-						-- Stop the inner loop if current target is maxed out.
-						if target.count == target.maxStackCount then
-							--self:PrintDebug(">> target maxed; breaking inner loop")
-							break
-						end
-
-					end
-				end
-			end
-		end
-	end
-	--self:PrintDebug(table.getn(self.restackQueue.sources) .. " moves queued")
-
-	-- Make the actual moves.
-	self:ProcessRestackQueue()
-end
-
-
-
--- Perform the restack operations queued up by Restack().
-function Inventory:ProcessRestackQueue()
-
-	--self:PrintDebug("Starting ProcessRestackQueue()")
-
-	-- Are we done?
-	if table.getn(self.restackQueue.sources) <= 0 then
-		--self:PrintDebug("Nothing left to do")
-		Bagshui:QueueClassCallback(self, self.Update, 0.1)
-		-- Trigger docked inventory restack.
-		if self.dockedInventory then
-			self.dockedInventory:Restack()
-		end
-		return
-	end
-
-	--self:PrintDebug("starting move # " .. table.getn(self.restackQueue.sources))
-
-	-- Defaults.
-	local queueDelay = 0.15
-	local removeFromQueue = false
-
-	-- Get info about the current operation.
-	local source = self.restackQueue.sources[1]
-	local target = self.restackQueue.targets[1]
-
-	-- Empty the cursor just in case, since we're technically picking up and putting down items.
-	_G.ClearCursor()
-
-	-- Make sure neither item is locked
-	local _, _, sourceLocked = _G.GetContainerItemInfo(source.bagNum, source.slotNum)
-    local _, _, targetLocked = _G.GetContainerItemInfo(target.bagNum, target.slotNum)
-
-	-- Only attempt the move if everything is unlocked
-	if not sourceLocked and not targetLocked then
-		-- Record stock states so we can revise them.
-		local oldSourceStockState = source.bagshuiStockState
-		local oldSourceDate = source.bagshuiDate or 0
-		local oldTargetStockState = target.bagshuiStockState
-		local oldTargetDate = target.bagshuiDate or 0
-
-		-- Do the actual move.
-		-- Intentionally calling the game's `PickupContainerItem()` instead of `Bagshui:PickupItem()`
-		-- because it's immediately picked up and put down, and we don't need (or want) to invoke
-		-- `ContainerFrameItemButton_OnClick()` either. As an extra safety measure, force all
-		-- modifier keys to return false for the duration of the move since some addons
-		-- hook `PickupContainerItem()` and change its behavior when a modifier is pressed.
-
-		local oldIsAltKeyDown = _G.IsAltKeyDown
-		local oldIsControlKeyDown = _G.IsControlKeyDown
-		local oldIsShiftKeyDown = _G.IsShiftKeyDown
-		_G.IsAltKeyDown = BsUtil.ReturnFalse
-		_G.IsControlKeyDown = BsUtil.ReturnFalse
-		_G.IsShiftKeyDown = BsUtil.ReturnFalse
-		_G.PickupContainerItem(source.bagNum, source.slotNum)
-		_G.PickupContainerItem(target.bagNum, target.slotNum)
-		_G.IsAltKeyDown = oldIsAltKeyDown
-		_G.IsControlKeyDown = oldIsControlKeyDown
-		_G.IsShiftKeyDown = oldIsShiftKeyDown
-
-		-- Try to make stock states and dates make sense.
-		-- Always copy source stock state over target if the source was new/increased,
-		-- but only copy a decreased stock state if the target didn't have a state.
-		if
-			oldSourceStockState
-			and oldSourceStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE
-			and (
-				oldSourceStockState ~= BS_ITEM_STOCK_STATE.DOWN
-				or (
-					oldSourceStockState == BS_ITEM_STOCK_STATE.DOWN
-					and (
-						not oldTargetStockState
-						or oldTargetStockState == BS_ITEM_STOCK_STATE.NO_CHANGE
-					)
-				)
-			)
-		then
-			target.bagshuiStockState = oldSourceStockState
-		end
-		target.bagshuiDate = math.max(oldSourceDate, oldTargetDate)
-
-		-- These can come out of the queue now.
-		removeFromQueue = true
-
-		-- Reset retry count.
-		self.restackRetryCount = 0
-
-	else
-		-- Show error message and retry if we haven't reached the limit.
-		local baseError = string.format(L.Error_RestackFailed, source.name)
-
-		if self.restackRetryCount < 5 then
-
-			-- Longer delay until retry if either item was locked.
-			queueDelay = 0.5
-
-			if self.restackRetryCount > 1 then
-				Bagshui:ShowErrorMessage(string.format(L.Error_Suffix_Retrying, baseError), self.inventoryType, 1.0, 0.578, 0)
-				queueDelay = 1.0
-			end
-
-			self.restackRetryCount = self.restackRetryCount + 1
-
-		else
-			-- Once we've tried several times, give up on this operation and move to the next one.
-			Bagshui:ShowAndLogErrorMessage(baseError)
-			self.restackRetryCount = 0
-			removeFromQueue = true
-		end
-
-	end
-
-	-- Once we're done with this set, take them out of the queue.
-	if removeFromQueue then
-		table.remove(self.restackQueue.sources, 1)
-		table.remove(self.restackQueue.targets, 1)
-	end
-
-	-- Queue either the next restack operation.
-	-- The check at the beginning of this function will stop things when we're done.
-	--self:PrintDebug("Remaining: " .. table.getn(self.restackQueue.sources))
-	Bagshui:QueueClassCallback(self, self.ProcessRestackQueue, queueDelay)
-
+	BsItemInfo:InitializeEmptySlotItem(self.emptySlotStacks[bagInfo.genericType], true)
 end
 
 

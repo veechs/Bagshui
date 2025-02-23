@@ -26,10 +26,10 @@ function Profiles:InitUi()
 				text = "",
 				button1 = L.Replace,
 				button2 = L.Cancel,
-				showAlert = 1,
+				showAlert = true,
 				timeout = 0,
-				whileDead = 1,
-				hideOnEscape = 0,
+				whileDead = true,
+				hideOnEscape = true,
 				--- Perform replacement (no need for OnCancel as that simply needs to do nothing).
 				---@param data table Reference to `self.replaceAfterConfirmation_Data`, passed through via the dialog's `data` property.
 				OnAccept = function(data)

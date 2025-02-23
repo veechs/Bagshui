@@ -469,7 +469,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					-- At merchant (not on buyback tab).
 					_G.ShowContainerSellCursor(item.bagNum, item.slotNum)
 
-				elseif (item.readable or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
+				elseif (item.readable == 1 or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
 					-- Readable items (books, etc) / Control key dressup.
 					_G.ShowInspectCursor()
 
@@ -708,8 +708,8 @@ end
 
 
 --- OnLeave: Reset everything and hide the tooltip.
-function Inventory:ItemButton_OnLeave()
-	local itemButton = _G.this
+function Inventory:ItemButton_OnLeave(itemButton)
+	itemButton = itemButton or _G.this
 
 	-- Clear Edit Mode category highlighting.
 	if self.editState.cursorItemType ~= BS_INVENTORY_OBJECT_TYPE.CATEGORY or self.editState.cursorItem == nil then
@@ -925,6 +925,16 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 
 			-- Can't do anything else offline.
 			if not self.online then
+				return
+			end
+
+			-- Bag swapping.
+			if
+				Bagshui.cursorBagSlotNum
+				and BsItemInfo:IsContainer(item)
+				and self.inventoryIdsToContainerIds[Bagshui.cursorBagSlotNum]
+			then
+				self:SwapBag(item, self.inventoryIdsToContainerIds[Bagshui.cursorBagSlotNum])
 				return
 			end
 

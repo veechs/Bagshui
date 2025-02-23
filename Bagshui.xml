@@ -20,6 +20,7 @@ Don't move things around unless you're sure it won't break anything.
 <Include file="Config\ItemFixes.lua" />
 <Include file="Config\PeriodicTable.lua" />
 <Include file="Components\Hooks.lua" />
+<Include file="Components\ItemInfo.lua" />
 <Include file="Components\Slash.lua" />
 <Include file="Components\Menus.lua" />
 <Include file="Components\ObjectList.lua" />
@@ -67,9 +68,6 @@ Don't move things around unless you're sure it won't break anything.
 <Include file="Config\Skins.lua" />
 <Include file="Components\Skins.lua" />
 
-<!-- Item info must load after UI because it depends on ScrollableTextWindow. -->
-<Include file="Components\ItemInfo.lua" />
-
 <!-- Rules -->
 <Include file="Config\RuleFunctions.lua" />
 <Include file="Config\RuleFunctionTemplates.lua" />
@@ -82,6 +80,7 @@ Don't move things around unless you're sure it won't break anything.
 
 <!-- Inventory class prototype -->
 <Include file="Components\Inventory.lua" />
+<Include file="Components\Inventory.Actions.lua" />
 <Include file="Components\Inventory.Cache.lua" />
 <Include file="Components\Inventory.EditMode.lua" />
 <Include file="Components\Inventory.Layout.lua" />
@@ -131,7 +130,7 @@ Bags and Bank (i.e. both can just specify a template).
 	<Frames>
 		<!--
 		PaperDollItemSlotButtonTemplate doesn't include the animation model.
-		Must be named this way so Blizzard code will work..
+		Must be named this way so Blizzard code will work.
 		-->
 		<Model name="$parentItemAnim" inherits="ItemAnimTemplate">
 			<Anchors>

@@ -177,6 +177,7 @@ local bagshuiEnvironment = {
 	---@type table<string, string>
 	BS_SETTING_TYPE = {
 		BOOL = "Bool",
+		BOOLEAN = "Bool",
 		CHOICES = "Choices",
 		COLOR = "ColorRgba",
 		NUMBER = "Number",
@@ -311,16 +312,19 @@ local bagshuiEnvironment = {
 		bagType = "",
 		charges = 0,
 		count = 0,
-		equipLocationLocalized = "",
 		equipLocation = "",
-		emptySlot = 0,  -- Using 0/1 instead of true/false for easy sorting
+		equipLocationLocalized = "",
+		equipLocationSort = 0,
+		emptySlot = 0,  -- Using 0/1 instead of true/false for easy sorting.
 		id = 0,
-		itemLink = "",  -- Item link (|cffffffff|Hitem:12345:0:0:0|h[Name]|h|r)
-		itemString = "",  -- Item string (item:12345:0:0:0)
+		itemLink = "",  -- Item link (|cffffffff|Hitem:12345:0:0:0|h[Name]|h|r).
+		itemString = "",  -- Item string (item:12345:0:0:0).
 		locked = 0,
+		lockPickable = 0,
 		maxStackCount = 0,
 		minLevel = "",
 		name = "",
+		openable = 0,
 		quality = 1,
 		qualityLocalized = "",
 		readable = 0,
@@ -330,7 +334,7 @@ local bagshuiEnvironment = {
 		tooltip = "",
 		texture = "Interface\\Icons\\INV_Misc_QuestionMark",
 		type = "",
-		uncategorized = 0,  -- Using 0/1 instead of true/false for easy sorting
+		uncategorized = 0,  -- Using 0/1 instead of true/false for easy sorting.
 
 		bagshuiGroupId = "",
 		bagshuiCategoryId = "",
@@ -357,8 +361,7 @@ local bagshuiEnvironment = {
 		"bagType",
 		"charges",
 		"count",
-		"equipLocationLocalized",
-		"equipLocation",
+		"equipLocationSort",
 		"emptySlot",
 		"id",
 		"itemLink",
@@ -371,6 +374,22 @@ local bagshuiEnvironment = {
 		"tooltip",
 		"type",
 		"uncategorized",
+	},
+
+	-- ItemInfo:InitializeItem() will never reset these properties.
+	---@type table<string, boolean>
+	BS_ITEM_PROTECTED_PROPERTIES = {
+		bagNum = true,
+		bagType = true,
+		slotNum = true,
+	},
+
+	-- ItemInfo:InitializeItem() will not set these properties to default if nil.
+	-- Typically needed for properties that are used for empty slot identification.
+	---@type table<string, boolean>
+	BS_ITEM_NIL_PROPERTIES = {
+		itemLink = true,
+		itemString = true,
 	},
 
 	-- Rule functions that correspond to item properties.
@@ -486,6 +505,42 @@ local bagshuiEnvironment = {
 	---@type string[]
 	BS_ITEM_PROPERTIES_SORTED = nil,
 
+	-- Used to get numbers for slot names so they can be sorted.
+	---@type table<string, number>
+	BS_INVENTORY_EQUIP_LOCATION_SORT_ORDER = {
+		INVTYPE_HEAD = 1,
+		INVTYPE_NECK = 2,
+		INVTYPE_SHOULDER = 3,
+		INVTYPE_CLOAK = 4,  -- Back
+		INVTYPE_CHEST = 5,
+		INVTYPE_ROBE = 5,  -- Chest
+		INVTYPE_BODY = 6,  -- Shirt
+		INVTYPE_TABARD = 7,
+		INVTYPE_WRIST = 8,
+		INVTYPE_HAND = 9,
+		INVTYPE_WAIST = 10,
+		INVTYPE_LEGS = 11,
+		INVTYPE_FEET = 12,
+		INVTYPE_FINGER = 13,
+		INVTYPE_FINGER_OTHER = 14,
+		INVTYPE_TRINKET = 15,
+		INVTYPE_TRINKET_OTHER = 16,
+		INVTYPE_2HWEAPON = 17,  -- Main Hand
+		INVTYPE_WEAPON = 17,  -- Main Hand
+		INVTYPE_WEAPONMAINHAND = 17,  -- Main Hand
+		INVTYPE_HOLDABLE = 18,  -- Offhand
+		INVTYPE_SHIELD = 18,  -- Offhand
+		INVTYPE_WEAPON_OTHER = 18,  -- Offhand
+		INVTYPE_WEAPONOFFHAND = 18,  -- Offhand
+		INVTYPE_RANGED = 19,
+		INVTYPE_RELIC = 19,  -- Ranged
+		INVTYPE_WAND = 19,  -- Ranged
+		INVTYPE_GUN = 19,  -- Ranged
+		INVTYPE_CROSSBOW = 19,  -- Ranged
+		INVTYPE_THROWN = 19,  -- Ranged
+		INVTYPE_PROJECTILE = 20,  -- Ammo
+	},
+
 
 	-- In addition to the bagshuiStockState item property, stock state table values are used
 	-- to determine the following stock badge attributes, so they must be PascalCase:
@@ -501,6 +556,40 @@ local bagshuiEnvironment = {
 		UP = "Up",
 		DOWN = "Down",
 		NO_CHANGE = "",
+	},
+
+	
+	---@enum BS_INVENTORY_BAG_USAGE_DISPLAY
+	-- Control when bag usage is displayed.
+	-- Values must match Setting_BagUsageDisplay_* localization entries.
+	---@type table<string, string>
+	BS_INVENTORY_BAG_USAGE_DISPLAY = {
+		ALWAYS = "Always",
+		SMART = "Smart",
+		NEVER = "Never",
+	},
+
+	---@enum BS_INVENTORY_BAG_USAGE_FORMAT
+	-- Control how bag usage is displayed.
+	-- Values must match Setting_BagUsageFormat_* localization entries.
+	---@type table<string, string>
+	BS_INVENTORY_BAG_USAGE_FORMAT = {
+		EMPTY = "Empty",
+		EMPTY_TOTAL = "Empty_Total",
+		EMPTY_USED_TOTAL = "Empty_Used_Total",
+		USED = "Used",
+		USED_TOTAL = "Used_Total",
+		USED_EMPTY_TOTAL = "Used_Empty_Total",
+	},
+
+
+	---@enum BS_GAME_PLAYER_GROUP_TYPE
+	-- Used by GameInfo for the `playerGroupType` property.
+	---@type table<string, string>
+	BS_GAME_PLAYER_GROUP_TYPE = {
+		PARTY = "Party",
+		RAID = "Raid",
+		SOLO = "Solo",
 	},
 
 
@@ -567,6 +656,10 @@ local bagshuiEnvironment = {
 		UNREGISTER = "Unregister",
 		CHECK = "Check",
 	},
+
+
+	-- Output indentation.
+	BS_INDENT = "  ",
 
 
 	---@enum BS_LOG_MESSAGE_TYPE
@@ -835,6 +928,9 @@ function Bagshui:Init()
 		self:ProcessEventQueue()
 	end)
 
+	-- Enable for event spelunking only.
+	-- self.eventFrame:RegisterAllEvents()
+
 
 	-- Bagshui itself needs these events. Other classes register their own events.
 	self:RegisterEvent("ADDON_LOADED")
@@ -956,6 +1052,21 @@ function Bagshui:AddonLoaded()
 	end
 	self.currentCharacterInfo = self.currentCharacterData[BS_CONFIG_KEY.CHARACTER_INFO]
 
+	-- Inventory validation.
+	-- This will ensure there are no errors when changes are made to the expected inventory cache structure.
+	for character, characterData in pairs(self.characters) do
+		for _, inventoryType in pairs(BS_INVENTORY_TYPE) do
+			inventoryType = string.lower(inventoryType)
+			if characterData[inventoryType] and characterData[inventoryType].inventory then
+				for containerNum, containerContents in pairs(characterData[inventoryType].inventory) do
+					for slotNum, item in ipairs(containerContents) do
+						BsItemInfo:InitializeItem(item, false, true)
+					end
+				end
+			end
+		end
+	end
+
 	-- Log storage.
 	if _G.BagshuiData[BS_CONFIG_KEY.LOG] == nil then
 		_G.BagshuiData[BS_CONFIG_KEY.LOG] = {}
@@ -1012,6 +1123,8 @@ end
 ---@param arg3 any? Third argument, if any.
 ---@param arg4 any? Fourth argument, if any.
 function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
+	-- Bagshui:PrintDebug("Bagshui event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
+
 	local downstreamEvent = event  --[[@as string|nil]]
 
 	if event == "ADDON_LOADED" then
