@@ -369,6 +369,52 @@ end
 
 
 
+local sellProtectionQualityChoices = {}
+
+for quality = 1, 10 do
+	local qualityDescription = _G["ITEM_QUALITY" .. quality .. "_DESC"]
+	if not qualityDescription then
+		break
+	end
+	table.insert(
+		sellProtectionQualityChoices,
+		1,
+		{
+			value = quality,
+			text = qualityDescription,
+			tooltipTitle = string.format(L.sellProtectionQualityThreshold_Choice_TooltipTitle, qualityDescription),
+			tooltipText = string.format(L.sellProtectionQualityThreshold_Choice_TooltipText, qualityDescription),
+			textR = _G.ITEM_QUALITY_COLORS[quality].r,
+			textG = _G.ITEM_QUALITY_COLORS[quality].g,
+			textB = _G.ITEM_QUALITY_COLORS[quality].b,
+		}
+	)
+end
+
+
+--- Assigned to the `disableFunc` property of the `sellProtection*` settings
+--- to disable them when the `sellProtectionEnabled` setting is false.
+---@param settingName string
+---@param settings table
+---@return boolean
+local function disableWhenSellProtectionOff(settingName, settings)
+	return settings.sellProtectionEnabled == false
+end
+
+
+--- Assigned to the `choicesCheckedFunc` property of the `sellProtectionQualityThreshold`
+--- setting to place check marks next to all qualities greater than or equal to the
+--- current setting value.
+---@param settingName string
+---@param settings table
+---@param value any
+---@return boolean checked
+local function checkQualityGreaterEqual(settingName, settings, value)
+	return value >= settings.sellProtectionQualityThreshold
+end
+
+
+
 -- This is where settings and their defaults are configured.
 -- Tables in the arrays corresponding to each BS_SETTING_APPLICABILITY key
 -- must conform to the `settingsTable` parameter definition of `Settings:InitSettingsInfo()`.
@@ -415,6 +461,64 @@ Bagshui.config.Settings = {
 					scope = BS_SETTING_SCOPE.CHARACTER,
 					type = BS_SETTING_TYPE.BOOLEAN,
 					defaultValue = false,
+				},
+
+
+				{
+					submenuName = L.Menu_Settings_SellProtection,
+					tooltipText = L.sellProtectionEnabled_TooltipText,
+					settings = {
+						{
+							menuTitle = L.Menu_Settings_SellProtection,
+						},
+						{
+							name = "sellProtectionEnabled",
+							scope = BS_SETTING_SCOPE.ACCOUNT,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+						},
+
+						{
+							menuTitle = L.Menu_Settings_ItemProperties,
+						},
+						{
+							name = "sellProtectionActiveQuest",
+							scope = BS_SETTING_SCOPE.ACCOUNT,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+							disableFunc = disableWhenSellProtectionOff,
+						},
+						{
+							name = "sellProtectionEquipped",
+							scope = BS_SETTING_SCOPE.ACCOUNT,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = false,
+							disableFunc = disableWhenSellProtectionOff,
+						},
+						{
+							name = "sellProtectionSoulbound",
+							scope = BS_SETTING_SCOPE.ACCOUNT,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+							disableFunc = disableWhenSellProtectionOff,
+						},
+
+						{
+							menuTitle = L.Quality,
+						},
+						{
+							name = "sellProtectionQualityThreshold",
+							scope = BS_SETTING_SCOPE.ACCOUNT,
+							type = BS_SETTING_TYPE.CHOICES,
+							inline = true,
+							defaultValue = 4,
+							choices = sellProtectionQualityChoices,
+							disableFunc = disableWhenSellProtectionOff,
+							choicesCheckedFunc = checkQualityGreaterEqual,
+						},
+						
+					},
+
 				},
 
 

@@ -73,6 +73,11 @@ function Inventory:InitUi()
 	end
 
 	uiFrame:SetScript("OnMouseDown", function()
+		-- Clear a pending item sale.
+		if self.itemPendingSale then
+			self:ClearItemPendingSale()
+		end
+
 		if _G.arg1 == "LeftButton" then
 			-- Close non-Settings menus on left mouse down (Settings is closed OnMouseUp).
 			if not self.menus:IsMenuOpen("Settings") then
@@ -1149,7 +1154,8 @@ function Inventory:UiFrame_OnShow()
 	self.expandEmptySlotStacks = false
 	self.temporarilyShowWindowHeader = false
 	self.highlightChanges = false
-	self.queuedTradeItem = nil  -- Used by self:TradeFrame_OnShow().
+	self.queuedTradeItem = nil  -- Used by Inventory:TradeFrame_OnShow().
+	self.itemPendingSale = nil  -- Used by Inventory:ItemButton_OnClick() to confirm sale of protected items.
 
 	-- Reset any item highlighting.
 	self.highlightItemsInContainerId = nil

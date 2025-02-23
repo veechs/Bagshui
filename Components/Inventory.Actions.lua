@@ -20,6 +20,55 @@ end
 
 
 
+--- Return `true` if an item is protected from sale by the current settings.
+---@param item table Bagshui inventory cache entry.
+---@return string? protectionType Localized reason the item was protected ("Soulbound", "Quality", etc.), if any.
+function Inventory:GetItemSellProtectionReason(item)
+	-- Protection is completely disabled.
+	if not self.settings.sellProtectionEnabled then
+		return
+	end
+
+	-- Active Quest.
+	if self.settings.sellProtectionActiveQuest and Bagshui.activeQuestItems[item.name] then
+		return L.ItemPropFriendly_activeQuest
+	end
+
+	-- Soulbound.
+	if self.settings.sellProtectionSoulbound and BsRules:Match("Soulbound()", item) then
+		return L.ItemPropFriendly_soulbound
+	end
+
+	-- Equipped Gear.
+	if self.settings.sellProtectionEquipped and BsCharacter.equippedHistory[item.itemString] then
+		return L.EquippedGear
+	end
+
+	-- Quality at or above threshold.
+	if (item.quality or 1) >= self.settings.sellProtectionQualityThreshold then
+		return L.Quality
+	end
+end
+
+
+
+--- Reset the pending sale of an item so it's no longer highlighted.
+---@param itemButton table? If provided, call OnEnter for this item button to update the tooltip.
+---@param noUpdate boolean? Don't call `Inventory:UpdateItemSlotColors()`.
+function Inventory:ClearItemPendingSale(itemButton, noUpdate)
+	self.itemPendingSale = nil
+	self.highlightItemsInContainerId = nil
+	self.highlightItemsContainerSlot = nil
+	if itemButton then
+		self:ItemButton_OnEnter(itemButton)
+	end
+	if not noUpdate then
+		self:UpdateItemSlotColors()
+	end
+end
+
+
+
 --- Sort and organize inventory while the window is open.
 --- Used from toolbars, menus, and key bindings.
 function Inventory:Resort()

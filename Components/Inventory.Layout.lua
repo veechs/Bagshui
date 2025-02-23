@@ -2092,6 +2092,8 @@ function Inventory:UpdateToolbar()
 			-- Don't allow at Bank because UseContainerItem() moves the item
 			-- instead of opening it.
 			and not Bagshui.components.Bank.atBank
+			-- Avoid messing with item highlighting during a pending sale.
+			and not self.itemPendingSale
 		)
 	)
 
