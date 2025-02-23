@@ -1,6 +1,14 @@
 # Bagshui Changelog
 
-## [1.4.0] - 2025-02-17
+## [1.4.2] - 2025-02-22
+### Fixed
+* Hearthstone toolbar button won't throw errors anymore.
+
+## [1.4.1] - 2025-02-22
+### Fixed
+* Small improvement to item slot button proxying to avoid errors from Blizzard code.
+
+## [1.4.0] - 2025-02-22
 ### Changed
 * Added [window strata option](https://github.com/veechs/Bagshui/issues/84). Find it at **[Settings](https://github.com/veechs/Bagshui/wiki/Home#settings)** > **Advanced** > **Window** • **Strata**. <sup><small>🫶 [@Nikki1993](https://github.com/Nikki1993)</small></sup>
 
