@@ -115,6 +115,8 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 			and _G.CursorHasItem()
 			and inventoryClass
 		then
+			self:PrintDebug(self.cursorBagSlotNum)
+			self:PrintDebug(inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum])
 			local bagNum = inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
 			if inventoryClass.containers[bagNum].slotsFilled > 0 then
 				-- Bag needs to be emptied before it can be unequipped.
@@ -312,7 +314,23 @@ function Bagshui:PickupInventoryItem(wowApiFunctionName, invSlotId)
 		and _G.CursorHasItem()
 		and self.cursorItem == nil
 	then
-		self.cursorBagSlotNum = invSlotId
+		if wowApiFunctionName == "PickupBagFromSlot" then
+			self.cursorBagSlotNum = invSlotId
+
+		else
+			-- This could be a bag or an inventory item. Make sure it's a bag
+			-- or there will be errors from Bagshui:PickupItem().
+			for _, inventoryType in pairs(BS_INVENTORY_TYPE) do
+				if
+					self.components[inventoryType]
+					and self.components[inventoryType].inventoryIdsToContainerIds
+					and self.components[inventoryType].inventoryIdsToContainerIds[invSlotId]
+				then
+					self.cursorBagSlotNum = invSlotId
+					break
+				end
+			end
+		end
 	end
 
 	-- PutItemInBag() doesn't trigger any of our normal cursor clearing methods,
