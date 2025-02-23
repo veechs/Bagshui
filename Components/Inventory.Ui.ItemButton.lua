@@ -939,8 +939,11 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 
 			-- Reset pending item sale.
 			if
-				mouseButton == "LeftButton"
-				and self.itemPendingSale
+				self.itemPendingSale
+				and (
+					mouseButton == "LeftButton"
+					or self.itemPendingSale ~= item
+				)
 			then
 				self:ClearItemPendingSale(itemButton)
 				return
