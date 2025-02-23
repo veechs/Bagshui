@@ -204,28 +204,32 @@ function Localization:AddLocale(locale, strings)
 		self.locales[locale] = strings
 	end
 
-
-	-- for localizationString, localized in pairs(strings) do
-	-- 	if type(localized) == "table" then
-	-- 		Bagshui:PrintWarning("Localization of '" .. localizationString .. "' is a table. Maybe a global string got overwritten?")
-	-- 	end
-	-- end
-
 	-- Replace any !!placeholders!! with their actual localized values.
 	for localizationString, localized in pairs(self.locales[locale]) do
-		self.locales[locale][localizationString] = string.gsub(
-			localized,
-			"(!!(.-)!!)",
-			function(match, placeholderToReplace)
-				if self.locales[locale][placeholderToReplace] then
-					return self.locales[locale][placeholderToReplace]
-				else
-					Bagshui:PrintWarning("Localization placeholder " .. tostring(match) .. " not found!")
-					return match
-				end
-			end
-		)
+		self.locales[locale][localizationString] = self:ReplacePlaceholders(localized, locale)
 	end
+end
+
+
+
+--- Replace any !!placeholders!! with their actual localized values.
+--- Recurses as needed.
+---@param str string String to search for !!placeholders!!.
+---@param locale string Locale in which placeholder keys can be found.
+---@return string
+function Localization:ReplacePlaceholders(str, locale)
+	return (string.gsub(
+		str,
+		"(!!(.-)!!)",
+		function(match, placeholderToReplace)
+			if self.locales[locale][placeholderToReplace] then
+				return Localization:ReplacePlaceholders(self.locales[locale][placeholderToReplace], locale)
+			else
+				Bagshui:PrintWarning("Localization placeholder " .. tostring(match) .. " not found!")
+				return match
+			end
+		end
+	))
 end
 
 
