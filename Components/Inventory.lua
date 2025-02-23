@@ -257,6 +257,7 @@ function Inventory:New(newPropsOrInventoryType)
 			BAG_UPDATE_COOLDOWN = true,
 			ITEM_LOCKED = true,  -- Doesn't seem to actually ever fire but let's register for it anyway.
 			ITEM_LOCK_CHANGED = true,  -- Required for multiple reasons, including preventing items from staying gray if you attempt to place them in an incompatible container (ex. non-ammo in ammo bags).
+			MERCHANT_CLOSED = true,  -- Clear pending sale item when leaving the merchant.
 			BAGSHUI_INVENTORY_INIT_RETRY = true,
 			BAGSHUI_INVENTORY_SEARCH = true,
 			BAGSHUI_ACTIVE_QUEST_ITEM_UPDATE = true,
@@ -670,6 +671,14 @@ function Inventory:OnEvent(event, arg1, arg2)
 
 	-- BAG_UPDATE: Don't do anything if arg1 is for a bag not handled by this class.
 	if event == "BAG_UPDATE" and not self.myContainerIds[arg1] then
+		return
+	end
+
+
+	-- MERCHANT_CLOSED: Clear pending sale item.
+	-- We also clear this when the window is opened but this is here just to be safe.
+	if event == "MERCHANT_CLOSED" then
+		self:ClearItemPendingSale()
 		return
 	end
 

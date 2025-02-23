@@ -150,6 +150,7 @@ function InventoryUi:CreateBagSlotButtons()
 			if
 				inventory:BagSlotButtonHasBag(this)
 				and not inventory.highlightItemsInContainerLocked
+				and not inventory.highlightItemsContainerSlot
 			then
 				inventory.highlightItemsInContainerId = this.bagshuiData.bagNum
 				inventory:UpdateItemSlotColors()
@@ -178,6 +179,7 @@ function InventoryUi:CreateBagSlotButtons()
 			if
 				inventory.highlightItemsInContainerId == _G.this.bagshuiData.bagNum
 				and not inventory.highlightItemsInContainerLocked
+				and not inventory.highlightItemsContainerSlot
 			then
 				inventory.highlightItemsInContainerId = nil
 				inventory:UpdateItemSlotColors()
@@ -199,6 +201,7 @@ function InventoryUi:CreateBagSlotButtons()
 			if
 				inventory.highlightItemsInContainerLocked == _G.this.bagshuiData.bagNum
 				and not inventory:BagSlotButtonHasBag(_G.this)
+				and not inventory.highlightItemsContainerSlot
 			then
 				inventory.highlightItemsInContainerLocked = nil
 				inventory.highlightItemsInContainerId = nil
@@ -287,6 +290,10 @@ function InventoryUi:CreateBagSlotButtons()
 				)
 				and not inventory.editMode
 			then
+				-- Don't do anything if a specific item is highlighted.
+				if inventory.highlightItemsContainerSlot then
+					return
+				end
 
 				-- Toggle highlight lock for this button
 				-- this.bagshuiData.highlightLocked = not this.bagshuiData.highlightLocked
@@ -574,6 +581,7 @@ function Inventory:ShowBagSlotTooltip(bagSlotButton)
 			or (self.containers[this.bagshuiData.bagNum].numSlots or 0) > 0
 		)
 		and self.inventory[this.bagshuiData.bagNum]
+		and not self.highlightItemsContainerSlot
 	then
 		_G.GameTooltip:AddLine(
 			string.format(

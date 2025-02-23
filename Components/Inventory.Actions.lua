@@ -20,6 +20,55 @@ end
 
 
 
+--- Return `true` if an item is protected from sale by the current settings.
+---@param item table Bagshui inventory cache entry.
+---@return string? protectionType Localized reason the item was protected ("Soulbound", "Quality", etc.), if any.
+function Inventory:GetItemSellProtectionReason(item)
+	-- Protection is completely disabled.
+	if not self.settings.sellProtectionEnabled then
+		return
+	end
+
+	-- Active Quest.
+	if self.settings.sellProtectionActiveQuest and Bagshui.activeQuestItems[item.name] then
+		return L.ItemPropFriendly_activeQuest
+	end
+
+	-- Soulbound.
+	if self.settings.sellProtectionSoulbound and BsRules:Match("Soulbound()", item) then
+		return L.ItemPropFriendly_soulbound
+	end
+
+	-- Equipped Gear.
+	if self.settings.sellProtectionEquipped and BsCharacter.equippedHistory[item.itemString] then
+		return L.EquippedGear
+	end
+
+	-- Quality at or above threshold.
+	if (item.quality or 1) >= self.settings.sellProtectionQualityThreshold then
+		return L.Quality
+	end
+end
+
+
+
+--- Reset the pending sale of an item so it's no longer highlighted.
+---@param itemButton table? If provided, call OnEnter for this item button to update the tooltip.
+---@param noUpdate boolean? Don't call `Inventory:UpdateItemSlotColors()`.
+function Inventory:ClearItemPendingSale(itemButton, noUpdate)
+	self.itemPendingSale = nil
+	self.highlightItemsInContainerId = nil
+	self.highlightItemsContainerSlot = nil
+	if itemButton then
+		self:ItemButton_OnEnter(itemButton)
+	end
+	if not noUpdate then
+		self:UpdateItemSlotColors()
+	end
+end
+
+
+
 --- Sort and organize inventory while the window is open.
 --- Used from toolbars, menus, and key bindings.
 function Inventory:Resort()
@@ -710,9 +759,13 @@ end
 
 
 
-
+-- Reusable table for `Inventory:GetSupplementalEmptySlotCount()`.
 local getSupplementalEmptySlotCount_inventoriesChecked = {}
 
+--- Determine how many slots are available in other inventories to help with bag swapping.
+---@param availableSlotTable table? Array to which additional slots should be added.
+---@return integer availableEmptySlotCount
+---@return table<string,true> inventoriesChecked Other inventory classes that were checked for available slots.
 function Inventory:GetSupplementalEmptySlotCount(availableSlotTable)
 	local availableEmptySlotCount = 0
 	BsUtil.TableClear(getSupplementalEmptySlotCount_inventoriesChecked)
@@ -741,7 +794,10 @@ end
 
 
 
-
+--- Calculate how many more slots are required before a swap of the specified bag can be performed.
+---@param bagNum number Container to check.
+---@return integer slotsNeeded
+---@return table<string, true>? inventoriesChecked Second return value from `Inventory:GetSupplementalEmptySlotCount()`.
 function Inventory:GetAdditionalSlotsNeededToSwapBag(bagNum)
 	local filledSlots = (self.containers[bagNum].slotsFilled or 0)
 

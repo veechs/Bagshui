@@ -253,7 +253,7 @@ BsLocalization:AddLocale("enUS", {
 ["ItemPropFriendly_name"] = "!!Name!!",
 ["ItemPropFriendly_periodicTable"] = "Periodic Table",
 ["ItemPropFriendly_quality"] = "!!Quality!!",
-["ItemPropFriendly_qualityLocalized"] = "Quality (Localized)",
+["ItemPropFriendly_qualityLocalized"] = "!!Quality!! (Localized)",
 ["ItemPropFriendly_readable"] = "Readable",
 ["ItemPropFriendly_slotNum"] = "Slot Number",
 ["ItemPropFriendly_soulbound"] = "Soulbound",
@@ -274,6 +274,11 @@ BsLocalization:AddLocale("enUS", {
 -- Spell names that enable special features.
 ["Spell_Disenchant"] = "Disenchant",
 ["Spell_PickLock"] = "Pick Lock",
+
+-- Special item tooltips.
+["Inventory_Item_SellProtection_ConfirmSale"] = "Control+Right-Click to confirm sale.",
+["Inventory_Item_SellProtection_Reason"] = "Protected due to %s.",
+["Inventory_Item_SellProtection_OverrideHint"] = "Skip confirmation: Ctrl+Alt+Shift+Right-Click.",
 
 -- Bag tooltips.
 ["Bag_SlotsNeededToSwap"] = "%d more free slot(s) required to swap.",
@@ -348,6 +353,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_InfoTooltip"] = "Info Tooltip",
 ["Menu_Settings_Integration"] = "Integration",
 ["Menu_Settings_Interface"] = "Interface",
+["Menu_Settings_ItemProperties"] = "Item Properties",
 ["Menu_Settings_ItemSlots"] = "Item Slots",
 ["Menu_Settings_More"] = "More",
 ["Menu_Settings_More_TooltipTitle"] = "Additional Settings",
@@ -356,6 +362,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Options"] = "Options",
 ["Menu_Settings_PerBag"] = "Per-Bag",
 ["Menu_Settings_Profile"] = "Profile",
+["Menu_Settings_SellProtection"] = "Selling Protection",
 ["Menu_Settings_Size"] = "Sizing",
 ["Menu_Settings_SizeAndLayering"] = "Sizing and Layering",
 ["Menu_Settings_Summary"] = "Summary",
@@ -1150,6 +1157,27 @@ BsLocalization:AddLocale("enUS", {
 
 ["resetStockState"] = "Mark Items Unchanged",
 ["resetStockState_TooltipText"] = "Set all items in this inventory as no longer new, increased, or decreased.",
+
+["sellProtectionActiveQuest"] = "!!ItemPropFriendly_activeQuest!!",
+["sellProtectionActiveQuest_TooltipTitle"] = "Protect !!ItemPropFriendly_activeQuest!! Items",
+["sellProtectionActiveQuest_TooltipText"] = "Require confirmation before selling.",
+
+["sellProtectionEnabled"] = "Enabled",
+["sellProtectionEnabled_TooltipTitle"] = "Selling Protection",
+["sellProtectionEnabled_TooltipText"] = "Require confirmation before selling certain items.",
+
+["sellProtectionEquipped"] = "!!EquippedGear!!",
+["sellProtectionEquipped_TooltipTitle"] = "Protect All !!EquippedGear!!",
+["sellProtectionEquipped_TooltipText"] = "Require confirmation before selling.",
+
+["sellProtectionQualityThreshold"] = "!!ItemPropFriendly_quality!! Threshold",
+["sellProtectionQualityThreshold_TooltipText"] = "Require confirmation before selling.",
+["sellProtectionQualityThreshold_Choice_TooltipTitle"] = "Protect %s Items",  -- %s = Quality (ex. Rare, Epic).
+["sellProtectionQualityThreshold_Choice_TooltipText"] = "Require confirmation before selling %s items or higher.",  -- %s = Quality (ex. Rare, Epic).
+
+["sellProtectionSoulbound"] = "!!ItemPropFriendly_soulbound!!",
+["sellProtectionSoulbound_TooltipTitle"] = "Protect !!ItemPropFriendly_soulbound!! Items",
+["sellProtectionSoulbound_TooltipText"] = "Require confirmation before selling.",
 
 ["showBagBar"] = "Bag Slots",
 ["showBagBar_TooltipText"] = "Show bag bar in the bottom left.",
