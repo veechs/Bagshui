@@ -349,6 +349,7 @@ function Inventory:New(newPropsOrInventoryType)
 		-- Category/group-related lookup tables -- See CategorizeAndSort() for descriptions of most of these.
 		categoryIdsGroupedBySequence = {},
 		activeGroups = {},
+		categorySequenceNumbers = {},
 		sortedCategorySequenceNumbers = {},
 		categoriesToGroups = {},
 

@@ -231,9 +231,14 @@ function Inventory:UpdateLayoutLookupTables()
 	BsUtil.TableClear(self.groups)
 	BsUtil.TableClear(self.activeGroups)
 	BsUtil.TableClear(self.groupsIdsToFrames)
-	BsUtil.TableClear(self.categoryIdsGroupedBySequence)
+	BsUtil.TableClear(self.categorySequenceNumbers)
 	BsUtil.TableClear(self.sortedCategorySequenceNumbers)
 	BsUtil.TableClear(self.categoriesToGroups)
+	-- Don't remove unused sequence number tables - no need to upset the garbage collector.
+	-- (This could be slightly more efficient with something like Compost, but it's not a huge deal.)
+	for _, categoryIds in pairs(self.categoryIdsGroupedBySequence) do
+		BsUtil.TableClear(categoryIds)
+	end
 
 	-- Process the layout and update lookup tables.
 	for rowNum, rowGroups in ipairs(self.layout) do
@@ -288,10 +293,13 @@ function Inventory:AddCategoryToLookupTables(categoryId, groupId)
 
 		-- We haven't seen this sequence number yet.
 		if self.categoryIdsGroupedBySequence[categoryDetails.sequence] == nil then
-			-- Add it to sortedCategorySequenceNumbers so it can be used during categorization.
-			table.insert(self.sortedCategorySequenceNumbers, categoryDetails.sequence)
-			-- Initialize a place for it in the categoryIdsGroupedBySequence table.
 			self.categoryIdsGroupedBySequence[categoryDetails.sequence] = {}
+		end
+
+		-- Add sequence number to sortedCategorySequenceNumbers so it can be used during categorization.
+		if not self.categorySequenceNumbers[categoryDetails.sequence] then
+			self.categorySequenceNumbers[categoryDetails.sequence] = true
+			table.insert(self.sortedCategorySequenceNumbers, categoryDetails.sequence)
 		end
 
 		-- Create the category-to-group relationship in categoryIdsGroupedBySequence[<sequence>][<categoryId].
