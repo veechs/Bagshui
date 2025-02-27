@@ -1146,7 +1146,7 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				-- meaning of global this while any code outside our control
 				-- is executed.
 				local oldGlobalThis = _G.this
-				_G.this = itemButton.bagshuiData.getIdProxy
+				_G.this = itemButton.bagshuiData.getIdProxy or _G.this
 
 				if mouseButton == "LeftButton" then
 					-- Normal left-click.
