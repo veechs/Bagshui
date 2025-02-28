@@ -231,6 +231,7 @@ function Inventory:UpdateLayoutLookupTables()
 	BsUtil.TableClear(self.groups)
 	BsUtil.TableClear(self.activeGroups)
 	BsUtil.TableClear(self.groupsIdsToFrames)
+	BsUtil.TableClear(self.activeCategoryIds)
 	BsUtil.TableClear(self.categorySequenceNumbers)
 	BsUtil.TableClear(self.sortedCategorySequenceNumbers)
 	BsUtil.TableClear(self.categoriesToGroups)
@@ -289,7 +290,9 @@ function Inventory:AddCategoryToLookupTables(categoryId, groupId)
 
 		-- Get info about the category.
 		local categoryDetails = BsCategories.list[categoryId]
-		-- self:PrintDebug(categoryDetails)
+
+		-- This is an active category (used when checking for errors).
+		self.activeCategoryIds[categoryId] = true
 
 		-- We haven't seen this sequence number yet.
 		if self.categoryIdsGroupedBySequence[categoryDetails.sequence] == nil then
@@ -343,13 +346,6 @@ function Inventory:CategorizeItems()
 
 	local defaultGroupId = self.categoriesToGroups[BsCategories.defaultCategory]
 	local groupId
-
-	-- Reset error tracking for the categorization process so that category errors
-	-- are only displayed once per category and only every 10 seconds.
-	if _G.GetTime() - (self.lastCategorizeItems or 0) > 10 then
-		BsCategories:ClearErrors()
-	end
-	self.lastCategorizeItems = _G.GetTime()
 
 	-- Perform the actual categorization.
 	for _, bagNum in ipairs(self.containerIds) do
@@ -408,7 +404,7 @@ function Inventory:CategorizeItems()
 	end -- self.containerIds loop
 
 	-- Show the error button if there were problems.
-	self.errorText = BsCategories:GetErrors()
+	self.errorText = BsCategories:GetErrors(self.activeCategoryIds)
 
 end
 

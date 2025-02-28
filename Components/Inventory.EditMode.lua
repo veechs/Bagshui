@@ -46,7 +46,6 @@ function Inventory:EditModeWindowUpdate(forceResort, itemSlotColorsOnly)
 		self.cacheUpdateNeeded = false
 		self.windowUpdateNeeded = true
 		self.forceResort = (forceResort == true)
-		self.lastCategorizeItems = 0  -- Force clearing errors in `Inventory:CategorizeItems()`.
 		self:Update()
 		Bagshui:RaiseEvent("BAGSHUI_INVENTORY_EDIT_MODE_UPDATE")
 	end

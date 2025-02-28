@@ -95,8 +95,7 @@ local Categories = Bagshui.prototypes.ObjectList:New({
 	finalizedCategoryRules = {},
 
 	-- Error tracking.
-	errors = {},  -- Errors for all categories.
-	recentErrors = {},  -- Errors only stored until `Categories:ClearErrors()` is called.
+	errors = {},  -- Category ID to error message mapping for quick retrieval.
 
 	-- There's some initialization that needs to happen on `PLAYER_ENTERING_WORLD`
 	-- (see `Categories:OnEvent()`), but that event fires when zoning and we
@@ -278,9 +277,6 @@ function Categories:FinalizeAllRules()
 	for categoryId, _ in pairs(self.list) do
 		self:FinalizeCategoryRules(categoryId, true)
 	end
-	-- Need to reset recent errors to avoid the error indicator from showing up
-	-- in the Inventory window regardless of errors in the current Structure.
-	self:ClearErrors()
 end
 
 
@@ -332,6 +328,7 @@ function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
 	-- Otherwise, proceed with compiling/recompiling the rule.
 	local finalRule = ""
 	category.ruleError = nil
+	self.errors[categoryId] = nil
 
 	-- Remove previously compiled rule if it exists.
 	-- This does mean that when a rule is changed and the recompile fails, the rule will become invalid.
@@ -362,9 +359,9 @@ function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
 		if valid then
 			-- Compile the rule once we know it's good.
 			self.finalizedCategoryRules[finalRuleId] = BsRules:Compile(finalRule)
-			self:ClearError(categoryId)
 		else
 			category.ruleError = errorMessage
+			category.ruleErrorTimestamp = _G.time()
 			self:ReportError(categoryId, errorMessage)
 		end
 
@@ -478,9 +475,9 @@ function Categories:MatchCategory(categoryId, item, character, ruleSession)
 		end
 	end
 
-	-- If the rule is in error status, just fail (checking this here makes sense
-	-- because item lists can't have errors).
-	if category.ruleError then
+	-- If the rule is in error status and hasn't been changed since the error occurred,
+	-- just fail (checking this here makes sense because item lists can't have errors)
+	if category.ruleError and category.ruleErrorTimestamp >= category.dateModified then
 		self:ReportError(categoryId, category.ruleError)
 		return false
 	end
@@ -549,46 +546,27 @@ end
 
 
 
---- Reset error tracking. Only clears `recentErrors` unless `all` is `true`.
----@param all boolean?
-function Categories:ClearErrors(all)
-	BsUtil.TableClear(self.recentErrors)
-	if all then
-		BsUtil.TableClear(self.errors)
-	end
-end
-
-
-
---- Reset all error tracking for a specific category.
----@param categoryId string|number ID of the category.
----@param all boolean?
-function Categories:ClearError(categoryId, all)
-	assert(categoryId, "categoryId must be specified")
-	self.recentErrors[categoryId] = nil
-	self.errors[categoryId] = nil
-end
-
-
-
---- Get all current errors as a single newline-separated string.
---- Returns the contents of `recentErrors` unless `all` is `true`.
----@param all boolean?
+--- Get all category errors as a single newline-separated string.
+---@param filter table<string,boolean>? Category IDs to check for errors.
 ---@return string errors
-function Categories:GetErrors(all)
-	local errorTable = all and self.errors or self.recentErrors
-	if BsUtil.TrueTableSize(errorTable) == 0 then
+function Categories:GetErrors(filter)
+	if BsUtil.TrueTableSize(self.errors) == 0 then
 		return ""
 	end
 	local errors = ""
 	for _, categoryId in ipairs(self.sortedIdLists.name) do
-		if errorTable[categoryId] then
-			errors = errors .. (string.len(errors) > 0 and BS_NEWLINE or "") .. errorTable[categoryId]
+		if
+			self.errors[categoryId]
+			and (
+				type(filter) ~= "table"
+				or filter[categoryId]
+			)
+		then
+			errors = errors .. (string.len(errors) > 0 and BS_NEWLINE or "") .. self.errors[categoryId]
 		end
 	end
 	return errors
 end
-
 
 
 
