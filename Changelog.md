@@ -10,7 +10,7 @@
 
 ## [1.4.0] - 2025-02-22
 ### Changed
-* Added [window strata option](https://github.com/veechs/Bagshui/issues/84). Find it at **[Settings](https://github.com/veechs/Bagshui/wiki/Home#settings)** > **Advanced** > **Window** • **Strata**. <sup><small>🫶 [@Nikki1993](https://github.com/Nikki1993)</small></sup>
+* Added [window strata option](https://github.com/veechs/Bagshui/issues/91). Find it at **[Settings](https://github.com/veechs/Bagshui/wiki/Home#settings)** > **Advanced** > **Window** • **Strata**. <sup><small>🫶 [@Nikki1993](https://github.com/Nikki1993)</small></sup>
 
 ### Fixed
 * Yet another rework of how Bagshui's item slot buttons interact with Blizzard code. Hopefully third time's the charm! This also fixes [partial stack selling](https://github.com/veechs/Bagshui/issues/93).
