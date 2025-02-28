@@ -680,10 +680,10 @@ function ObjectManager:DeleteAfterConfirmation()
 			text = L.ObjectManager_DeletePrompt,
 			button1 = L.Delete,
 			button2 = L.Cancel,
-			showAlert = 1,
+			showAlert = true,
 			timeout = 0,
-			whileDead = 1,
-			hideOnEscape = 0,
+			whileDead = true,
+			hideOnEscape = true,
 			--- Perform deletion (no need for OnCancel as that simply needs to do nothing).
 			---@param data table Reference to `self.deleteAfterConfirmation_Data`, passed through via the dialog's `data` property.
 			OnAccept = function(data)
@@ -1497,11 +1497,11 @@ function ObjectEditor:PromptForSave()
 			text = L.ObjectEditor_UnsavedPrompt,
 			button1 = L.AbandonChanges,
 			button2 = L.KeepEditing,
-			showAlert = 1,
+			showAlert = true,
 			timeout = 0,
-			whileDead = 1,
-			hideOnEscape = 0,
-			notClosableByLogout = 1,
+			whileDead = true,
+			hideOnEscape = true,
+			notClosableByLogout = true,
 			-- Abandon changes to the object (no need for OnCancel as that simply needs to do nothing).
 			-- The editor parameter comes from the dialog's data property which is set below.
 			OnAccept = function(editor)

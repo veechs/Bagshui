@@ -4,7 +4,10 @@
 -- Provide PeriodicTable interface.
 -- Display a window with an edit box to provide copyable item information.
 
-Bagshui:AddComponent(function()
+
+-- Using `LoadComponent()` to get `BsItemInfo` into the environment immediately so
+-- `Bagshui:AddonLoaded()` can access `InitializeItem()` for inventory cache validation.
+Bagshui:LoadComponent(function()
 
 
 Bagshui:AddConstants({
@@ -60,25 +63,31 @@ local ItemInfo = {
 	-- Cache invalidation.
 	itemUsableStatusMinTimestamp = 0,
 
-	-- This is the ItemInfo window.
-	window = Bagshui.prototypes.ScrollableTextWindow:New({
-		name = "ItemInfo",
-		title = "Item Info",  -- Will be updated to the name of the item in Open().
-		readOnly = true,
-		width = 400,
-		height = 650,
-		selectAllOnFocus = false,
-	})
+	-- Usability of items, cached so we don't have to constantly reload tooltips.
+	itemUsableStatusCache = {},
+	-- Last update for each item in `itemUsableStatusCache`.
+	itemUsableStatusCacheTimestamps = {},
+	-- Cache invalidation.
+	itemUsableStatusMinTimestamp = 0,
+
+	-- This is the ItemInfo window, declared in `ItemInfo:Init()`.
+	window = nil
 }
 Bagshui.components.ItemInfo = ItemInfo
 Bagshui.environment.BsItemInfo = ItemInfo
 
--- local infoWindowName = "ItemInfo"
--- local ui, uiFrame, uiTitle, scrollFrame, infoBox, itemSlotButton
-
 
 
 --- Given an item link or string, obtain as much information as possible.
+--- # Important best practice for this function!
+--- Except in special cases, provide fallback values from `BS_ITEM_SKELETON`:  
+--- ```
+--- item.name = newName or BS_ITEM_SKELETON.name
+--- ```
+--- This makes it safe for other code to assume that item property values won't be nil.  
+--- Notable special cases, both used for empty slot differentiation:
+--- * `itemString`
+--- * `itemLink`
 ---@param itemIdentifier string|number|nil Item ID, link, or string. Allowed to be nil for empty slots.
 ---@param itemInfoTable table Table that will be filled with item information.
 ---@param initialize boolean? When true, always wipe the provided `itemInfoTable` before doing anything else.
@@ -166,10 +175,10 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 	-- Add item information that will be applicable regardless of whether this is
 	-- an empty slot (or nil'd if it's an empty slot).
 
-	item.itemString = itemString
-	item.id = itemId
-	item.texture = itemTexture
-	item.bagshuiInventoryType = (inventory and inventory.inventoryType or nil)  -- Item location (Bags, Bank, etc).
+	item.itemString = itemString  -- Must be allowed to be nil for empty slot identification.
+	item.id = itemId or BS_ITEM_SKELETON.id
+	item.texture = itemTexture or BS_ITEM_SKELETON.texture
+	item.bagshuiInventoryType = (inventory and inventory.inventoryType or BS_ITEM_SKELETON.bagshuiInventoryType)  -- Item location (Bags, Bank, etc).
 
 	-- itemStringGeneric is disabled -- see BS_ITEM_SKELETON in Bagshui.lua for details.
 	-- To restore this, bring back:
@@ -182,13 +191,16 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 
 		-- GetItemInfo() results.
 
-		item.name = itemName
-		item.quality = itemQuality
-		item.minLevel = itemMinLevel
-		item.type = itemType
-		item.subtype = itemSubtype
-		item.maxStackCount = itemMaxStackCount
-		item.equipLocation = itemEquipLocation
+		item.name = itemName or BS_ITEM_SKELETON.name
+		-- EngInventory/EngBags had an "unknown" quality value of -1 but that doesn't
+		-- seem likely to occur (or particularly relevant to convey?), so let's just
+		-- use the default quality color if we somehow didn't get one.
+		item.quality = itemQuality or BS_ITEM_SKELETON.quality
+		item.minLevel = itemMinLevel or BS_ITEM_SKELETON.minLevel
+		item.type = itemType or BS_ITEM_SKELETON.type
+		item.subtype = itemSubtype or BS_ITEM_SKELETON.subtype
+		item.maxStackCount = itemMaxStackCount or BS_ITEM_SKELETON.maxStackCount
+		item.equipLocation = itemEquipLocation or BS_ITEM_SKELETON.equipLocation
 
 		-- Apply any property overrides from Config\ItemFixes.lua.
 		if Bagshui.config.ItemFixes[item.id] then
@@ -201,9 +213,11 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 
 		-- Store localized versions of information.
 		if item.equipLocation and string.len(item.equipLocation) > 0 then
-			item.equipLocationLocalized = _G[item.equipLocation]
+			item.equipLocationLocalized = _G[item.equipLocation] or BS_ITEM_SKELETON.equipLocationLocalized
+			-- This is also the best place to add the sortable version of equipLocation.
+			item.equipLocationSort = BS_INVENTORY_EQUIP_LOCATION_SORT_ORDER[item.equipLocation] or BS_ITEM_SKELETON.equipLocationSort
 		end
-		item.qualityLocalized = _G[string.format("ITEM_QUALITY%d_DESC", item.quality)]
+		item.qualityLocalized = _G[string.format("ITEM_QUALITY%d_DESC", item.quality)] or BS_ITEM_SKELETON.qualityLocalized
 
 		-- If this is an item with a random suffix, figure out what it is.
 		-- This will be used for reversed name sorting so that "Amazing Helmet of the Bear"
@@ -212,8 +226,8 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 			itemBaseName = _G.GetItemInfo(itemLinkWithoutRandomSuffix)
 			itemSuffixName = BsUtil.Trim(string.gsub(itemName, itemBaseName, ""))
 		end
-		item.baseName = itemBaseName
-		item.suffixName = itemSuffixName
+		item.baseName = itemBaseName or BS_ITEM_SKELETON.baseName
+		item.suffixName = itemSuffixName or BS_ITEM_SKELETON.suffixName
 
 		-- Load tooltip.
 		self:GetTooltip(item, inventory)
@@ -221,20 +235,13 @@ function ItemInfo:Get(itemIdentifier, itemInfoTable, reinitialize, initialize, f
 	end -- itemString exists
 
 	-- Construct an item link if the itemIdentifier wasn't one.
+	-- itemLink must be allowed to be nil for empty slot identification.
 	if itemString ~= nil and not string.find(tostring(itemIdentifier), "^|") then
 		local itemQualityColor = _G.ITEM_QUALITY_COLORS[item.quality or 1].hex
 		item.itemLink = itemQualityColor .. "|H" .. itemString .. "|H[" .. (itemName or L.Unknown) .. "]|H|r"
 	else
 		item.itemLink = itemIdentifier
 	end
-
-	-- Make sure important values aren't nil to avoid errors elsewhere.
-	item.name = item.name or BS_ITEM_SKELETON.name
-	item.subtype = item.subtype or BS_ITEM_SKELETON.subtype
-	-- EngInventory/EngBags had an "unknown" quality value of -1 but that doesn't
-	-- seem likely to occur (or particularly relevant to convey?), so let's just
-	-- use the default quality color if we somehow didn't get one.
-	item.quality = item.quality or BS_ITEM_SKELETON.quality
 
 	return true
 end
@@ -243,19 +250,27 @@ end
 
 --- Set all values of an inventory cache item to default.
 --- It's up to calling functions to manage any of the properties in
---- BS_ITEM_INFO_PROTECTED_PROPERTIES when they already have values.
+--- BS_ITEM_PROTECTED_PROPERTIES when they already have values.
 ---@param itemInfoTable table Table that will be filled with item information.
----@param initializeProtected boolean? Reset properties protected by `BS_ITEM_INFO_PROTECTED_PROPERTIES`.
-function ItemInfo:InitializeItem(itemInfoTable, initializeProtected)
+---@param initializeProtected boolean? Reset properties protected by `BS_ITEM_PROTECTED_PROPERTIES`.
+---@param validate boolean? Never overwrite anything. In this mode, missing properties are filled and anything not in `BS_ITEM_SKELETON` is removed.
+function ItemInfo:InitializeItem(itemInfoTable, initializeProtected, validate, temp)
+	-- Existing property resets/missing property filling.
 	for itemKey, defaultValue in pairs(BS_ITEM_SKELETON) do
-		-- Never reset a protected property; only fill it if it's empty.
-		-- All other properties are fair game.
 		if
-			not (
-				BS_ITEM_INFO_PROTECTED_PROPERTIES[itemKey]
-				and not initializeProtected
+			(
+				itemInfoTable[itemKey] == nil
+				and not BS_ITEM_NIL_PROPERTIES[itemKey]
 			)
-			or not itemInfoTable[itemKey]
+			or (
+				-- Don't reset properties with values during validation.
+				not validate
+				-- Never reset a protected property unless forced.
+				and not (
+					BS_ITEM_PROTECTED_PROPERTIES[itemKey]
+					and not initializeProtected
+				)
+			)
 		then
 			if type(defaultValue) == "table" then
 				itemInfoTable[itemKey] = BsUtil.TableCopy(defaultValue)
@@ -264,8 +279,42 @@ function ItemInfo:InitializeItem(itemInfoTable, initializeProtected)
 			end
 		end
 	end
+
+	-- Validation only: remove extraneous properties.
+	if validate then
+		for itemKey in next, itemInfoTable do
+			if BS_ITEM_SKELETON[itemKey] == nil then
+				rawset(itemInfoTable, itemKey, nil)
+			end
+		end
+	end
 end
 
+
+
+--- Set the proper cache values for an empty slot item.
+---@param item table Filled by `ItemInfo:Get()`.
+---@param isEmptySlotStack boolean? true for empty slot stack proxy entries.
+function ItemInfo:InitializeEmptySlotItem(item, isEmptySlotStack)
+	item.id = 0
+	-- Using 0/1 for ease of sorting.
+	item.emptySlot = 1
+	-- Add "[Profession Bag Type]" to the name when needed.
+	item.name =
+		(isEmptySlotStack and item.bagType ~= BsGameInfo.itemSubclasses.Container.Bag)
+		and string.format(L.Suffix_EmptySlot, item.bagType)
+		or L.ItemPropFriendly_emptySlot
+	item.subtype = item.bagType
+	item.quality = -1
+	item.charges = -1
+	item.texture = nil
+	item.readable = nil
+	if not item._bagsRepresented then
+		item._bagsRepresented = {}
+	else
+		BsUtil.TableClear(item._bagsRepresented)
+	end
+end
 
 
 
@@ -316,6 +365,8 @@ function ItemInfo:GetTooltip(item, inventory, forceItemString)
 	end
 
 	item.tooltip = ""
+	item.lockPickable = BS_ITEM_SKELETON.lockPickable
+	item.openable = BS_ITEM_SKELETON.openable
 
 	-- Pull the tooltip text into our hidden tooltip.
 	BsHiddenTooltip:SetOwner(_G.WorldFrame, "ANCHOR_NONE")  -- Need to clear lines first.
@@ -341,6 +392,14 @@ function ItemInfo:GetTooltip(item, inventory, forceItemString)
 					-- Append to tooltip.
 					ttText = string.gsub(ttText, "^%s+$", "")
 					item.tooltip = item.tooltip .. BS_INVENTORY_TOOLTIP_JOIN_CHARACTERS[lr] .. ttText
+
+					-- Check whether openable or lock-pickable.
+					if ttText == L.TooltipIdentifier_Openable then
+						item.openable = 1
+					end
+					if ttText == L.TooltipIdentifier_Locked then
+						item.lockPickable = 1
+					end
 
 					-- Parse charges and store, but don't overwrite if we already know them.
 					if not BS_SUPER_WOW_LOADED and item.charges == 0 then
@@ -596,6 +655,21 @@ end
 
 
 
+--- Is the given item a bag?
+---@param item table Inventory cache entry.
+---@return boolean
+function ItemInfo:IsContainer(item)
+	return (
+		type(item) == "table"
+		and (
+			item.type == L.Container
+			or item.type == L.Quiver
+		)
+	)
+end
+
+
+
 --- Wrap an item's name in the appropriate color escape sequence for its quality level.
 ---@param item table<string,string|number> Item information table populated by ItemInfo:Get().
 ---@return string
@@ -671,6 +745,28 @@ end
 ---@param item table<string,string|number> Item information table populated by ItemInfo:Get().
 function ItemInfo:Open(item)
 	self.window:Open(item)
+end
+
+
+
+local arbitraryItemInfo = {}
+function ItemInfo:OpenWithArbitraryItem(itemIdentifier)
+	if self.lastArbitraryItem == itemIdentifier then
+		self.arbitraryItemTries = (self.arbitraryItemTries or 0) + 1
+	else
+		self.arbitraryItemTries = 0
+	end
+	self.lastArbitraryItem = itemIdentifier
+	if not self:Get(itemIdentifier, arbitraryItemInfo, true, true, true) then
+		if self.arbitraryItemTries < 5 then
+			Bagshui:QueueClassCallback(self, self.OpenWithArbitraryItem, 0.75, nil, itemIdentifier)
+		else
+			Bagshui:PrintError(string.format(L.Error_ItemNotFound, tostring(itemIdentifier)))
+		end
+		return
+	end
+	
+	self:Open(arbitraryItemInfo)
 end
 
 
@@ -789,94 +885,153 @@ end
 
 
 
---- ScrollableTextWindow override for item info display.
----@param item table<string,string|number> Item information table populated by ItemInfo:Get().
-function ItemInfo.window:Open(item)
-	-- Nothing to do.
-	if not item then
-		return
-	end
 
-	-- Build item information text.
+--- Just need to do this little bit after initialization because the UI classes
+--- aren't loaded until well after ItemInfo.
+function ItemInfo:Init()
 
-	local infoText = ""
+	-- Add /bagshui info
+	-- The Character parameter is handled here for convenience.
+	local itemInfoSlashCache = {}
+	BsSlash:AddHandler("Info", function(tokens)
+		if not tokens[2] then
+			-- Character may be added in a future update.
+			BsSlash:PrintHandlers({L.Group, L.ItemId, L.Location}, "Info")
 
-	for itemProperty, itemPropertyFriendly, itemPropertyValue, itemPropertyDisplay in ItemInfo:ItemPropertyValuesForDisplay(item, BS_ITEM_INFO_DISPLAY_TYPE.TEXT) do
+		elseif BsGameInfo:HandleInfoSlash(tokens) then
+			-- Let GameInfo handle its own stuff.
+			return
 
-		-- Start this property with `<Friendly Property Name>: <Property Value>`.
-		infoText = infoText .. string.format(L.Symbol_Colon, itemPropertyFriendly) .. " " .. itemPropertyDisplay .. BS_NEWLINE
-
-		-- Add rule function examples.
-		local ruleFunctionExamples = BS_ITEM_PROPERTIES_TO_FUNCTIONS[itemProperty]
-		if type(ruleFunctionExamples) == "table" then
-			if type(itemPropertyValue) == "table" then
-				for _, val in ipairs(itemPropertyValue) do
-					infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, val, itemPropertyFriendly)
-				end
-			else
-				infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, itemPropertyValue, itemPropertyFriendly)
-			end
+		elseif BsUtil.MatchLocalizedOrNon(tokens[2], "itemid") or BsUtil.MatchLocalizedOrNon(tokens[2], "help") then
+			Bs:PrintBare(L.Slash_Help_ItemInfo)
 		else
-			infoText = infoText .. GRAY_FONT_COLOR_CODE .. L.NoRuleFunction .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE
+			self:OpenWithArbitraryItem(tokens[2])
+		end
+	end)
+
+
+	-- Get the UI ready.
+	self.window = Bagshui.prototypes.ScrollableTextWindow:New({
+		name = "ItemInfo",
+		title = "Item Info",  -- Will be updated to the name of the item in Open().
+		readOnly = true,
+		width = 400,
+		height = 650,
+		selectAllOnFocus = false,
+	})
+
+
+	--- ScrollableTextWindow override for item info display.
+	---@param item table<string,string|number> Item information table populated by ItemInfo:Get().
+	function self.window:Open(item)
+		-- Nothing to do.
+		if not item then
+			return
 		end
 
-		-- End with a final newline so that there are two newlines to separate from
-		-- the next property (extra newlines at the very end don't matter).
-		infoText = infoText .. BS_NEWLINE
+		local infoText = ""
 
+		if type(item) == "table" then
+
+			-- Build item information text.
+
+			for itemProperty, itemPropertyFriendly, itemPropertyValue, itemPropertyDisplay in ItemInfo:ItemPropertyValuesForDisplay(item, BS_ITEM_INFO_DISPLAY_TYPE.TEXT) do
+
+				-- Start this property with `<Friendly Property Name>: <Property Value>`.
+				infoText = infoText .. string.format(L.Symbol_Colon, itemPropertyFriendly) .. " " .. itemPropertyDisplay .. BS_NEWLINE
+
+				-- Add rule function examples.
+				local ruleFunctionExamples = BS_ITEM_PROPERTIES_TO_FUNCTIONS[itemProperty]
+				if type(ruleFunctionExamples) == "table" then
+					if type(itemPropertyValue) == "table" then
+						for _, val in ipairs(itemPropertyValue) do
+							infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, val, itemPropertyFriendly)
+						end
+					else
+						infoText = infoText .. ItemInfo:BuildRuleFunctionExampleText(ruleFunctionExamples, itemPropertyValue, itemPropertyFriendly)
+					end
+				else
+					infoText = infoText .. GRAY_FONT_COLOR_CODE .. L.NoRuleFunction .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE
+				end
+
+				-- End with a final newline so that there are two newlines to separate from
+				-- the next property (extra newlines at the very end don't matter).
+				infoText = infoText .. BS_NEWLINE
+
+			end
+		end
+
+		-- Prepare to open the window.
+		if self._super.Open(self, infoText, true) == false then
+			return
+		end
+
+		-- Set title to item name.
+		self.uiTitle:SetText(
+			string.format(L.Symbol_Colon, L.BagshuiItemInformation) .. " "
+			.. HIGHLIGHT_FONT_COLOR_CODE .. tostring(item.name) .. FONT_COLOR_CODE_CLOSE
+		)
+
+		-- Set item slot button in top left to item.
+		self.ui:AssignItemToItemButton(self.itemSlotButton, item)
+		self.itemSlotButton.bagshuiData.itemString = item.itemString  -- This will be picked up for the tooltip.
+
+		-- Actually open the window.
+		-- self:Open()
 	end
 
-	-- Prepare to open the window.
-	if self._super.Open(self, infoText, true) == false then
-		return
+
+
+	--- ScrollableTextWindow override for initializing UI.
+	function self.window:InitUi()
+		if not self then
+			return
+		end
+
+		-- Calls ScrollableTextWindow:InitUi().
+		if self._super.InitUi(self) == false then
+			return
+		end
+
+		-- Add item slot button to top left of window.
+		self.itemSlotButton = self.ui:CreateItemSlotButton("ItemSlotButton", self.uiHeader)
+		self.itemSlotButton.bagshuiData.tooltipAnchorDefault = true
+		self.itemSlotButton.bagshuiData.noBorderScale = true
+		self.ui:SetItemButtonSize(self.itemSlotButton, self.uiTitle:GetHeight() + 2)
+		self.itemSlotButton:SetPoint("LEFT", self.uiFrame.bagshuiData.header)
+		-- Remove clickability and pass drag events to the window.
+		self.itemSlotButton:RegisterForClicks(nil)
+		self.itemSlotButton:RegisterForDrag("LeftButton")
+		self.itemSlotButton:SetScript("OnDragStart", function()
+			if _G.GameTooltip:IsOwned(_G.this) then
+				_G.GameTooltip:Hide()
+			end
+			self.uiFrame:StartMoving()
+		end)
+		self.itemSlotButton:SetScript("OnDragStop", function()
+			self.uiFrame:StopMovingOrSizing()
+		end)
+
+		-- Anchor title to item slot button.
+		self.uiTitle:ClearAllPoints()
+		self.uiTitle:SetPoint("LEFT", self.itemSlotButton, "RIGHT", 4, 0)
 	end
 
-	-- Set title to item name.
-	self.uiTitle:SetText(
-		string.format(L.Symbol_Colon, L.BagshuiItemInformation) .. " "
-		.. HIGHLIGHT_FONT_COLOR_CODE .. tostring(item.name) .. FONT_COLOR_CODE_CLOSE
-	)
-
-	-- Set item slot button in top left to item.
-	self.ui:AssignItemToItemButton(self.itemSlotButton, item)
-	self.itemSlotButton.bagshuiData.itemString = item.itemString  -- This will be picked up for the tooltip.
-
-	-- Actually open the window.
-	-- self:Open()
 end
 
 
 
---- ScrollableTextWindow override for initializing UI.
-function ItemInfo.window:InitUi()
-	-- Calls ScrollableTextWindow:InitUi().
-	if self._super.InitUi(self) == false then
-		return
+--- Event handling.
+---@param event string Event identifier.
+---@param arg1 any? Argument 1 from the event.
+function ItemInfo:OnEvent(event, arg1)
+	if event == "ADDON_LOADED" then
+		self:Init()
 	end
-
-	-- Add item slot button to top left of window.
-	self.itemSlotButton = self.ui:CreateItemSlotButton("ItemSlotButton", self.uiHeader)
-	self.itemSlotButton.bagshuiData.tooltipAnchorDefault = true
-	self.itemSlotButton.bagshuiData.noBorderScale = true
-	self.ui:SetItemButtonSize(self.itemSlotButton, self.uiTitle:GetHeight() + 2)
-	self.itemSlotButton:SetPoint("LEFT", self.uiFrame.bagshuiData.header)
-	-- Remove clickability and pass drag events to the window.
-	self.itemSlotButton:RegisterForClicks(nil)
-	self.itemSlotButton:RegisterForDrag("LeftButton")
-	self.itemSlotButton:SetScript("OnDragStart", function()
-		if _G.GameTooltip:IsOwned(_G.this) then
-			_G.GameTooltip:Hide()
-		end
-		self.uiFrame:StartMoving()
-	end)
-	self.itemSlotButton:SetScript("OnDragStop", function()
-		self.uiFrame:StopMovingOrSizing()
-	end)
-
-	-- Anchor title to item slot button.
-	self.uiTitle:ClearAllPoints()
-	self.uiTitle:SetPoint("LEFT", self.itemSlotButton, "RIGHT", 4, 0)
 end
+
+
+Bagshui:RegisterEvent("ADDON_LOADED", ItemInfo)
 
 
 end)

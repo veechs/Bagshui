@@ -152,7 +152,7 @@ function Bagshui:FormatTooltipLine(text, label, title, indent)
 		)
 	end
 	if indent then
-		tooltipText = "  " .. tooltipText
+		tooltipText = BS_INDENT .. tooltipText
 	end
 	return tooltipText
 end
@@ -169,7 +169,7 @@ end
 --- ```
 ---@param tooltip table Tooltip frame to show.
 ---@param expectedOwner table Frame that should own the tooltip.
----@param tooltipGroupElement table UI element that conceptually groups multiple items together and will be used to determine when the delay to display tooltips should be shortened.
+---@param tooltipGroupElement table? UI element that conceptually groups multiple items together and will be used to determine when the delay to display tooltips should be shortened.
 ---@param delayOverride number? Delay after which the tooltip should be shown. `BS_TOOLTIP_DELAY_SECONDS.DEFAULT` will be used if not provided.
 ---@param noTooltipDelayShorting boolean? When true, do not shorten subsequent tooltip display delays.
 ---@param postDisplayCallback function? Callback to trigger after the tooltip is shown.
