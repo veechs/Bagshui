@@ -294,6 +294,7 @@ function InventoryUi:CreateBagSlotButtons()
 				-- ```
 				-- Luckily we can trick Outfitter into not going down that path by temporarily showing
 				-- the OutfitterQuickSlots frame and then hiding it immediately afterwards.
+				-- https://github.com/veechs/Bagshui/issues/101
 				local outfitterQuickSlotsOldParent = nil
 				if
 					_G.OutfitterQuickSlots
