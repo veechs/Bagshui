@@ -1,5 +1,10 @@
 # Bagshui Changelog
 
+## [1.4.3] - 2025-03-01
+### Fixed
+* Clicking a bag slot with Outfitter installed will no longer [error](https://github.com/veechs/Bagshui/issues/101) (this was somehow an issue since 1.0‽). <sup>🪲 bonho</sup>
+* Prevent [errors](https://github.com/veechs/Bagshui/issues/102) while processing items with very long tooltips. <sup>🪲 bonho</sup>
+
 ## [1.4.2] - 2025-02-22
 ### Fixed
 * Hearthstone toolbar button won't throw errors anymore.
