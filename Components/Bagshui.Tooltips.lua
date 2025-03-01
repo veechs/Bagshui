@@ -68,8 +68,11 @@ function Bagshui:InitTooltips()
 		self.tooltips.hidden:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
 		self.tooltips.hidden:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
 	)
-	-- Avoid `SetTooltipMoney()` errors.
-	self.tooltips.hidden:SetScript("OnTooltipAddMoney", function() end)
+	-- Avoid `SetTooltipMoney()` errors when very long tooltips are loaded.
+	-- There are probably other ways around this, but we don't (currently) need money info
+	-- in the hidden tooltip.
+	-- https://github.com/veechs/Bagshui/issues/102
+	self.tooltips.hidden:SetScript("OnTooltipAddMoney", nil)
 
 
 	-- Expose tooltips.
@@ -586,6 +589,7 @@ local hookTooltipFunctions = {
 	-- and pfUI's [libtooltip.lua](https://github.com/shagu/pfUI/blob/master/libs/libtooltip.lua)
 
 	SetBagItem = function(self, bagNum, slotNum)
+		Bs:PrintDebug(self:GetName())
 		self.bagshuiData.lastItemString = BsItemInfo:ParseItemLink(_G.GetContainerItemLink(bagNum, slotNum))
 		return self.bagshuiData.hooked.SetBagItem(self, bagNum, slotNum)
 	end,
