@@ -1,5 +1,10 @@
 # Bagshui Changelog
 
+## [1.4.3] - 2025-03-01
+### Fixed
+* Clicking a bag slot with Outfitter installed will no longer [error](https://github.com/veechs/Bagshui/issues/101) (this was somehow an issue since 1.0‽). <sup>🪲 bonho</sup>
+* Prevent [errors](https://github.com/veechs/Bagshui/issues/102) while processing items with very long tooltips. <sup>🪲 bonho</sup>
+
 ## [1.4.2] - 2025-02-22
 ### Fixed
 * Hearthstone toolbar button won't throw errors anymore.
@@ -10,7 +15,7 @@
 
 ## [1.4.0] - 2025-02-22
 ### Changed
-* Added [window strata option](https://github.com/veechs/Bagshui/issues/84). Find it at **[Settings](https://github.com/veechs/Bagshui/wiki/Home#settings)** > **Advanced** > **Window** • **Strata**. <sup><small>🫶 [@Nikki1993](https://github.com/Nikki1993)</small></sup>
+* Added [window strata option](https://github.com/veechs/Bagshui/issues/91). Find it at **[Settings](https://github.com/veechs/Bagshui/wiki/Home#settings)** > **Advanced** > **Window** • **Strata**. <sup><small>🫶 [@Nikki1993](https://github.com/Nikki1993)</small></sup>
 
 ### Fixed
 * Yet another rework of how Bagshui's item slot buttons interact with Blizzard code. Hopefully third time's the charm! This also fixes [partial stack selling](https://github.com/veechs/Bagshui/issues/93).

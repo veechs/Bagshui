@@ -362,8 +362,40 @@ function InventoryUi:CreateBagSlotButtons()
 				return
 			end
 
+			-- Call original OnClick.
 			if oldOnClick then
+
+				-- Outfitter's `Outfitter_PaperDollItemSlotButton_OnClick()` makes the assumption that
+				-- it will only ever be called for the exact buttons it has defined. There is never a
+				-- check to verify that `vInventorySlot` isn't nil, and this presents a problem for
+				-- our use of `PaperDollItemSlotButtonTemplate` to build `BagshuiBagsContainerTemplate`.
+				-- When a Bags bag slot is clicked, Outfitter will throw an error from `OutfitterQuickSlots_Open()`:
+				-- ```
+				-- Interface\AddOns\Outfitter\Outfitter.lua:6011: attempt to concatenate local `pSlotName' (a nil value)
+				-- ```
+				-- Luckily we can trick Outfitter into not going down that path by temporarily showing
+				-- the OutfitterQuickSlots frame and then hiding it immediately afterwards.
+				-- https://github.com/veechs/Bagshui/issues/101
+				local outfitterQuickSlotsOldParent = nil
+				if
+					_G.OutfitterQuickSlots
+					and type(_G.OutfitterQuickSlots.IsVisible) == "function"
+					and not _G.OutfitterQuickSlots:IsVisible()
+				then
+					_G.OutfitterQuickSlots:ClearAllPoints()
+					-- Need to re-parent to UIParent so `:IsVisible()` will be true.
+					outfitterQuickSlotsOldParent = _G.OutfitterQuickSlots:GetParent()
+					_G.OutfitterQuickSlots:SetParent(_G.UIParent)
+					_G.OutfitterQuickSlots:Show()
+				end
+
 				oldOnClick()
+
+				-- Undo the Outfitter workaround. 
+				if outfitterQuickSlotsOldParent then
+					_G.OutfitterQuickSlots:SetParent(outfitterQuickSlotsOldParent)
+					_G.OutfitterQuickSlots:Hide()
+				end
 			end
 
 			-- Equipping a new bag should highlight slots immediately.
