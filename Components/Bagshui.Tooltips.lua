@@ -68,6 +68,8 @@ function Bagshui:InitTooltips()
 		self.tooltips.hidden:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
 		self.tooltips.hidden:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
 	)
+	-- Avoid `SetTooltipMoney()` errors.
+	self.tooltips.hidden:SetScript("OnTooltipAddMoney", function() end)
 
 
 	-- Expose tooltips.
