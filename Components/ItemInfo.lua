@@ -433,6 +433,9 @@ end
 function ItemInfo:LoadTooltip(tooltipFrame, item, inventory, forceItemString)
 	local hasCooldown, repairCost
 
+	-- Wipe the tooltip first, just to be safe.
+	tooltipFrame:ClearLines()
+
 	-- Determine whether the tooltip needs to be loaded using the itemString (via SetHyperlink()).
 	-- There are multiple reasons this can occur:
 	-- 
