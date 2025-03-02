@@ -723,16 +723,14 @@ end
 
 --- Test whether a rule expression is valid.
 ---@param expression string
----@param startup boolean? Sets the `Rules.startup` property, which is read by `Rules:RuleErrorNotAtStartup()`
 ---@return boolean valid Is the rule valid?
 ---@return string? errorMessage When the rule is invalid, this is the error message.
-function Rules:Validate(expression, startup)
+function Rules:Validate(expression)
 	-- Run the rule expression through multiple scenarios to try and catch every possible failure state:
 	-- 1. Normal
 	-- 2. Return true from every rule function
 	-- 3. Return false from every rule function
 	-- Not using a session here because SetItemAndCharacter() already does a check to only update when the item changes.
-	self.startup = startup
 	self.validationMode = true
 	self.validationModeReturnValueOverride = nil
 	local _, errorMessage = self:Match(expression, BS_ITEM_SKELETON)
@@ -746,7 +744,6 @@ function Rules:Validate(expression, startup)
 		self.validationModeReturnValueOverride = nil
 	end
 	self.validationMode = false
-	self.startup = nil
 	return (errorMessage == nil), errorMessage
 end
 
@@ -1153,16 +1150,6 @@ function Rules:GetRuleFunctionNames(primaryName, alias)
 		-- The function INSIDE the rule environment should NOT start with Rule_.
 		"" .. string.gsub((alias or ""), "^[Rr]ule_", "")
 end
-
-
-
---
-function Rules:RuleErrorNotAtStartup(errorMessage)
-	if not self.startup then
-		self.errorMessage = errorMessage
-	end
-end
-
 
 
 
