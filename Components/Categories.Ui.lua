@@ -477,7 +477,7 @@ function Categories:InitUi()
 
 
 
-	---comment Override NewEditor so we can modify the interface.
+	--- Override NewEditor so we can modify the interface.
 	---@return table objectEditorInstance
 	function self.objectManager:NewEditor()
 		-- Create the ObjectEditor instance.
