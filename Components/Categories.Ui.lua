@@ -477,7 +477,7 @@ function Categories:InitUi()
 
 
 
-	--- Override NewEditor so we can modify the interface.
+	---comment Override NewEditor so we can modify the interface.
 	---@return table objectEditorInstance
 	function self.objectManager:NewEditor()
 		-- Create the ObjectEditor instance.
@@ -761,8 +761,8 @@ function Categories:InitUi()
 			and not self.dirtyFields.rule
 		then
 			-- Revert to last saved validation state if the rule hasn't been edited.
-			ruleValid = not self.originalObject.ruleError
-			errorMessage = self.originalObject.ruleError
+			errorMessage = categories.errors[self.originalObject.categoryId]
+			ruleValid = not errorMessage
 		end
 
 		-- Only change the validation icon if validation state is known.

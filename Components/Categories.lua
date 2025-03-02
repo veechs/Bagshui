@@ -96,6 +96,8 @@ local Categories = Bagshui.prototypes.ObjectList:New({
 
 	-- Error tracking.
 	errors = {},  -- Category ID to error message mapping for quick retrieval.
+	errorTimestamps = {},  -- Track when errors occurred so we know whether re-testing is needed.
+	recursedCategories = {},  -- Any category that contains a MatchCategory() rule function call.
 
 	-- There's some initialization that needs to happen on `PLAYER_ENTERING_WORLD`
 	-- (see `Categories:OnEvent()`), but that event fires when zoning and we
@@ -327,7 +329,6 @@ function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
 
 	-- Otherwise, proceed with compiling/recompiling the rule.
 	local finalRule = ""
-	category.ruleError = nil
 	self.errors[categoryId] = nil
 
 	-- Remove previously compiled rule if it exists.
@@ -477,8 +478,11 @@ function Categories:MatchCategory(categoryId, item, character, ruleSession)
 
 	-- If the rule is in error status and hasn't been changed since the error occurred,
 	-- just fail (checking this here makes sense because item lists can't have errors)
-	if category.ruleError and category.ruleErrorTimestamp >= category.dateModified then
-		self:ReportError(categoryId, category.ruleError)
+	if
+		self.errors[categoryId]
+		and (self.errorTimestamps[categoryId] or 0) >= category.dateModified
+	then
+		self:ReportError(categoryId, self.errors[categoryId])
 		return false
 	end
 
@@ -521,6 +525,7 @@ function Categories:ReportError(categoryId, errorMessage)
 	if not self.errors[categoryId] then
 		formattedMessage = self:FormatErrorMessage(errorMessage, categoryId)
 		self.errors[categoryId] = formattedMessage
+		self.errorTimestamps[categoryId] = _G.time()
 		-- Don't spam chat with errors at startup.
 		if self.initialized then
 			Bagshui:PrintError(formattedMessage, L.Category)
