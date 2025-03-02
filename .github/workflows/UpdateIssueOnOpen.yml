@@ -1,0 +1,19 @@
+# Automatically assign if no assignee was chosen.
+name: Update issue on open
+on:
+  issues:
+    types:
+      - opened
+jobs:
+  label_issues:
+    if: join(github.event.issue.assignees) == ''
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - run: gh issue edit "$NUMBER" --add-assignee "$ASSIGNEE"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          ASSIGNEE: ${{ github.repository_owner }}
