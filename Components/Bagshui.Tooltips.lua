@@ -589,7 +589,6 @@ local hookTooltipFunctions = {
 	-- and pfUI's [libtooltip.lua](https://github.com/shagu/pfUI/blob/master/libs/libtooltip.lua)
 
 	SetBagItem = function(self, bagNum, slotNum)
-		Bs:PrintDebug(self:GetName())
 		self.bagshuiData.lastItemString = BsItemInfo:ParseItemLink(_G.GetContainerItemLink(bagNum, slotNum))
 		return self.bagshuiData.hooked.SetBagItem(self, bagNum, slotNum)
 	end,
