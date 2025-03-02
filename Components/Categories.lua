@@ -518,10 +518,9 @@ local formattedMessage
 ---@param errorMessage any
 function Categories:ReportError(categoryId, errorMessage)
 	assert(categoryId, "categoryId must be specified")
-	if not self.errors[categoryId] or not self.recentErrors[categoryId] then
+	if not self.errors[categoryId] then
 		formattedMessage = self:FormatErrorMessage(errorMessage, categoryId)
 		self.errors[categoryId] = formattedMessage
-		self.recentErrors[categoryId] = formattedMessage
 		-- Don't spam chat with errors at startup.
 		if self.initialized then
 			Bagshui:PrintError(formattedMessage, L.Category)
