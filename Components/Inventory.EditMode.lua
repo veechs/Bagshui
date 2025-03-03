@@ -31,10 +31,11 @@ end
 
 
 --- Trigger window update only if Edit Mode is enabled.
----@param forceResort boolean?
----@param itemSlotColorsOnly boolean?
-function Inventory:EditModeWindowUpdate(forceResort, itemSlotColorsOnly)
-	if not self.editMode then
+---@param forceResort boolean? Trigger a full re-sort.
+---@param itemSlotColorsOnly boolean? High performance update mode.
+---@param calledFromEvent boolean? This is coming from a BAGSHUI_PROFILE_UPDATE event raised by another inventory class.
+function Inventory:EditModeWindowUpdate(forceResort, itemSlotColorsOnly, calledFromEvent)
+	if not (self.editMode or calledFromEvent) then
 		return
 	end
 
@@ -43,11 +44,15 @@ function Inventory:EditModeWindowUpdate(forceResort, itemSlotColorsOnly)
 		-- Using normal Update() is way too slow to keep pace with mouse movements.
 		self:UpdateItemSlotColors()
 	else
+		-- Normal Edit Mode update.
 		self.cacheUpdateNeeded = false
 		self.windowUpdateNeeded = true
 		self.forceResort = (forceResort == true)
 		self:Update()
-		Bagshui:RaiseEvent("BAGSHUI_INVENTORY_EDIT_MODE_UPDATE")
+		-- Don't cause a stack overflow with recursive events.
+		if not calledFromEvent then
+			Bagshui:RaiseEvent("BAGSHUI_INVENTORY_EDIT_MODE_UPDATE", nil, self, forceResort)
+		end
 	end
 end
 

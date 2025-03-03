@@ -390,6 +390,7 @@ local bagshuiEnvironment = {
 	BS_ITEM_NIL_PROPERTIES = {
 		itemLink = true,
 		itemString = true,
+		texture = true,  -- Without this, empty slots for offline inventories will become ? icons.
 	},
 
 	-- Rule functions that correspond to item properties.
