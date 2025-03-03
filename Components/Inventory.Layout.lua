@@ -1062,9 +1062,15 @@ function Inventory:UpdateWindow()
 
 
 			-- Determine footer height based on whether the bag bar is visible.
-			local footerHeight = self.settings.showBagBar
-				and (uiButtons.itemSlots[1].bagshuiData.originalSizeAdjusted * bagBarScale)  -- Bag bar visible.
-				or (BsSkin.inventoryHeaderFooterHeight)  -- Bag bar hidden.
+			local footerHeight = math.max(
+				(
+					-- Bag bar visible.
+					self.settings.showBagBar
+					and (uiButtons.itemSlots[1].bagshuiData.originalSizeAdjusted * bagBarScale)
+					or 0
+				),
+				BsSkin.inventoryHeaderFooterHeight
+			)
 
 			uiFrames.footer:SetHeight(footerHeight)
 			uiFrames.footer:Show()

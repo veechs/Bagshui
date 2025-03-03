@@ -252,6 +252,7 @@ function Inventory:New(newPropsOrInventoryType)
 			ITEM_LOCKED = true,  -- Doesn't seem to actually ever fire but let's register for it anyway.
 			ITEM_LOCK_CHANGED = true,  -- Required for multiple reasons, including preventing items from staying gray if you attempt to place them in an incompatible container (ex. non-ammo in ammo bags).
 			BAGSHUI_INVENTORY_INIT_RETRY = true,
+			BAGSHUI_INVENTORY_EDIT_MODE_UPDATE = true,  -- Need to register for this so inventory classes that share the same Structure profile can stay in sync.
 			BAGSHUI_ACTIVE_QUEST_ITEM_UPDATE = true,
 			BAGSHUI_INITIAL_INVENTORY_UPDATE = true,
 			BAGSHUI_CATEGORY_UPDATE = true,
@@ -753,6 +754,20 @@ function Inventory:OnEvent(event, arg1, arg2)
 		end
 
 		-- Even if no update was needed, we don't need anything else to happen.
+		return
+	end
+
+
+	-- Keep layouts of inventories that share the same Structure profile in sync.
+	if event == "BAGSHUI_INVENTORY_EDIT_MODE_UPDATE" then
+		-- arg1 = Raising class.
+		-- arg2 = forceResort.
+		if
+			arg1 ~= self
+			and arg1.settings.profileStructure == self.settings.profileStructure
+		then
+			self:EditModeWindowUpdate(arg2, false, true)
+		end
 		return
 	end
 

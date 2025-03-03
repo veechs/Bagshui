@@ -343,12 +343,21 @@ function Settings:OnEvent(event, arg1, arg2, arg3, arg4)
 	-- arg1 is settingName.
 	-- arg2 is settingInfo.
 	-- arg3 is newValue.
-	-- arg4 is the Settings class instance.
+	-- arg4 is the Settings class instance that raised the event.
+
 	if
 		self._settingCache
 		and event == "BAGSHUI_SETTING_UPDATE"
 		and arg4 ~= self
-		and arg2.scope ~= BS_SETTING_SCOPE.INVENTORY
+		and (
+			arg2.scope ~= BS_SETTING_SCOPE.INVENTORY
+			or (
+				-- Keep profile-scoped settings in sync when the change was made to the profile we're using.
+				self._inventoryClassInstance
+				and arg2.profileScope
+				and self["profile" .. BS_PROFILE_TYPE[arg2.profileScope]] == arg4["profile" .. BS_PROFILE_TYPE[arg2.profileScope]]
+			)
+		)
 	then
 		self._settingCache[arg1] = arg3
 	end
