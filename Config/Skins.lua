@@ -122,7 +122,7 @@ Bagshui.config.Skins = {
 		itemSlotMarginFudge = 2,
 
 		---@type number Item slot texture and bag bar opacity when offline.
-		itemSlotTextureOfflineOpacity = 0.5,
+		itemSlotTextureOfflineOpacity = 0.6,
 		---@type number Item slot texture opacity in Edit Mode.
 		itemSlotTextureEditModeOpacity = 0.5,
 		---@type number Item slot texture opacity for items that don't match search terms or haven't changed in "highlight changes" mode.

@@ -274,6 +274,7 @@ function Ui:CreateIconButton(buttonOpts)
 
 	-- Initialize Bagshui info table.
 	button.bagshuiData = {
+		isIconButton = true,
 		xOffset = buttonOpts.xOffset or -6,
 		yOffset = buttonOpts.yOffset or 0,
 		tooltipTitle = buttonOpts.tooltipTitle,
@@ -371,10 +372,20 @@ function Ui:CreateIconButton(buttonOpts)
 
 	-- Set up other scripts.
 	if buttonOpts.onEnter then
-		button:SetScript("OnEnter", buttonOpts.onEnter)
+		local oldOnEnter = button:GetScript("OnEnter")
+		button:SetScript("OnEnter", function()
+			if buttonOpts.onEnter() ~= false and oldOnEnter then
+				oldOnEnter()
+			end
+		end)
 	end
 	if buttonOpts.onLeave then
-		button:SetScript("OnLeave", buttonOpts.onLeave)
+		local oldOnLeave = button:GetScript("OnLeave")
+		button:SetScript("OnLeave", function()
+			if buttonOpts.onLeave() ~= false and oldOnLeave then
+				oldOnLeave()
+			end
+		end)
 	end
 
 	if buttonOpts.onShow then
@@ -421,7 +432,7 @@ end
 
 
 
---- Set icon button (toolbar buttons, etc) texture.
+--- Set icon button (toolbar buttons, etc) texture colors.
 ---@param button table Return value from `Ui:CreateIconButton()`.
 ---@param vertexColor number?[] { r, g, b, [a] }
 ---@param hoverVertexColor number?[] { r, g, b, [a] }
@@ -683,7 +694,6 @@ function Ui:ShowIconButtonTooltip(button, tooltipDelayOverride, secondPass)
 
 	if bagshuiInfo.tooltipFunction then
 		-- When a tooltipFunction is configured, it should handle adding all tooltip content.
-		-- This isn't currently used.
 		bagshuiInfo.tooltipFunction(button, tooltip)
 	else
 		-- Normal behavior.

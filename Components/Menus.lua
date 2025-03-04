@@ -613,14 +613,14 @@ end
 
 
 --- Redraw an open menu at the given level.
----@param level number Menu level to refresh.
----@param levelAdjustment number Add to _G.UIDROPDOWNMENU_MENU_LEVEL instead of passing a specific level.
-function Menus:Refresh(level, levelAdjustment)
-	level = (level or _G.UIDROPDOWNMENU_MENU_LEVEL) + (levelAdjustment or 0)
+---@param level number? Menu level to refresh. Defaults to _G.UIDROPDOWNMENU_MENU_LEVEL.
+---@param refreshParent boolean? Also refresh the next level up.
+function Menus:Refresh(level, refreshParent)
+	level = (level or _G.UIDROPDOWNMENU_MENU_LEVEL)
 
 	-- Do refresh on next frame to ensure new values are picked up.
 	if not self.refresh then
-		Bagshui:QueueClassCallback(self, self.Refresh, nil, nil, level)
+		Bagshui:QueueClassCallback(self, self.Refresh, nil, nil, level, refreshParent)
 
 		-- Set flag so that we know the callback has been queued and LoadMenu()
 		-- knows to pull from self.recentLevelValues.
@@ -647,6 +647,11 @@ function Menus:Refresh(level, levelAdjustment)
 	-- Reset frame and call initialization function to re-populate buttons.
 	Bagshui.menuFrame:SetHeight(_G.UIDROPDOWNMENU_BUTTON_HEIGHT * 2)
 	Bagshui.menuFrame.initialize(level)
+
+	-- Only refresh parent level if it's feasible.
+	if refreshParent and level > 1 then
+		self:Refresh(level - 1)
+	end
 
 	-- Reset flag.
 	self.refresh = false
