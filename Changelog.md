@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## [1.4.5] - 2025-03-04
+### Fixed
+* Picking up the Hearthstone by dragging the toolbar button [works again](https://github.com/veechs/Bagshui/issues/111). <sup><small>🪲 [@p3isman](https://github.com/p3isman)</small></sup>
+
 ## [1.4.4] - 2025-03-02
 ### Fixed
 * Keep Bags and Bank settings [in sync](https://github.com/veechs/Bagshui/issues/108) when they are using the same profiles (hard to believe I missed this for so long). <sup><small>🪲 Evilko</small></sup>
