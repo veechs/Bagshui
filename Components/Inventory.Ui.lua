@@ -752,7 +752,7 @@ function Inventory:InitUi()
 	buttons.toolbar.hearthstone:SetScript("OnDragStart", function()
 		local hearthstone = self.hearthstoneItemRef
 		if hearthstone then
-			Bagshui:PickupItem(hearthstone, self)
+			Bagshui:PickupItem(hearthstone, self, nil, true)
 		end
 		self.pickedUpHearthstoneFromButton = true
 	end)
