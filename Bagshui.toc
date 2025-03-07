@@ -4,7 +4,7 @@
 ## Title-zhCN:|CFF00FF00[|r|CFFDD66DD界面|r|CFF00FF00] 乾坤袋
 ## Notes-zhCN: 自带离线银行等功能的一体化自动分拣背包插件。
 ## Author: veechs
-## Version: 1.4.4
+## Version: 1.4.5
 ## OptionalDeps: AtlasLoot, ItemRack, Outfitter, pfUI
 ## SavedVariables: BagshuiData
 
