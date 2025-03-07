@@ -1,0 +1,157 @@
+# This workflow creates a new release of a WoW addon when the changelog is
+# updated with a new version. The repository contents are zipped up
+# and added as a release asset.
+#
+# The changelog is expected to be in https://keepachangelog.com/
+# format (brackets around version numbers are *not* required though).
+#
+# Just about everything should be determined automatically, but if you want
+# to use this for your addon, the two places marked "❇️ Changelog file name"
+# must be updated if they don't *exactly* match your changelog file.
+#
+name: Create WoW Addon Release From Changelog
+on:
+  push:
+    branches:
+    - main
+    paths:
+    # ❇️ Changlog file name. Case must match.
+    - 'Changelog.md'
+jobs:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      
+    steps:
+    # Must check out repository to query the changelog.
+    - uses: actions/checkout@v4
+    
+    # Get version and releaae notes.
+    - name: Query Changelog
+      id: changelog
+      uses: release-flow/keep-a-changelog-action@v2
+      with:
+       command: query
+       # ❇️ Changlog file name. Case must match.
+       changelog: Changelog.md
+       version: latest
+
+    # Figure out everything we need to know.
+    - name: Set Variables
+      id: vars
+      shell: bash
+      run: |
+        # In this section, it's not *necessary* to put things in Bash variables,
+        # then send to $GITHUB_OUTPUT at the end, but it makes things a little
+        # more readable.
+
+        # The TOC will decide the name of everything else.
+        # This is a little lazy, but *most* addons don't have multiple TOCs.
+        tocFile=$(shopt -s nullglob; ls -bt *.toc | head -n 1)
+        tocVersion=""
+        baseName=""
+        addonName=""
+
+        # Grab info from TOC.
+        if [[ "$tocFile" != "" ]]; then
+          addonName=$(perl -lne 'print "$1" and last if /^##\s*Title:\s*(.+?)\s*$/' "$tocFile")
+          tocVersion=$(perl -lne 'print "$1" and last if /^##\s*Version:\s*(.+?)\s*$/' "$tocFile")
+          baseName=$(basename "$tocFile" .toc)
+        fi
+
+        # Couldn't get TOC info, so use repository info.
+        if [[ "$addonName" == '' ]]; then
+          addonName=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}
+          baseName=$addonName
+        fi
+
+        zipFile=${baseName}.zip
+        
+        currentChangelogVersion=${{ steps.changelog.outputs.version }}
+        # Alternate method of getting version from changelog. Would also require parsing release notes out.
+        #currentChangelogVersion=$(perl -lne 'print "$1" and last if /^##\s+\[(\d+\.\d+\.\d+)\]/;' Changelog.md) 
+        
+        lastReleaseTag=$(gh repo view --json latestRelease --jq '.[] | .tagName')
+
+        # These will be assigned to steps.vars.outputs.
+        echo "addonName=$addonName" >> $GITHUB_OUTPUT
+        # Version = X.Y.Z
+        echo "currentChangelogVersion=$currentChangelogVersion" >> $GITHUB_OUTPUT
+        # Tag = vX.Y.Z
+        echo "currentChangelogTag=v$currentChangelogVersion" >> $GITHUB_OUTPUT
+        echo "lastReleaseTag=$lastReleaseTag" >> $GITHUB_OUTPUT
+        echo "tocFile=$tocFile" >> $GITHUB_OUTPUT
+        echo "tocVersion=$tocVersion" >> $GITHUB_OUTPUT
+        echo "zipFile=$zipFile" >> $GITHUB_OUTPUT
+    
+    # Decide whether we should do a release (and do some logging).
+    # Every step after this must have this condition so changelog updates that dont't contain a new version won't trigger a release:
+    # ```
+    # if: ${{ steps.check.outputs.proceed == 'true' }}
+    # ```
+    - name: Check Variables
+      id: check
+      shell: bash
+      run: |
+        # The rest of the workflow only needs to run if the changelog version is different.
+        proceed=${{ steps.vars.outputs.currentChangelogTag != steps.vars.outputs.lastReleaseTag }}
+        echo "proceed=$proceed" >> $GITHUB_OUTPUT
+
+        # Logging.
+        echo "addonName: ${{ steps.vars.outputs.addonName }}"
+        echo "currentChangelogVersion: ${{ steps.vars.outputs.currentChangelogVersion }}"
+        echo "currentChangelogTag: ${{ steps.vars.outputs.currentChangelogTag }}"
+        echo "lastReleaseTag: ${{ steps.vars.outputs.lastReleaseTag }}"
+        echo "tocFile: ${{ steps.vars.outputs.tocFile }}"
+        echo "tocVersion: ${{ steps.vars.outputs.tocVersion }}"
+        echo "zipFile: ${{ steps.vars.outputs.zipFile }}"
+        echo "toc hash: ${{ hashFiles(steps.vars.outputs.tocFile) }}"
+        echo "🚦proceed: $proceed"
+
+    # TOC needs a version update.
+    - name: Update TOC
+      if: ${{
+          steps.check.outputs.proceed == 'true'
+          && hashFiles(steps.vars.outputs.tocFile) != ''
+          && steps.vars.outputs.tocVersion != steps.vars.outputs.currentChangelogVersion
+        }}
+      shell: bash
+      run: |
+        sed -i 's/^\(##[[:space:]]*Version:\).*/\1 ${{ steps.vars.outputs.currentChangelogVersion }}/' ${{ steps.vars.outputs.tocFile }}
+        git config --global user.name '${{ github.actor }}'
+        git config --global user.email '${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com'
+        git commit -am '${{ steps.vars.outputs.addonName }} ${{ steps.vars.outputs.currentChangelogVersion }}'
+        git push
+
+    # This is the vX.Y.Z tag the release will be created from.
+    - name: Create Tag
+      if: ${{ steps.check.outputs.proceed == 'true' }}
+      shell: bash
+      run: |
+        git config --global user.name '${{ github.actor }}'
+        git config --global user.email '${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com'
+        git tag -a "${{ steps.vars.outputs.currentChangelogTag }}" -m ":bookmark: ${{ steps.vars.outputs.currentChangelogVersion }}"
+        git push origin ${{ steps.vars.outputs.currentChangelogTag }}
+
+    # This is our release asset.
+    - name: Create Zip
+      if: ${{ steps.check.outputs.proceed == 'true' }}
+      id: create-zip
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: 'zip'
+        filename: '${{ steps.vars.outputs.zipFile }}'
+        exclusions: '*.git* .vscode .editorconfig'
+
+    # Release it!
+    - name: Create Release
+      if: ${{ steps.check.outputs.proceed == 'true' }}
+      uses: softprops/action-gh-release@v2
+      with:
+        body: ${{ steps.changelog.outputs.release-notes }}
+        files: ${{ steps.vars.outputs.zipFile }}
+        tag_name: ${{ steps.vars.outputs.currentChangelogTag }}
+        fail_on_unmatched_files: true
