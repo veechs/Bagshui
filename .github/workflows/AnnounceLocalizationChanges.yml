@@ -1,0 +1,82 @@
+# Based on https://github.com/marketplace/actions/create-discussion-comment
+name: enUS Localization Update Announcement
+on:
+  push:
+    branches:
+    - main
+    - dev
+    paths:
+    - 'Locale/enUS.lua'
+jobs:
+  localization-update-announcement:
+    # Don't run on forks by default.
+    if: github.repository_owner == 'veechs'
+    permissions:
+      discussions: write
+    env:
+      body: ${{ format('enUS localization updated on {0} branch in {1}.', github.ref_name, github.sha) }}
+      discussionId: D_kwDOJ5XDLM4Aepdt
+      replyToId: ${{ github.ref_name == 'dev' && 'DC_kwDOJ5XDLM4AvNzo' || 'DC_kwDOJ5XDLM4AvNzi' }}
+      clientMutationId: 302201
+    runs-on: ubuntu-latest
+    steps:
+    - name: Add Discussion Comment
+      shell: bash
+      id: discusscomment
+      run: |
+        RESPONSE=$(curl -v -X POST -H "Authorization: bearer ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/json" -d '{"query": "mutation { addDiscussionComment(input: {body: \"${{env.body}}\" discussionId: \"${{env.discussionId}}\" replyToId: \"${{env.replyToId}}\" clientMutationId: \"${{env.clientMutationId}}\"}) { clientMutationId comment { id body } } }"}' https://api.github.com/graphql)
+        echo $RESPONSE
+        echo "Comment ID:"
+        echo $RESPONSE | jq -r '.data.addDiscussionComment.comment.id'
+        echo "Comment Body:"
+        echo $RESPONSE | jq -r '.data.addDiscussionComment.comment.body'
+
+
+# GraphQL queries to find required data.
+#
+#
+#query {
+#  repository(owner: "<username>", name: "<repository>") {
+#    discussions(first: 5) {
+#      edges {
+#        node {
+#          # number parameter for 2nd query:
+#          number
+#          # discussion-id:
+#          id
+#          title
+#          category {
+#            id
+#            name
+#          }
+#          body
+#          id
+#        }
+#      }
+#    }
+#  }
+#}
+#
+#query{
+#  repository(owner: "<username>", name: "<repository>") {
+#    discussion(number: 6) {
+#      title
+#      createdAt
+#      # first 100 results
+#      comments(first: 100) {
+#        # edges.node is where the actual 'Comment' object is
+#        edges {
+#          node {
+#            # replyToId:
+#            id
+#            author {
+#              login
+#              url
+#            }
+#            body
+#          }
+#        }
+#      }
+#    }
+#  }
+#}
