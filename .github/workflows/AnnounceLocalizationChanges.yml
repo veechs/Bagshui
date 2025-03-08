@@ -15,8 +15,8 @@ jobs:
       discussions: write
     env:
       body: ${{ format('enUS localization updated on {0} branch in {1}.', github.ref_name, github.sha) }}
-      discussionId: D_kwDOJ5XDLM4Aepdt
-      replyToId: ${{ github.ref_name == 'dev' && 'DC_kwDOJ5XDLM4AvNzo' || 'DC_kwDOJ5XDLM4AvNzi' }}
+      discussionId: D_kwDOJ3GOZc4Aep4W
+      replyToId: ${{ github.ref_name == 'dev' && 'DC_kwDOJ3GOZc4AvO_3' || 'DC_kwDOJ3GOZc4AvO_1' }}
       clientMutationId: 302201
     runs-on: ubuntu-latest
     steps:
@@ -33,7 +33,7 @@ jobs:
 
 
 # GraphQL queries to find required data.
-#
+# https://docs.github.com/en/graphql/overview/explorer
 #
 #query {
 #  repository(owner: "<username>", name: "<repository>") {
