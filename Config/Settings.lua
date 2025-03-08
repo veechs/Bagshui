@@ -439,6 +439,7 @@ Bagshui.config.Settings = {
 
 		{
 			submenuName = L.Menu_Settings_General,
+			tooltipTitle = L.Menu_Settings_General_TooltipText,
 			settings = {
 				{
 					menuTitle = L.Menu_Settings_Commands,
@@ -1308,6 +1309,7 @@ Bagshui.config.Settings = {
 				},
 				{
 					submenuName = L.Menu_Settings_Integration,
+					tooltipText = L.Menu_Settings_Integration_TooltipText,
 					-- Insert the hook settings submenu.
 					settings = hookSettings,
 				},

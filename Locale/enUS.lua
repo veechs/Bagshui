@@ -350,17 +350,19 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_DesignColors_TooltipTitle"] = "Design Colors",
 ["Menu_Settings_DesignColors_TooltipText"] = "Change inventory colors.",
 ["Menu_Settings_DesignSize_TooltipTitle"] = "Design Sizing",
-["Menu_Settings_DesignSize_TooltipText"] = "Change how the inventory is sized.",
+["Menu_Settings_DesignSize_TooltipText"] = "Change inventory dimensions.",
 ["Menu_Settings_DesignView_TooltipTitle"] = "Design View",
-["Menu_Settings_DesignView_TooltipText"] = "Change the visibility of window elements.",
+["Menu_Settings_DesignView_TooltipText"] = "Change inventory interface element visibility.",
 ["Menu_Settings_Etcetera"] = "Etcetera",
 ["Menu_Settings_Format"] = "Format",
 ["Menu_Settings_General"] = "General",
+["Menu_Settings_General_TooltipText"] = "General Settings",
 ["Menu_Settings_GroupDefaults"] = "Group Defaults",
 ["Menu_Settings_Groups"] = "Groups",
 ["Menu_Settings_Hooks_Suffix"] = "%s Hooks",  -- %s = Inventory type.
 ["Menu_Settings_InfoTooltip"] = "Info Tooltip",
 ["Menu_Settings_Integration"] = "Integration",
+["Menu_Settings_Integration_TooltipText"] = "Control how Bagshui integrates with the game.",
 ["Menu_Settings_Interface"] = "Interface",
 ["Menu_Settings_ItemProperties"] = "Item Properties",
 ["Menu_Settings_ItemSlots"] = "Item Slots",
@@ -1103,7 +1105,7 @@ BsLocalization:AddLocale("enUS", {
 
 ["globalInfoTooltips"] = "Everywhere",
 ["globalInfoTooltips_TooltipTitle"] = "Hook All Item Tooltips ",
-["globalInfoTooltips_TooltipText"] = "Show Bagshui Info Tooltip with Catalog counts when Alt is held anywhere (i.e. Character window, chat links, etc.).",
+["globalInfoTooltips_TooltipText"] = "Show the Bagshui Info Tooltip when Alt is held while any item tooltip is displayed (i.e. Character window, chat links, etc.).",
 
 ["groupBackgroundDefault"] = "Background",
 ["groupBackgroundDefault_TooltipTitle"] = "Default Group Background Color",
@@ -1235,7 +1237,7 @@ BsLocalization:AddLocale("enUS", {
 ["showHearthstone_TooltipText"] = "Show the Hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
 
 ["showInfoTooltipsWithoutAlt"] = "Show Without Alt",
-["showInfoTooltipsWithoutAlt_TooltipText"] = "Always display the Bagshui Info Tooltip (hold Shift to temporarily hide it).",
+["showInfoTooltipsWithoutAlt_TooltipText"] = "Always display the Bagshui Info Tooltip (hold Shift to hide it temporarily).",
 
 ["showLogWindow_TooltipText"] = "Open the Bagshui log window.",
 
