@@ -54,18 +54,19 @@ end
 ---@param widget table UI widget.
 ---@param widgetWidth number
 ---@param widgetHeight number
+---@param anchorPoint string? Point on the holding frame to anchor (default: TOPLEFT).
 ---@param anchorToFrame table The holding frame will be anchored to this frame.
----@param anchorToPoint string The holding frame will be anchored to this point on anchorToFrame.
+---@param anchorToPoint string? The holding frame will be anchored to this point on anchorToFrame (default: BOTTOMLEFT).
 ---@param xOffset number? Horizontal offset for holding frame (default: 0).
 ---@param yOffset number? Vertical offset for holding frame (default: -10).
 ---@return table holdingFrame
-function Ui:CreateLabeledWidget(parent, labelText, labelWidth, widget, widgetWidth, widgetHeight, anchorToFrame, anchorToPoint, xOffset, yOffset)
+function Ui:CreateLabeledWidget(parent, labelText, labelWidth, widget, widgetWidth, widgetHeight, anchorPoint, anchorToFrame, anchorToPoint, xOffset, yOffset)
 	parent = parent or widget:GetParent()
 
 	local holdingFrame = _G.CreateFrame("Frame", nil, parent)
 	holdingFrame:SetWidth(parent:GetWidth())
 	holdingFrame:SetHeight(widgetHeight)
-	holdingFrame:SetPoint("TOPLEFT", anchorToFrame, anchorToPoint or "BOTTOMLEFT", xOffset or 0, yOffset or -10)
+	holdingFrame:SetPoint(anchorPoint or "TOPLEFT", anchorToFrame, anchorToPoint or "BOTTOMLEFT", xOffset or 0, yOffset or -10)
 
 	local labelFrame, label = self:CreateLabel(holdingFrame, nil, "GameFontNormal", true)
 

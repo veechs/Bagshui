@@ -1279,6 +1279,7 @@ function ObjectEditor:InitUi()
 				widget,             -- Widget
 				widgetWidth,        -- Widget width
 				widgetHeight,       -- Widget height
+				"TOPLEFT",          -- Anchor point
 				nextAnchor,         -- Anchor to frame
 				nextAnchorToPoint   -- Anchor to point
 			)
