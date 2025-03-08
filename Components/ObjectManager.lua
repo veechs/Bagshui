@@ -1754,7 +1754,8 @@ function ObjectEditor:BringToFront()
 		self.uiFrame:ClearAllPoints()
 		self.uiFrame:SetPoint(point, anchorToFrame, point, 20, -20)
 		self.uiFrame:Show()
-		self.uiFrame:ClearAllPoints()
+		self.uiFrame:SetToplevel(true)
+		self.uiFrame:SetMovable(true)
 	else
 		self.uiFrame:Raise()
 	end
