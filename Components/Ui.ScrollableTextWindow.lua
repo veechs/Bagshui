@@ -66,12 +66,12 @@ function ScrollableTextWindow:SetText(text)
 	end
 
 	-- Add text to EditBox.
-	if self.readOnly then
-		-- Set readOnlyText property for fake read-only-ness.
-		self.editBox.bagshuiData.readOnlyText = tostring(text)
-	end
 	self.editBox:ClearFocus()
-	self.editBox:SetText(tostring(text))
+	self.ui:SetEditBoxText(
+		self.editBox,
+		(text == nil) and "" or tostring(text),
+		self.readOnly
+	)
 	self.editBox:SetFocus()
 end
 

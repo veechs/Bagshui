@@ -326,6 +326,86 @@ Bagshui.config.RuleFunctions = {
 	},
 
 
+	-- Item matches another category.
+	-- This is one of the most complex rule functions because it's critical to avoid
+	-- a loop where category 1 wants to match 2 which wants to match 1. To make this
+	-- work requires cooperation from the Categories and Rules classes to help manage
+	-- the call stack tracking (`Rules._matchCategory_callStack`) and other aspects.
+	{
+		functionNames = {
+			"MatchCategory",
+			"Match",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			rules:RequireArguments(ruleArguments)
+
+			-- Set up special table for loop prevention.
+			-- Managed here and in:
+			-- - Categories:MatchCategory()
+			-- - Rules:Match()
+			if not rules._matchCategory_callStack then
+				rules._matchCategory_callStack = {}
+			end
+
+			-- This controls which property on the `rules` object error messages
+			-- get stored in. By default we assume we're inside a stack of
+			-- `MatchCategory()` rule function calls and so we assume we'll need
+			-- to use the special property that will be picked up at the end
+			-- of this function.
+			local errorProperty = "_matchCategory_errorMessage"
+			-- When the call stack is empty, this is the originating category,
+			-- and any errors belong to it.
+			if table.getn(rules._matchCategory_callStack) == 0 then
+				errorProperty = "errorMessage"
+				rules._matchCategory_errorMessage = nil
+				-- Store the ID of the category that started this.
+				-- Used by the Categories class to track which categories have MatchCategory() rules.
+				if rules.currentCategoryId then
+					rules._matchCategory_originalCaller = rules.currentCategoryId
+				end
+			end
+
+			-- Try to match categories.
+			for _, categoryId in ipairs(ruleArguments) do
+				-- Custom category IDs are numeric and built-ins are strings, so anything
+				-- that converts to a number should be treated as such.
+				categoryId = tonumber(categoryId) or categoryId
+
+				-- Check potential error conditions before allowing the Categories:MatchCategory() call to proceed.
+				if BsUtil.TableContainsValue(rules._matchCategory_callStack, categoryId) then
+					-- We've seen this category ID before, so stop before we overflow the call stack.
+					-- Build out the error message so it shows the dependency list: ID1 → ID2 → ID1.
+					rules[errorProperty] =
+						BsUtil.Trim(L.Error_Rule_MatchCategory_Loop)
+						.. " " .. table.concat(rules._matchCategory_callStack, " → ")
+						.. " → " .. categoryId
+					return false
+
+				elseif BsCategories.errors[categoryId] then
+					-- The category referenced by this one has an error, so evaluation can't continue.
+					rules[errorProperty] = string.format(L.Error_Rule_MatchCategory_DownstreamError, categoryId)
+					return false
+				end
+
+				-- Make the real MatchCategory() call.
+				if BsCategories:MatchCategory(categoryId, rules.item, rules.character, rules.currentSession, true) then
+					return true
+				end
+
+			end
+
+			-- We want to lift the error message from the depths of the call stack and
+			-- only return it for the category at the top.
+			if errorProperty == "errorMessage" then
+				rules[errorProperty] = rules._matchCategory_errorMessage
+			end
+
+			return false
+		end,
+		-- Templates come from localization.
+	},
+
+
 	-- Item is usable by the current character based on the item's minimum level requirement.
 	{
 		functionNames = {

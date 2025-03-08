@@ -219,11 +219,13 @@ function Profiles:InitUi()
 	function self.objectManager:NewEditor()
 		local editor = self._super.NewEditor(self)
 
-		local footerText = editor.uiFrame:CreateFontString(nil, nil, "GameFontNormalSmall")
+		local footerText = editor.content:CreateFontString(nil, nil, "GameFontNormalSmall")
 		footerText:SetText(GRAY_FONT_COLOR_CODE .. L.ProfileEditor_FooterText .. FONT_COLOR_CODE_CLOSE)
 		footerText:SetJustifyH("LEFT")
-		footerText:SetPoint("BOTTOMLEFT", editor.uiFrame, "BOTTOMLEFT", BsSkin.windowPadding, BsSkin.windowPadding)
-		footerText:SetPoint("BOTTOMRIGHT", editor.uiFrame, "BOTTOMRIGHT", -BsSkin.windowPadding, BsSkin.windowPadding)
+		footerText:SetPoint("BOTTOMLEFT", editor.content, "BOTTOMLEFT")
+		footerText:SetPoint("BOTTOMRIGHT", editor.content, "BOTTOMRIGHT")
+
+		editor.bottomWidget = footerText
 
 		return editor
 	end

@@ -348,8 +348,10 @@ function Inventory:New(newPropsOrInventoryType)
 		lastUpdateLockedContainers = {},
 
 		-- Category/group-related lookup tables -- See CategorizeAndSort() for descriptions of most of these.
+		activeCategoryIds = {},
 		categoryIdsGroupedBySequence = {},
 		activeGroups = {},
+		categorySequenceNumbers = {},
 		sortedCategorySequenceNumbers = {},
 		categoriesToGroups = {},
 

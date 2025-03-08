@@ -43,8 +43,7 @@ function About:InitUi()
 	version:SetPoint("TOPRIGHT", logoParts[4], "BOTTOMLEFT", 13, 17)
 
 	local url = Bagshui.prototypes.Ui:CreateEditBox("AboutUrl", self.uiFrame, nil, nil, nil, true, true)
-	url:SetText(BS_URL)
-	url.bagshuiData.readOnlyText = BS_URL
+	Bagshui.prototypes.Ui:SetEditBoxTextReadOnly(url, BS_URL)
 	url:SetWidth(150)
 	url:SetHeight(16)
 	url:SetTextInsets(0, 0, 0, 0)

@@ -106,6 +106,7 @@ BsLocalization:AddLocale("enUS", {
 ["HoldAlt"] = "Hold Alt",
 ["HoldControlAlt"] = "Hold Control+Alt",
 ["Horizontal"] = "Horizontal",
+["ID"] = "ID",  -- Short way of saying "Identifier"
 ["Ignore"] = "Ignore",
 ["Import"] = "Import",
 ["ImportSlashExport"] = "Import/Export",
@@ -632,6 +633,8 @@ BsLocalization:AddLocale("enUS", {
 ["CategoryEditor_Field_rule_TooltipText"] = "One or more Bagshui rule functions, combined with and/or/not keywords, optionally grouped via parentheses. See documentation for help.",
 ["CategoryEditor_Field_list"] = "Directly Assigned",
 ["CategoryEditor_Field_list_TooltipText"] = "List of items that are directly assigned to this category instead of using rule functions.",
+["CategoryEditor_ID_TooltipTitle"] = "Category ID",
+["CategoryEditor_ID_TooltipText"] = "Pass to the MatchCategory() rule function to check if an item matches this Category.",
 -- Button tooltips.
 ["CategoryEditor_AddRuleFunction"] = "Add Rule Function",
 ["CategoryEditor_RuleFunctionWiki"] = "Rules Help",
@@ -782,6 +785,17 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_LootMethod_ExampleDescription6"] = "Check if current loot method is any of the provided values.",
 ["RuleFunction_LootMethod_Example7"] = 'LootMaster()',
 ["RuleFunction_LootMethod_ExampleDescription7"] = "Check if you are the loot master.",
+
+["RuleFunction_MatchCategory_GenericDescription"] = "Check if the item matches one or more other Categories.",
+["RuleFunction_MatchCategory_Note"] = "Parameters are Category IDs (NOT NAMES) which can be found the bottom of the Category Editor.",
+["RuleFunction_MatchCategory_Example1"] = 'MatchCategory("KeyAndKeyLike")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription1"] = "Check if the item matches the built-in Keys Category." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "IDs for built-in Categories are strings that may not match their names." .. FONT_COLOR_CODE_CLOSE,
+["RuleFunction_MatchCategory_Example2"] = 'MatchCategory(5)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription2"] = "Check if the item matches custom Category 5." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Custom Categories have numeric IDs.",
+["RuleFunction_MatchCategory_Example3"] = 'not MatchCategory(5)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription3"] = "Check if the item does NOT match custom Category 5.",
+["RuleFunction_MatchCategory_Example4"] = 'MatchCategory(ID1, ID2, IDN)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription4"] = "Check if the item matches any of the specified Categories." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. 'Remember that built-in Categories use strings that must be "quoted" and custom Categories use numbers.',
 
 ["RuleFunction_MinLevel_GenericDescription"] = "Check if the item is usable based on the specified level.",
 ["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
@@ -970,6 +984,9 @@ BsLocalization:AddLocale("enUS", {
 
 ["Error_Rule_ItemLevelStat"] = "Vanilla WoW doesn't have item levels (ilvl) so ItemLevelStat() is not available.",
 ["Error_Rule_ItemStat"] = "ItemStat() and ItemStatActive() are not currently supported. Try using Tooltip() to check for stats instead.",
+
+["Error_Rule_MatchCategory_Loop"] = "MatchCategory() loop detected:",
+["Error_Rule_MatchCategory_DownstreamError"] = "MatchCategory() unable to proceed due to error in referenced category %s.",
 
 -- ### Logging ###
 

@@ -48,7 +48,6 @@ function Inventory:EditModeWindowUpdate(forceResort, itemSlotColorsOnly, calledF
 		self.cacheUpdateNeeded = false
 		self.windowUpdateNeeded = true
 		self.forceResort = (forceResort == true)
-		self.lastCategorizeItems = 0  -- Force clearing errors in `Inventory:CategorizeItems()`.
 		self:Update()
 		-- Don't cause a stack overflow with recursive events.
 		if not calledFromEvent then
