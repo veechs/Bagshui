@@ -1273,38 +1273,20 @@ function ObjectEditor:InitUi()
 
 			-- Add to UI.
 			self.labelWidgetPairs[fieldName] = ui:CreateLabeledWidget(
-				self.content,       -- Parent
-				fieldLabel,         -- Label text
-				labelWidth,         -- Label width
-				widget,             -- Widget
-				widgetWidth,        -- Widget width
-				widgetHeight,       -- Widget height
-				"TOPLEFT",          -- Anchor point
-				nextAnchor,         -- Anchor to frame
-				nextAnchorToPoint   -- Anchor to point
+				self.content,  -- Parent.
+				fieldLabel,  -- Label text.
+				labelWidth,  -- Label width.
+				widget,  -- Widget.
+				widgetWidth,  -- Widget width.
+				widgetHeight,  -- Widget height.
+				"TOPLEFT",  -- Anchor point.
+				nextAnchor,  -- Anchor to frame.
+				nextAnchorToPoint,  -- Anchor to point.
+				nil,  -- X offset.
+				nil,  -- Y offset.
+				localizedFieldName,  -- Tooltip title.
+				L_nil[self.objectType .. "Editor_Field_" .. fieldName .. "_TooltipText"]  -- Tooltip 
 			)
-
-			-- Widget tooltips.
-			local tooltipText = L_nil[self.objectType .. "Editor_Field_" .. fieldName .. "_TooltipText"]
-			if tooltipText then
-				local widgetHoldingFrame = self.labelWidgetPairs[fieldName]
-
-				widget:SetScript("OnEnter", function()
-					_G.GameTooltip:ClearLines()
-					_G.GameTooltip_SetDefaultAnchor(_G.GameTooltip, _G.this)
-					_G.GameTooltip:AddLine(localizedFieldName, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, true)
-					_G.GameTooltip:AddLine(tooltipText, nil, nil, nil, true)
-					_G.GameTooltip:SetWidth(10)
-					Bagshui:ShowTooltipAfterDelay(_G.GameTooltip, _G.this, widgetHoldingFrame)
-				end)
-
-				widget:SetScript("OnLeave", function()
-					if _G.GameTooltip:IsOwned(_G.this) then
-						Bagshui:ShortenTooltipDelay(_G.this, true)
-						_G.GameTooltip:Hide()
-					end
-				end)
-			end
 
 			nextAnchor = self.labelWidgetPairs[fieldName]
 			nextAnchorToPoint = "BOTTOMLEFT"
