@@ -1421,9 +1421,7 @@ function ObjectEditor:Load(objectId, duplicate, template, refresh, onFirstSave)
 	end
 
 	-- Remove focus from all edit boxes.
-	for _, editBox in pairs(self.editBoxes) do
-		editBox:ClearFocus()
-	end
+	self:CloseMenusAndClearFocuses(false, true, true)
 
 	-- Re-focus the Name field if it's a new object.
 	if isNew then
