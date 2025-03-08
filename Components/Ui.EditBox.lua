@@ -195,4 +195,27 @@ function Ui:CreateScrollableEditBox(namePrefix, parent, borderStyle, editBoxInhe
 end
 
 
+
+--- Wrapper for `EditBox:SetText()` that also sets the `EditBox.bagshuiData.readOnlyText` property.
+---@param editBox table EditBox widget.
+---@param str string? Text to set.
+---@param readOnly boolean? `true` to make read-only.
+function Ui:SetEditBoxText(editBox, str, readOnly)
+	editBox:SetText(str)
+	if editBox.bagshuiData then
+		editBox.bagshuiData.readOnlyText = readOnly and str or nil
+	end
+end
+
+
+
+--- Wrapper for `Ui:SetEditBoxText()` that automatically sets the `EditBox.bagshuiData.readOnlyText` property.
+---@param editBox table EditBox widget.
+---@param str string? Text to set.
+function Ui:SetEditBoxTextReadOnly(editBox, str, readOnly)
+	self:SetEditBoxText(editBox, str, true)
+end
+
+
+
 end)

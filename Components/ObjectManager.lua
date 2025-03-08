@@ -1444,11 +1444,12 @@ function ObjectEditor:PopulateField(fieldName, fallbackStorageTable)
 
 	-- Edit boxes and scrollable lists are different.
 	if self.editBoxes[fieldName] then
-		-- Set readOnlyText property for fake read-only-ness.
-		self.editBoxes[fieldName].bagshuiData.readOnlyText = readOnly and value or nil
-
-		-- Populate the EditBox.
-		self.editBoxes[fieldName]:SetText(value or "")
+		-- Use our `:SetText()` wrapper to handle read-only.
+		self.ui:SetEditBoxText(
+			self.editBoxes[fieldName],
+			value or "",
+			readOnly
+		)
 
 
 	elseif self.lists[fieldName] then
