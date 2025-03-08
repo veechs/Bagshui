@@ -332,6 +332,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings"] = "%s Settings",  -- "Bags Settings"
 ["Menu_Settings_About"] = "About Bagshui",
 ["Menu_Settings_Accessibility"] = "Accessibility",
+["Menu_Settings_ActiveDesignProfileHint"] = "Applies to the active Design Profile.",
 ["Menu_Settings_Advanced"] = "Advanced",
 ["Menu_Settings_Anchoring"] = "Anchoring",
 ["Menu_Settings_BagUsage"] = "Utilization",
@@ -344,7 +345,14 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_ColorHistory_TooltipTitle"] = "Color Picker History",
 ["Menu_Settings_Commands"] = "Commands",
 ["Menu_Settings_DefaultProfiles"] = "Default Profiles",
+["Menu_Settings_DefaultProfiles_TooltipText"] = "Manage how profiles are created for new characters.",
 ["Menu_Settings_Defaults"] = "Defaults",
+["Menu_Settings_DesignColors_TooltipTitle"] = "Design Colors",
+["Menu_Settings_DesignColors_TooltipText"] = "Change inventory colors.",
+["Menu_Settings_DesignSize_TooltipTitle"] = "Design Sizing",
+["Menu_Settings_DesignSize_TooltipText"] = "Change how the inventory is sized.",
+["Menu_Settings_DesignView_TooltipTitle"] = "Design View",
+["Menu_Settings_DesignView_TooltipText"] = "Change the visibility of window elements.",
 ["Menu_Settings_Etcetera"] = "Etcetera",
 ["Menu_Settings_Format"] = "Format",
 ["Menu_Settings_General"] = "General",
@@ -358,6 +366,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_ItemSlots"] = "Item Slots",
 ["Menu_Settings_More"] = "More",
 ["Menu_Settings_More_TooltipTitle"] = "Additional Settings",
+["Menu_Settings_NitpickyDetails"] = "Nitpicky Details",
 ["Menu_Settings_Overrides"] = "Overrides",
 ["Menu_Settings_Open"] = "!!Open!!",
 ["Menu_Settings_Options"] = "Options",
@@ -366,6 +375,8 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_SellProtection"] = "Selling Protection",
 ["Menu_Settings_Size"] = "Sizing",
 ["Menu_Settings_SizeAndLayering"] = "Sizing and Layering",
+["Menu_Settings_StructureOptions_TooltipTitle"] = "Structure Options",
+["Menu_Settings_StructureOptions_TooltipText"] = "Settings for the active Structure Profile.",
 ["Menu_Settings_Summary"] = "Summary",
 ["Menu_Settings_Tinting"] = "Item Tinting",
 ["Menu_Settings_Toggles"] = "Toggles",
@@ -797,7 +808,7 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_MatchCategory_Example4"] = 'MatchCategory(ID1, ID2, IDN)',  -- DO NOT LOCALIZE THE PARAMETER.
 ["RuleFunction_MatchCategory_ExampleDescription4"] = "Check if the item matches any of the specified Categories." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. 'Remember that built-in Categories use strings that must be "quoted" and custom Categories use numbers.',
 
-["RuleFunction_MinLevel_GenericDescription"] = "Check if the item is usable based on the specified level.",
+["RuleFunction_MinLevetl_GenericDescription"] = "Check if the item is usable based on the specified level.",
 ["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
 ["RuleFunction_MinLevel_ExampleDescription1"] = "Check if the item is usable at <level> or above.",
 ["RuleFunction_MinLevel_Example2"] = 'MinLevel(min, max)',
@@ -1084,7 +1095,7 @@ BsLocalization:AddLocale("enUS", {
 ["defaultProfileStructure_TooltipTitle"] = "Default Structure Profile",
 ["defaultProfileStructure_TooltipText"] = "Profile to use for new characters.",
 
-["disableAutomaticResort"] = "Manual Reorganization",
+["disableAutomaticResort"] = "Manual Organization",
 ["disableAutomaticResort_TooltipText"] = "Don't categorize and sort items when the inventory window is closed and reopened." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "This is NOT the same as setting the default sort order to Manual." .. FONT_COLOR_CODE_CLOSE,
 
 ["windowDoubleClickActions"] = "Double-Click",

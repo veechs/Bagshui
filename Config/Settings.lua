@@ -438,7 +438,7 @@ Bagshui.config.Settings = {
 		},
 
 		{
-			submenuName = L.Menu_Settings_Advanced,
+			submenuName = L.Menu_Settings_General,
 			settings = {
 				{
 					menuTitle = L.Menu_Settings_Commands,
@@ -516,7 +516,6 @@ Bagshui.config.Settings = {
 							disableFunc = disableWhenSellProtectionOff,
 							choicesCheckedFunc = checkQualityGreaterEqual,
 						},
-						
 					},
 
 				},
@@ -609,6 +608,17 @@ Bagshui.config.Settings = {
 					defaultValue = false,
 				},
 
+				{
+					menuTitle = L.Menu_Settings_Accessibility,
+				},
+				{
+					name = "colorblindMode",
+					scope = BS_SETTING_SCOPE.ACCOUNT,
+					type = BS_SETTING_TYPE.BOOLEAN,
+					defaultValue = false,
+					inventoryWindowUpdateOnChange = true,
+				},
+
 			},
 		},
 
@@ -624,6 +634,8 @@ Bagshui.config.Settings = {
 		-- Options submenu for Structure profile.
 		{
 			submenuName = L.Menu_Settings_Options,
+			tooltipTitle = L.Menu_Settings_StructureOptions_TooltipTitle,
+			tooltipText = L.Menu_Settings_StructureOptions_TooltipText,
 			settings = {
 
 				{
@@ -680,6 +692,8 @@ Bagshui.config.Settings = {
 
 		{
 			submenuName = L.Menu_Settings_Colors,
+			tooltipTitle = L.Menu_Settings_DesignColors_TooltipTitle,
+			tooltipText = L.Menu_Settings_DesignColors_TooltipText .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. L.Menu_Settings_ActiveDesignProfileHint .. FONT_COLOR_CODE_CLOSE,
 			settings = {
 
 				{
@@ -808,6 +822,8 @@ Bagshui.config.Settings = {
 
 		{
 			submenuName = L.Menu_Settings_Size,
+			tooltipTitle = L.Menu_Settings_DesignSize_TooltipTitle,
+			tooltipText = L.Menu_Settings_DesignSize_TooltipText .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. L.Menu_Settings_ActiveDesignProfileHint .. FONT_COLOR_CODE_CLOSE,
 			settings = {
 
 				{
@@ -879,6 +895,8 @@ Bagshui.config.Settings = {
 
 		{
 			submenuName = L.Menu_Settings_View,
+			tooltipTitle = L.Menu_Settings_DesignView_TooltipTitle,
+			tooltipText = L.Menu_Settings_DesignView_TooltipText .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. L.Menu_Settings_ActiveDesignProfileHint .. FONT_COLOR_CODE_CLOSE,
 			settings = {
 
 				{
@@ -1098,15 +1116,19 @@ Bagshui.config.Settings = {
 
 
 		{
-			menuTitle = L.Menu_Settings_General,
+			menuTitle = L.Menu_Settings_Defaults,
 		},
 
 		{
-			submenuName = L.Menu_Settings_DefaultProfiles,
+			submenuName = L.Profiles,
+			tooltipTitle = L.Menu_Settings_DefaultProfiles,
+			tooltipText = L.Menu_Settings_DefaultProfiles_TooltipText,
 			settings = defaultProfileSettings,
 		},
 
-
+		{
+			menuTitle = L.Menu_Settings_Etcetera,
+		},
 
 		{
 			submenuName = L.Menu_Settings_More,
@@ -1137,18 +1159,10 @@ Bagshui.config.Settings = {
 				},
 
 				{
-					menuTitle = L.Menu_Settings_Accessibility,
+					menuTitle = L.Menu_Settings_NitpickyDetails,
 				},
 				{
-					name = "colorblindMode",
-					scope = BS_SETTING_SCOPE.ACCOUNT,
-					type = BS_SETTING_TYPE.BOOLEAN,
-					defaultValue = false,
-					inventoryWindowUpdateOnChange = true,
-				},
-
-				{
-					menuTitle = L.Menu_Settings_ChangeTiming,
+					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_ChangeTiming,
 				},
 				{
 					name = "itemStockBadgeFadeDuration",
