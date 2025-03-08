@@ -439,7 +439,7 @@ function Categories:InitUi()
 			-- Basic Object Editor settings.
 
 			editorWidth  = 550,
-			editorHeight = 550,
+			editorHeight = 565,
 
 			-- Order of fields in editor UI.
 			editorFields = {
@@ -616,10 +616,63 @@ function Categories:InitUi()
 			classSelector,  -- Widget.
 			classSelectorWidth,  -- Widget width.
 			editor.manager.editorDimensions.widgetHeight,
+			"TOPLEFT",
 			editor.labelWidgetPairs.sequence,  -- Anchor to frame.
 			"BOTTOMLEFT"   -- Anchor to point.
 		)
 		editor.labelWidgetPairs.class:Hide()
+
+
+		-- Add ID to bottom.
+
+		local idEditBox = ui:CreateEditBox(
+			"objectId",
+			editor.content,
+			nil,
+			"NumberFontNormalSmallGray",
+			false,  -- multiline.
+			true,  -- noBackgroundOrBorder.
+			true  -- selectAllOnFocus.
+		)
+		-- Ensure text is visible when highlighted.
+		local oldOnFocusGained = idEditBox:GetScript("OnEditFocusGained")
+		idEditBox:SetScript("OnEditFocusGained", function()
+			oldOnFocusGained()
+			_G.this:SetTextColor(1, 1, 1)
+		end)
+		-- Clear highlight on focus lost.
+		local oldOnFocusLost = idEditBox:GetScript("OnEditFocusLost")
+		idEditBox:SetScript("OnEditFocusLost", function()
+			oldOnFocusLost()
+			_G.this:HighlightText(0, 0)
+			_G.this:SetTextColor(0.35, 0.35, 0.35)
+		end)
+
+		editor.idDisplay = ui:CreateLabeledWidget(
+			editor.content,  -- Parent.
+			string.format(L.Symbol_Colon, L.ID),  -- Label text.
+			20,  -- Label width.
+			idEditBox, -- Widget.
+			self.editorDimensions.widgetWidth,  -- Widget width.
+			self.editorDimensions.widgetHeight,  -- Widget height.
+			"BOTTOMLEFT",  -- Anchor point.
+			editor.content,  -- Anchor to frame.
+			"BOTTOMLEFT",  -- Anchor to point.
+			nil,  -- X offset.
+			nil,  -- Y offset.
+			L.CategoryEditor_ID_TooltipTitle,
+			L.CategoryEditor_ID_TooltipText
+		)
+		editor.idDisplay.bagshuiData.labelFrame:SetWidth(editor.idDisplay.bagshuiData.label:GetStringWidth())
+		editor.idDisplay.bagshuiData.widget:ClearAllPoints()
+		editor.ui:SetPoint(editor.idDisplay.bagshuiData.widget, "LEFT", editor.idDisplay.bagshuiData.labelFrame, "RIGHT", 0, 0)
+		editor.idDisplay.bagshuiData.label:SetFontObject("GameFontDisableSmall")
+		local font = (editor.idDisplay.bagshuiData.label:GetFont())
+		editor.idDisplay.bagshuiData.label:SetTextColor(0.35, 0.35, 0.35)
+		editor.idDisplay.bagshuiData.label:SetFont(font, 10)
+		font = (editor.idDisplay.bagshuiData.widget:GetFont())
+		editor.idDisplay.bagshuiData.widget:SetTextColor(0.35, 0.35, 0.35)
+		editor.idDisplay.bagshuiData.widget:SetFont(font, 10)
 
 
 		-- Store the editor frame height so it can be adjusted up and down based on whether it's a class category
@@ -709,6 +762,12 @@ function Categories:InitUi()
 				self:SetClass(Bagshui.currentCharacterInfo.class)
 			end
 		end
+
+		-- Update ID.
+		self.ui:SetEditBoxTextReadOnly(
+			self.idDisplay.bagshuiData.widget,
+			type(self.objectId) == "string" and string.format('"%s"', self.objectId) or self.objectId
+		)
 
 		return newObjectId
 	end
@@ -854,6 +913,16 @@ function Categories:InitUi()
 		end
 
 		return dirty
+	end
+
+
+	-- Override for `ObjectEditor:CloseMenusAndClearFocuses()` to deal with the ID display.
+	function categoryEditor:CloseMenusAndClearFocuses(menus, editBoxes, listSelections)
+		self._super.CloseMenusAndClearFocuses(self, menus, editBoxes, listSelections)
+
+		if editBoxes ~= false then
+			self.idDisplay.bagshuiData.widget:ClearFocus()
+		end
 	end
 
 end

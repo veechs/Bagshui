@@ -632,6 +632,8 @@ BsLocalization:AddLocale("enUS", {
 ["CategoryEditor_Field_rule_TooltipText"] = "One or more Bagshui rule functions, combined with and/or/not keywords, optionally grouped via parentheses. See documentation for help.",
 ["CategoryEditor_Field_list"] = "Directly Assigned",
 ["CategoryEditor_Field_list_TooltipText"] = "List of items that are directly assigned to this category instead of using rule functions.",
+["CategoryEditor_ID_TooltipTitle"] = "Category ID",
+["CategoryEditor_ID_TooltipText"] = "Pass to the MatchCategory() rule function to check if an item matches this Category.",
 -- Button tooltips.
 ["CategoryEditor_AddRuleFunction"] = "Add Rule Function",
 ["CategoryEditor_RuleFunctionWiki"] = "Rules Help",
