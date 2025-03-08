@@ -25,6 +25,7 @@ function Ui:CreateEditBox(name, parent, inherits, fontObject, multiLine, noBackg
 	)
 
 	editBox.bagshuiData = {
+		selectAllOnFocus = selectAllOnFocus,
 		-- There doesn't seem to be a built-in way to check whether an edit box
 		-- currently has focus, so we'll track it.
 		hasFocus = false
@@ -52,7 +53,7 @@ function Ui:CreateEditBox(name, parent, inherits, fontObject, multiLine, noBackg
 		-- Focus tracking.
 		function self._createEditBox_OnFocusGained()
 			_G.this.bagshuiData.hasFocus = true
-			if selectAllOnFocus then
+			if _G.this.bagshuiData.selectAllOnFocus then
 				_G.this:HighlightText()
 			end
 		end
