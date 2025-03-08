@@ -957,7 +957,11 @@ function ObjectEditor:InitUi()
 	self.title = self.uiFrame.bagshuiData.title
 
 	-- Wipe object info on close.
+	local oldOnHide = uiFrame:GetScript("OnHide")
 	uiFrame:SetScript("OnHide", function()
+		if oldOnHide then
+			oldOnHide()
+		end
 		self.objectId = nil
 		self.originalObject = nil
 		BsUtil.TableClear(self.updatedObject)
