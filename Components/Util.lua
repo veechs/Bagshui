@@ -1206,9 +1206,15 @@ end
 ---@param obj2 any
 ---@param ignoreKeys table<string, true>? Table keys listed here (expressed in level1.level2.level3 notation) will not affect the outcome of the comparison.
 ---@param keyPath string? Recursion parameter for keeping track of the key path.
+---@param maxDepth number? Don't recurse tables any further than this (anything lower than 1 will just return `obj1 == obj2` immediately and is basically pointless).
 ---@return boolean equal
-function Util.ObjectsEqual(obj1, obj2, ignoreKeys, keyPath)
+function Util.ObjectsEqual(obj1, obj2, ignoreKeys, keyPath, maxDepth)
 	keyPath = keyPath or ""
+
+	-- Stop once maximum depth reached.
+	if type(maxDepth) == "number" and maxDepth <= 0 then
+		return obj1 == obj2
+	end
 
 	-- Same object.
 	if obj1 == obj2 then
@@ -1240,7 +1246,8 @@ function Util.ObjectsEqual(obj1, obj2, ignoreKeys, keyPath)
 					value1,
 					value2,
 					ignoreKeys,
-					keyPrefix .. key1
+					keyPrefix .. key1,
+					(type(maxDepth) == "number" and maxDepth - 1 or nil)
 				) == false
 			)
 		then
