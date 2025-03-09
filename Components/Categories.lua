@@ -471,7 +471,7 @@ end
 ---@param item table An item from the Bagshui inventory cache (should be based on `BS_ITEM_SKELETON`).
 ---@param character table? Character information table (uses `Bagshui.currentCharacterInfo` if not provided).
 ---@param sortedSequenceNumbers number[] An array of numbers that correspond to indexes of the `categoriesToGroups` table. This is what dictates priority of category evaluation.
----@param categoriesToGroups table Table of `{ <sequence number> = { categoryId1 = groupId1, categoryId2, = groupId2 } }`. (The `categoryIdsGroupedBySequence` table produced by `Inventory:UpdateLayoutLookupTables()`).
+---@param categoriesToGroups table Table of `{ <sequence number> = { categoryId1 = groupId1, categoryId2 = groupId2 } }`. (The `categoryIdsGroupedBySequence` table produced by `Inventory:UpdateLayoutLookupTables()`).
 ---@param defaultCategoryId string|number? If no matching category is found, assign the item to this category. (When not specified, use `Categories.defaultCategoryId`).
 function Categories:Categorize(item, character, sortedSequenceNumbers, categoriesToGroups, defaultCategoryId)
 	if not item then
