@@ -4,6 +4,10 @@
 Bagshui:AddComponent(function()
 
 
+---@alias DISABLE_ADDON string
+local DISABLE_ADDON = "!!!!!DISABLE!!!!!"
+
+
 --- Execute compatibility checks that will help avoid issues or unexpected behaviors.
 function Bagshui:CheckCompat()
 
@@ -49,6 +53,9 @@ function Bagshui:CheckCompat()
 		"hookBag0"
 	)
 
+	-- Swapper interferes with Bagshui's bag swapping implementation.
+	self:CheckOtherAddonSetting("Swapper", DISABLE_ADDON, nil, nil, nil, nil, true)
+
 end
 
 
@@ -60,7 +67,11 @@ local addonPromptData = {
 	--- @param data any
 	disableFunc = function(data)
 		-- Change the addon setting.
-		data.addonSettingTable[data.addonSettingKey] = data.settingDisabledValue
+		if data.disable then
+			_G.DisableAddOn(data.bagshuiCompatSettingId)
+		else
+			data.addonSettingTable[data.addonSettingKey] = data.settingDisabledValue
+		end
 
 		local dialogName = "BAGSHUI_COMPAT_RELOAD_UI"
 
@@ -70,8 +81,7 @@ local addonPromptData = {
 				button1 = L.Reload,
 				button2 = L.NotNow,
 				timeout = 0,
-				whileDead = 1,
-				hideOnEscape = 0,
+				whileDead = true,
 				OnAccept = function()
 					_G.ReloadUI()
 				end,
@@ -85,9 +95,22 @@ local addonPromptData = {
 	--- Show dialog with instructions for managing the offending setting.
 	---@param data any
 	ignoreFunc = function(data)
+		-- Shouldn't be able to reach this if Ignore button is hidden, but just in case...
+		if data.noIgnore then
+			Bagshui:CheckOtherAddonSetting(
+				data.bagshuiCompatSettingId,
+				data.addonInstalledCondition,
+				data.addonSettingTable,
+				data.addonSettingKey,
+				data.settingDisabledValue,
+				data.bagshuiSettingToCheck,
+				data.noIgnore
+			)
+		end
+
 		-- Record the choice to ignore.
 		BsSettings[data.ignoreSetting] = true
-		
+
 		local dialogName = "BAGSHUI_COMPAT_INFO"
 
 		if not _G.StaticPopupDialogs[dialogName] then
@@ -95,8 +118,7 @@ local addonPromptData = {
 				text = "",
 				button1 = _G.OKAY,
 				timeout = 10,
-				whileDead = 1,
-				hideOnEscape = 0,
+				whileDead = true,
 			}
 		end
 
@@ -119,19 +141,24 @@ local addonPromptData = {
 --- Localization:
 --- - `Compat_<bagshuiCompatSettingId>`
 --- - `Compat_<bagshuiCompatSettingId>Info`
+--- 
+--- Building addon disabling into this was an afterthought so it's kind of a hack.
+--- To use that, pass the addon name as the first parameter and `DISABLE_ADDON` as the second.
 ---@param bagshuiCompatSettingId string Used for the compat settings and localization (see function description).
----@param addonInstalledCondition boolean Must be `true` for the check to proceed.
----@param addonSettingTable table Storage for the other addon's setting.
----@param addonSettingKey any Key within `addonSettingTable` where the offending setting is found.
----@param settingDisabledValue any Value for `addonSettingKey` that indicates the setting is in a **good** state.
----@param bagshuiSettingToCheck string Bagshui setting that must be enabled for the check to proceed. **Must be a character or account-scoped setting!**
+---@param addonInstalledCondition boolean|DISABLE_ADDON Must be `true` for the check to proceed.
+---@param addonSettingTable table? Storage for the other addon's setting.
+---@param addonSettingKey any? Key within `addonSettingTable` where the offending setting is found.
+---@param settingDisabledValue any? Value for `addonSettingKey` that indicates the setting is in a **good** state.
+---@param bagshuiSettingToCheck string? Bagshui setting that must be enabled for the check to proceed. **Must be a character or account-scoped setting!**
+---@param noIgnore boolean? Hide the Ignore button in the compatibility prompt.
 function Bagshui:CheckOtherAddonSetting(
 	bagshuiCompatSettingId,
 	addonInstalledCondition,
 	addonSettingTable,
 	addonSettingKey,
 	settingDisabledValue,
-	bagshuiSettingToCheck
+	bagshuiSettingToCheck,
+	noIgnore
 )
 
 	-- Can't proceed if addon isn't installed or Bagshui setting is disabled.
@@ -146,14 +173,25 @@ function Bagshui:CheckOtherAddonSetting(
 	local ignored = "compat_" .. bagshuiCompatSettingId .. "Ignored"
 
 	-- Reset compatibility warning when addon setting is changed.
-	if BsSettings[lastSetting] ~= addonSettingTable[addonSettingKey] then
+	if
+		type(addonSettingTable) == "table"
+		and BsSettings[lastSetting] ~= addonSettingTable[addonSettingKey]
+	then
 		BsSettings[ignored] = false
 	end
 
 	-- Check actual setting.
 	if
-		addonSettingTable[addonSettingKey] ~= settingDisabledValue
-		and not BsSettings[ignored]
+		(
+			addonInstalledCondition == DISABLE_ADDON
+			and _G.IsAddOnLoaded(bagshuiCompatSettingId)
+		)
+		or (
+			addonInstalledCondition ~= DISABLE_ADDON
+			and type(addonSettingTable) == "table"
+			and addonSettingTable[addonSettingKey] ~= settingDisabledValue
+			and not BsSettings[ignored]
+		)
 	then
 
 		local dialogName = "BAGSHUI_COMPAT_DISABLE"
@@ -164,8 +202,7 @@ function Bagshui:CheckOtherAddonSetting(
 				button1 = L.Disable,
 				button2 = L.Ignore,
 				timeout = 0,
-				whileDead = 1,
-				hideOnEscape = 0,
+				whileDead = true,
 				cancels = dialogName,
 
 				--- Disable was clicked, so do it.
@@ -187,6 +224,7 @@ function Bagshui:CheckOtherAddonSetting(
 
 		end
 
+		_G.StaticPopupDialogs[dialogName].button2 = (not noIgnore) and L.Ignore or nil
 		_G.StaticPopupDialogs[dialogName].text = BS_FONT_COLOR.BAGSHUI .. "Bagshui" .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE .. L["Compat_" .. bagshuiCompatSettingId]
 
 		self:CloseMenus()
@@ -194,20 +232,25 @@ function Bagshui:CheckOtherAddonSetting(
 		local dialog = _G.StaticPopup_Show(dialogName)
 
 		if dialog then
+			addonPromptData.disable = (addonInstalledCondition == DISABLE_ADDON)
+			addonPromptData.bagshuiCompatSettingId = bagshuiCompatSettingId
+			addonPromptData.addonInstalledCondition = addonInstalledCondition
 			addonPromptData.addonSettingTable = addonSettingTable
 			addonPromptData.addonSettingKey = addonSettingKey
 			addonPromptData.settingDisabledValue = settingDisabledValue
+			addonPromptData.bagshuiSettingToCheck = bagshuiSettingToCheck
+			addonPromptData.noIgnore = noIgnore
 			addonPromptData.ignoreSetting = ignored
 			addonPromptData.infoMessage = L["Compat_" .. bagshuiCompatSettingId .. "Info"]
 			dialog.data = addonPromptData
 		end
 
-		Bs:PrintDebug("setting is enabled and needs to be disabled")
-
 	end
 
 	-- Record last setting value so we know when to reset our warning.
-	BsSettings[lastSetting] = addonSettingTable[addonSettingKey]
+	if type(addonSettingTable) == "table" then
+		BsSettings[lastSetting] = addonSettingTable[addonSettingKey] or nil
+	end
 
 end
 

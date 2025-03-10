@@ -333,6 +333,15 @@ function Bagshui:UIDropDownMenu_AddButton(wowApiFunctionName, menuItem, level)
 		if menuItem._bagshuiHideArrow then
 			expandArrow:Hide()
 		end
+
+		-- Disable when menu item is disabled. WHY IS THIS NOT THE DEFAULT.
+		if menuItem.disabled then
+			expandArrow:Disable()
+			expandArrow:SetAlpha(0.5)
+		else
+			expandArrow:Enable()
+			expandArrow:SetAlpha(1)
+		end
 	end
 
 
