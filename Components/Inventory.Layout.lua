@@ -5,6 +5,12 @@
 Bagshui:AddComponent(function()
 local Inventory = Bagshui.prototypes.Inventory
 
+-- When deciding whether there are differences between a dry run and current state,
+-- some tables need to be compared deeper than the default of 1 level. Set those here.
+local LAYOUT_LOOKUP_TABLE_COMPARE_DEPTH = {
+	categoryIdsGroupedBySequence = 2,
+	groupItems = 2,
+}
 
 -- Reusable variable for use in `Inventory:Update()`.
 local update_cascadeInventory
@@ -53,7 +59,10 @@ function Inventory:Update(cascade)
 
 	-- Perform all updates in the necessary order.
 	self:ValidateLayout()
+	self:ManageDryRun(true)  -- First call decides whether we're in dry run mode (`self.dryRun`).
+	self:UpdateLayoutLookupTables()
 	self:CategorizeAndSort()
+	self:ManageDryRun(false)  -- Second call re-points lookup tables if needed and sets `self.enableResortIcon`.
 	self:FindSpecialItems()
 	self:UpdateWindow()
 	self:UpdateBagBar()
@@ -126,6 +135,83 @@ end
 
 
 
+--- Control whether the current layout update is a dry run or not.
+--- **Should not be called directly!** Use `Inventory:Update()` to coordinate the process.
+--- 
+--- Doing a dry run means storing information in the `proposedLayoutState` tables
+--- instead of `currentLayoutState`. The proposed state can then be compared
+--- to current to decide whether resorting is needed.
+--- 
+--- This must be called twice during the `Update()` process - once prior to categorizing/sorting
+--- with a parameter of `true` and again just after with `false` (or nil) before calling `UpdateWindow()`.
+---@param phase1 boolean? Pass `true` the first time the function is called.
+function Inventory:ManageDryRun(phase1)
+	if phase1 then
+		-- Determine whether this is real or if we're just simulating to decide whether there are changes.
+		self.dryRun = false
+		-- Ensure items don't shift around when the window is open under normal usage.
+		-- self.forceResort can be used to override (usually when the user clicks the Resort button).
+		if
+			(
+				not self.resortNeeded
+				or self:Visible()
+			)
+			and not self.forceResort
+		then
+			self.dryRun = true
+			self:PrintDebug("++++DRY RUN ON++++")
+		else
+			self:PrintDebug("----dry run off----")
+		end
+
+		-- Reset force resort flag.
+		self.forceResort = false
+
+		-- Point layout state tracking keys to the correct tables.
+		for key, _ in pairs(self.currentLayoutState) do
+			self[key] = self[self.dryRun and "proposedLayoutState" or "currentLayoutState"][key]
+		end
+
+	else
+		-- Resetting tables to current if needed.
+		-- Decide whether the resort icon needs to be enabled.
+		self.enableResortIcon = false
+		-- Special stuff for dry run mode:
+		-- - Manage the resort icon.
+		-- - Re-point layout state tables.
+		if
+			self.dryRun
+			-- Safety check to ensure pointers are always reset.
+			or self.groups ~= self.currentLayoutState.groups
+		then
+			-- We can immediately know to enable resorting if any empty slot is peeled off its stack.
+			self.enableResortIcon = (self.emptySlotStackingAllowed and self.hasSlotsWithStackingPrevented)
+
+			for key, _ in pairs(self.currentLayoutState) do
+				if
+					self.dryRun
+					and not self.enableResortIcon  -- No need to keep checking once we've hit true.
+					and not BsUtil.ObjectsEqual(
+						self.proposedLayoutState[key],
+						self.currentLayoutState[key],
+						nil, nil,
+						LAYOUT_LOOKUP_TABLE_COMPARE_DEPTH[key] or 1
+					)
+				then
+					self.enableResortIcon = true
+				end
+
+				-- Always swap back to the "current" layout state for UpdateWindow() instead
+				-- of the dry run one so that nothing moves around undesirably.
+				self[key] = self.currentLayoutState[key]
+			end
+		end
+	end
+	
+end
+
+
+
 --- Assign inventory items to Bagshui categories and sort into the correct order for display.  
 --- **Should not be called directly!** Use `Inventory:Update()` to coordinate the process.
 ---
@@ -136,53 +222,8 @@ end
 function Inventory:CategorizeAndSort()
 	--self:PrintDebug("CategorizeAndSort()")
 
-	-- sortingAllowed tracks whether items can be moved between groups and sorted within groups.
-	-- Defaults to true but is turned off when the inventory window is open and the user hasn't
-	-- explicitly requested a resort.
-	self.sortingAllowed = true
-
-	-- Ensure items don't shift around when the window is open under normal usage.
-	-- self.forceResort can be used to override (usually when the user clicks the Resort button).
-	if
-		(
-			not self.resortNeeded
-			or self:Visible()
-		)
-		and not self.forceResort
-	then
-		-- self:PrintDebug("CategorizeAndSort() - sorting not allowed")
-		-- There was a change that would have triggered a resort, but it wasn't allowed, so enable the toolbar icon.
-		if self.resortNeeded then
-			self.enableResortIcon = true
-		end
-		-- Don't allow anything to move around; just update categorization.
-		self.sortingAllowed = false
-	end
-
-	-- self:PrintDebug("---------- CategorizeAndSort() PROCEEDING --------------")
-	-- self:PrintDebug("forceResort: " .. tostring(self.forceResort))
-	-- self:PrintDebug("visible: " .. tostring(self:Visible()))
-	-- self:PrintDebug("sortingAllowed: " .. tostring(self.sortingAllowed))
-
-	-- Reset force resort flag.
-	self.forceResort = false
-
-	-- Only refresh lookup tables when sorting can be performed.
-	if self.sortingAllowed then
-		self:UpdateLayoutLookupTables()
-
-		-- We're taking care of getting everything moved to the correct places now,
-		-- so the resort icon can be disabled.
-		self.enableResortIcon = false
-	end
-
 	-- Categorize items and assign to groups.
 	self:CategorizeItems()
-
-	-- Nothing more to do when items can't be moved.
-	if not self.sortingAllowed then
-		return
-	end
 
 	-- Sort items within groups.
 	self:SortGroups()
@@ -217,9 +258,6 @@ end
 --- - `categoriesToGroups` is exactly what it sounds like - the mapping of category IDs to group IDs (which are simply row:position)
 --- and is used by `CategorizeAndSort()` when filling the groupItems table.
 function Inventory:UpdateLayoutLookupTables()
-	if not self.sortingAllowed then
-		return
-	end
 	--self:PrintDebug("UpdateLayoutLookupTables()")
 	-- self:PrintDebug(BsCategories.list)
 
@@ -228,13 +266,12 @@ function Inventory:UpdateLayoutLookupTables()
 	local defaultCategoryFound = false
 
 	-- Wipe all the lookup tables managed by this function.
-	BsUtil.TableClear(self.groups)
-	BsUtil.TableClear(self.activeGroups)
-	BsUtil.TableClear(self.groupsIdsToFrames)
 	BsUtil.TableClear(self.activeCategoryIds)
-	BsUtil.TableClear(self.categorySequenceNumbers)
-	BsUtil.TableClear(self.sortedCategorySequenceNumbers)
+	BsUtil.TableClear(self.activeGroups)
 	BsUtil.TableClear(self.categoriesToGroups)
+	BsUtil.TableClear(self.categorySequenceNumbers)
+	BsUtil.TableClear(self.groups)
+	BsUtil.TableClear(self.sortedCategorySequenceNumbers)
 	-- Don't remove unused sequence number tables - no need to upset the garbage collector.
 	-- (This could be slightly more efficient with something like Compost, but it's not a huge deal.)
 	for _, categoryIds in pairs(self.categoryIdsGroupedBySequence) do
@@ -330,17 +367,15 @@ function Inventory:CategorizeItems()
 
 	-- groupItems stores the list of items that belongs to each group.
 	-- Start clean each time we categorize and sort.
-	-- This can only occur when items are allowed to be moved around!
-	if self.sortingAllowed then
-		-- groupItems is a table of tables, so only wipe the 2nd level tables to keep the garbage collector happy.
-		for groupId, _ in pairs(self.groupItems) do
-			BsUtil.TableClear(self.groupItems[groupId])
-		end
-		-- Using groups instead of activeGroups here just to ensure every possibility is initialized.
-		for groupId, _ in pairs(self.groups) do
-			if not self.groupItems[groupId] then
-				self.groupItems[groupId] = {}
-			end
+
+	-- groupItems is a table of tables, so only wipe the 2nd level tables to keep the garbage collector happy.
+	for groupId, _ in pairs(self.groupItems) do
+		BsUtil.TableClear(self.groupItems[groupId])
+	end
+	-- Using groups instead of activeGroups here just to ensure every possibility is initialized.
+	for groupId, _ in pairs(self.groups) do
+		if not self.groupItems[groupId] then
+			self.groupItems[groupId] = {}
 		end
 	end
 
@@ -367,33 +402,30 @@ function Inventory:CategorizeItems()
 						self.categoryIdsGroupedBySequence
 					)
 
-					-- Nothing more to do if we can't sort.
-					if self.sortingAllowed then
-						-- Fall back to the default group if one wasn't assigned.
-						groupId = self.inventory[bagNum][slotNum].bagshuiGroupId
-						if string.len(tostring(groupId or "")) == 0 then
-							groupId = defaultGroupId
-						end
-
-						-- Empty slots are now allowed to stack since they've been through the categorizing process.
-						-- (When an empty slot is first seen during a cache update, it gets the _bagshuiPreventEmptySlotStack
-						-- property set so that empty slots don't just "disappear" into a stack when the window is open
-						-- and the user moves an item out of a slot.)
-						if self.inventory[bagNum][slotNum].emptySlot == 1 then
-							self.inventory[bagNum][slotNum]._bagshuiPreventEmptySlotStack = nil
-						end
-
-						-- Final safety check to ensure we don't somehow try to assign to a group that doesn't exist.
-						if not self.groupItems[groupId] then
-							groupId = defaultGroupId
-						end
-
-						-- Add to group positions lookup table.
-						table.insert(
-							self.groupItems[groupId],
-							self.inventory[bagNum][slotNum]
-						)
+					-- Fall back to the default group if one wasn't assigned.
+					groupId = self.inventory[bagNum][slotNum].bagshuiGroupId
+					if string.len(tostring(groupId or "")) == 0 then
+						groupId = defaultGroupId
 					end
+
+					-- Empty slots are now allowed to stack since they've been through the categorizing process.
+					-- (When an empty slot is first seen during a cache update, it gets the _bagshuiPreventEmptySlotStack
+					-- property set so that empty slots don't just "disappear" into a stack when the window is open
+					-- and the user moves an item out of a slot.)
+					if not self.dryRun and self.inventory[bagNum][slotNum].emptySlot == 1 then
+						self.inventory[bagNum][slotNum]._bagshuiPreventEmptySlotStack = nil
+					end
+
+					-- Final safety check to ensure we don't somehow try to assign to a group that doesn't exist.
+					if not self.groupItems[groupId] then
+						groupId = defaultGroupId
+					end
+
+					-- Add to group positions lookup table.
+					table.insert(
+						self.groupItems[groupId],
+						self.inventory[bagNum][slotNum]
+					)
 
 				end -- bagNumSlots loop
 
@@ -494,6 +526,8 @@ function Inventory:UpdateWindow()
 
 	-- Only do the intensive work of redrawing the UI if we have to.
 	if self.windowUpdateNeeded then
+
+		BsUtil.TableClear(self.groupsIdsToFrames)
 
 		local uiFrames = self.ui.frames
 		local groupFrames = uiFrames.groups
@@ -637,7 +671,7 @@ function Inventory:UpdateWindow()
 
 		-- Reset tracking tables.
 		BsUtil.TableClear(self.groupItemCounts)  -- How many items are in each group.
-		BsUtil.TableClear(self.groupWidthsInItems)  -- Group width in items (actual count EXCEPT in Edit Mode, where 0 becomes 1 to force the group to be visible when empty)
+		BsUtil.TableClear(self.groupWidthsInItems)  -- Group width in items (actual count EXCEPT in Edit Mode, where 0 becomes 1 to force the group to be visible when empty).
 		BsUtil.TableClear(self.actualGroupWidths)  -- Group width in screen units.
 
 		-- Groups are placed starting at the bottom of the main frame and working upwards.
@@ -1147,7 +1181,6 @@ function Inventory:UpdateWindow()
 			-- WoW will change the anchor point to TOPLEFT when the frame is dragged, so we need to reset it.
 			self:FixWindowPosition()
 		end
-
 	end
 
 	-- Check for mouse over state for interact-able elements to ensure tooltips stay current.

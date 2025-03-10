@@ -347,25 +347,30 @@ function Inventory:New(newPropsOrInventoryType)
 		postUpdateItemCounts = {},
 		lastUpdateLockedContainers = {},
 
-		-- Category/group-related lookup tables -- See CategorizeAndSort() for descriptions of most of these.
-		activeCategoryIds = {},
-		categoryIdsGroupedBySequence = {},
-		activeGroups = {},
-		categorySequenceNumbers = {},
-		sortedCategorySequenceNumbers = {},
-		categoriesToGroups = {},
+		-- Category/group-related lookup tables -- See `UpdateLayoutLookupTables()` for descriptions of most of these.
+		-- This is stored in the `currentLayoutState` table because there is a parallel `proposedLayoutState`
+		-- table used for dry-run calculations (automatically created during `Init()`).
+		currentLayoutState = {
+			activeCategoryIds = {},
+			activeGroups = {},
+			categoriesToGroups = {},
+			categoryIdsGroupedBySequence = {},
+			categorySequenceNumbers = {},
+			groupItems = {},
+			groups = {},
+			sortedCategorySequenceNumbers = {},
+		},
 
 		-- Tracking tables and state variables for UpdateWindow() and friends.
 		-- Detailed descriptions typically can be found where each is first referenced.
-		groups = {},
-		groupItems = {},
-		groupItemCounts = {},
-		groupWidthsInItems = {},
-		groupsIdsToFrames = {},
 		actualGroupWidths = {},
 		emptySlotStacks = {},  -- Fake item entries used to create empty slot stacks in the UI
+		groupItemCounts = {},
+		groupsIdsToFrames = {},
+		groupWidthsInItems = {},
 		expandEmptySlotStacks = false,
 		lastExpandEmptySlotStacks = false,
+		hasSlotsWithStackingPrevented = false,  -- Whether any item in the cache has the `_bagshuiPreventEmptySlotStack` property set to `true` (managed by `UpdateCache()`).
 		highlightItemsInContainerId = nil,
 		highlightItemsInContainerLocked = false,
 		highlightItemsContainerSlot = nil,
@@ -584,6 +589,13 @@ function Inventory:Init()
 	-- Activate profiles.
 	for _, profileType in pairs(BS_PROFILE_TYPE) do
 		self:SetProfile(self.settings["profile" .. profileType], profileType, true)
+	end
+
+	-- Prepare dry-run lookup tables and set initial lookup table pointers.
+	self.proposedLayoutState = {}
+	for key, _ in pairs(self.currentLayoutState) do
+		self.proposedLayoutState[key] = {}
+		self[key] = self.currentLayoutState[key]
 	end
 
 	-- Initialize settings.
