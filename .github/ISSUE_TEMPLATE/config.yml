@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💡 Feature request
-    url: https://github.com/veechs/Bagshui/discussions/categories/ideas
+    url: https://github.com/veechs/Bagshui/discussions/categories/ideas?discussions_q=
     about: Suggest an idea
+  - name: 📕 Documentation
+    url: https://github.com/veechs/Bagshui/wiki
+    about: FAQ, walkthroghs, and more
+  - name: ❓ Help
+    url: https://github.com/veechs/Bagshui/discussions/categories/q-a?discussions_q=
+    about: Ask a question
