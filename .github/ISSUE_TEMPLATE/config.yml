@@ -1,4 +1,4 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
   - name: Feature request
     url: https://github.com/veechs/Bagshui/discussions/categories/ideas
