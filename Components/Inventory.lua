@@ -370,6 +370,7 @@ function Inventory:New(newPropsOrInventoryType)
 		groupWidthsInItems = {},
 		expandEmptySlotStacks = false,
 		lastExpandEmptySlotStacks = false,
+		hasSlotsWithStackingPrevented = false,  -- Whether any item in the cache has the `_bagshuiPreventEmptySlotStack` property set to `true` (managed by `UpdateCache()`).
 		highlightItemsInContainerId = nil,
 		highlightItemsInContainerLocked = false,
 		highlightItemsContainerSlot = nil,

@@ -59,10 +59,10 @@ function Inventory:Update(cascade)
 
 	-- Perform all updates in the necessary order.
 	self:ValidateLayout()
-	self:ManageDryRun()  -- First call decides whether we're in dry run mode.
+	self:ManageDryRun(true)  -- First call decides whether we're in dry run mode (`self.dryRun`).
 	self:UpdateLayoutLookupTables()
 	self:CategorizeAndSort()
-	self:ManageDryRun()  -- Second call re-points lookup tables if needed and sets `enableResortIcon`.
+	self:ManageDryRun(false)  -- Second call re-points lookup tables if needed and sets `self.enableResortIcon`.
 	self:FindSpecialItems()
 	self:UpdateWindow()
 	self:UpdateBagBar()
@@ -142,10 +142,11 @@ end
 --- instead of `currentLayoutState`. The proposed state can then be compared
 --- to current to decide whether resorting is needed.
 --- 
---- This must be called twice during the `Update()` process - once at the beginning
---- and then again before calling `UpdateWindow()`.
-function Inventory:ManageDryRun()
-	if not self.dryRunNeedsReset then
+--- This must be called twice during the `Update()` process - once prior to categorizing/sorting
+--- with a parameter of `true` and again just after with `false` (or nil) before calling `UpdateWindow()`.
+---@param phase1 boolean? Pass `true` the first time the function is called.
+function Inventory:ManageDryRun(phase1)
+	if phase1 then
 		-- Determine whether this is real or if we're just simulating to decide whether there are changes.
 		self.dryRun = false
 		-- Ensure items don't shift around when the window is open under normal usage.
@@ -171,8 +172,6 @@ function Inventory:ManageDryRun()
 			self[key] = self[self.dryRun and "proposedLayoutState" or "currentLayoutState"][key]
 		end
 
-		self.dryRunNeedsReset = true
-
 	else
 		-- Resetting tables to current if needed.
 		-- Decide whether the resort icon needs to be enabled.
@@ -185,6 +184,9 @@ function Inventory:ManageDryRun()
 			-- Safety check to ensure pointers are always reset.
 			or self.groups ~= self.currentLayoutState.groups
 		then
+			-- We can immediately know to enable resorting if any empty slot is peeled off its stack.
+			self.enableResortIcon = (self.emptySlotStackingAllowed and self.hasSlotsWithStackingPrevented)
+
 			for key, _ in pairs(self.currentLayoutState) do
 				if
 					self.dryRun
@@ -204,8 +206,6 @@ function Inventory:ManageDryRun()
 				self[key] = self.currentLayoutState[key]
 			end
 		end
-
-		self.dryRunNeedsReset = false
 	end
 	
 end
@@ -412,7 +412,7 @@ function Inventory:CategorizeItems()
 					-- (When an empty slot is first seen during a cache update, it gets the _bagshuiPreventEmptySlotStack
 					-- property set so that empty slots don't just "disappear" into a stack when the window is open
 					-- and the user moves an item out of a slot.)
-					if self.inventory[bagNum][slotNum].emptySlot == 1 then
+					if not self.dryRun and self.inventory[bagNum][slotNum].emptySlot == 1 then
 						self.inventory[bagNum][slotNum]._bagshuiPreventEmptySlotStack = nil
 					end
 

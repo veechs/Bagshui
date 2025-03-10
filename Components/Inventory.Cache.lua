@@ -64,6 +64,10 @@ function Inventory:UpdateCache()
 	-- Used to determine whether change highlighting should be enabled.
 	self.hasChanges = false
 
+	-- Whether any item in the cache has the `_bagshuiPreventEmptySlotStack` property set to `true`
+	-- Used by `ManageDryRun()` as a factor to determine whether `enableResortIcon` should be true.
+	self.hasSlotsWithStackingPrevented = false
+
 	-- Bag (outer loop) variables.
 	local bagName, bagNumSlots, bagTexture, bagType, bagSlotLink, bagItemCode, bagInfo
 
@@ -535,6 +539,11 @@ function Inventory:UpdateCache()
 			-- Update tracking of whether there are highlight-able items.
 			if item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE then
 				self.hasChanges = true
+			end
+
+			-- Update tracking of empty slots peeled off the stack.
+			if item._bagshuiPreventEmptySlotStack then
+				self.hasSlotsWithStackingPrevented = true
 			end
 		end
 	end
