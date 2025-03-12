@@ -5,13 +5,19 @@ labels: ["miscategorized item"]
 body:
   - type: input
     attributes:
+      label: Item ID
+      description: "Hold **Ctrl+Alt** and hover over the item. Make note of the **ID** and enter it here."
+    validations:
+      required: true
+  - type: input
+    attributes:
       label: Item name
     validations:
       required: true
   - type: input
     attributes:
-      label: Item ID
-      description: "Hold **Ctrl+Alt** and hover over the item. Make note of the **ID** and enter it here."
+      label: Locale (Language)
+      description: "`enUS`, `zhCN`, etc.<br>To find your locale, use this chat command in-game: <code>/run DEFAULT_CHAT_FRAME:AddMessage(GetLocale())</code><br>*Some categorizations are locale-dependent and the localization may need updating.*"
     validations:
       required: true
   - type: input
