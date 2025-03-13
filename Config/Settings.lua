@@ -776,6 +776,32 @@ Bagshui.config.Settings = {
 				},
 
 				{
+					menuTitle = L.EmptySlots,
+				},
+				{
+					name = "emptySlotBackgroundImage",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOLEAN,
+					defaultValue = true,
+					inventoryWindowUpdateOnChange = true,
+				},
+				{
+					name = "emptySlotBackgroundColor",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.COLOR,
+					hasOpacity = true,
+					defaultValue = { 0.090, 0.085, 0.090, 0.95 },
+					disableFunc = function(settingName, settings)
+						-- Disable colors when background is enabled.
+						return settings.emptySlotBackgroundImage
+					end,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+
+				{
 					menuTitle = L.Menu_Settings_Toolbar,
 				},
 				{

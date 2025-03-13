@@ -1146,6 +1146,14 @@ BsLocalization:AddLocale("enUS", {
 ["itemQualityBadges_TooltipTitle"] = "Item Quality Badges",
 ["itemQualityBadges_TooltipText"] = "Show icons in the bottom left for item rarity levels.",
 
+["emptySlotBackgroundImage"] = "Image",
+["emptySlotBackgroundImage_TooltipTitle"] = "Empty Slot Background Image",
+["emptySlotBackgroundImage_TooltipText"] = "Disable to use a solid background for empty item slots.",
+
+["emptySlotBackgroundColor"] = "Color",
+["emptySlotBackgroundColor_TooltipTitle"] = "Empty Slot Background Color",
+["emptySlotBackgroundColor_TooltipText"] = "Color to display in the background of empty slots.",
+
 ["itemUsableBadges"] = "Unusable",
 ["itemUsableBadges_TooltipTitle"] = "Item Unusable Badges",
 ["itemUsableBadges_TooltipText"] = "Show icons in the top left for unusable/learned items.",

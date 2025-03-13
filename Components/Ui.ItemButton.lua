@@ -453,6 +453,7 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 	buttonInfo.iconTextureColorG = BS_COLOR.ITEM_SLOT_STATE_NORMAL[2]
 	buttonInfo.iconTextureColorB = BS_COLOR.ITEM_SLOT_STATE_NORMAL[3]
 	buttonInfo.iconTextureAlpha = BS_COLOR.ITEM_SLOT_STATE_NORMAL[4]
+	buttonInfo.backgroundTextureAlpha = 1
 
 	-- Figure out border color.
 	-- It's typically the quality color, but can be forced to something else.
@@ -610,11 +611,26 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 
 	if item.emptySlot == 1 then
 		-- Empty slot: Show appropriate texture on the background layer.
-		local emptySlotTexture = BS_INVENTORY_EMPTY_SLOT_TEXTURE[L.Bag]
-		if inventory then
-			emptySlotTexture = inventory:GetEmptySlotTexture(item)
+		if
+			inventory
+			and inventory.settings
+			and not inventory.settings.emptySlotBackgroundImage
+		then
+			buttonComponents.background:SetTexture("Interface\\BUTTONS\\WHITE8X8")
+			buttonComponents.background:SetVertexColor(
+				inventory.settings.emptySlotBackgroundColor[1],
+				inventory.settings.emptySlotBackgroundColor[2],
+				inventory.settings.emptySlotBackgroundColor[3]
+			)
+			buttonInfo.backgroundTextureAlpha = inventory.settings.emptySlotBackgroundColor[4]
+		else
+			local emptySlotTexture = BS_INVENTORY_EMPTY_SLOT_TEXTURE[L.Bag]
+			if inventory then
+				emptySlotTexture = inventory:GetEmptySlotTexture(item)
+			end
+			buttonComponents.background:SetTexture(BsUtil.GetFullTexturePath(emptySlotTexture))
+			buttonComponents.background:SetVertexColor(1, 1, 1, 1)
 		end
-		buttonComponents.background:SetTexture(BsUtil.GetFullTexturePath(emptySlotTexture))
 
 	else
 		-- Filled slot: Remove background.
@@ -672,7 +688,6 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 	local iconTextureColorG = buttonInfo.iconTextureColorG or BS_COLOR.ITEM_SLOT_STATE_NORMAL[2]
 	local iconTextureColorB = buttonInfo.iconTextureColorB or BS_COLOR.ITEM_SLOT_STATE_NORMAL[3]
 	local iconTextureAlpha = buttonInfo.iconTextureAlpha or BS_COLOR.ITEM_SLOT_STATE_NORMAL[4]
-
 
 	-- Determine whether this slot needs to be highlighted because its container is highlighted.
 	local containerHighlight = (
@@ -919,7 +934,7 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 	end
 
 	-- Background opacity for search miss (only really matters for empty slots).
-	buttonComponents.background:SetAlpha((not containerHighlight) and opacityOverride or 1)
+	buttonComponents.background:SetAlpha((not containerHighlight) and opacityOverride or (buttonInfo.backgroundTextureAlpha or 1))
 
 end
 
