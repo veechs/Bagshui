@@ -1,5 +1,6 @@
 -- Bagshui WoW Game Information Loader
 -- Exposes: BsGameInfo (and Bagshui.components.GameInfo)
+-- Raises: BAGSHUI_GAME_UPDATE
 
 Bagshui:AddComponent(function()
 
@@ -91,6 +92,17 @@ local GameInfo = {
 	lowercaseToNormalCaseReverseTranslatedCharacterClasses = {},
 	lowercaseLocalizedCharacterClasses = {},
 	lowercaseToNormalCaseLocalizedCharacterClasses = {},
+
+	-- Game state tracking.
+	currentZone = "",
+	currentRealZone = "",
+	currentSubZone = "",
+	currentMinimapZone = "",
+	playerGroupType = BS_GAME_PLAYER_GROUP_TYPE.SOLO,
+	isInInstance = nil,  -- Game returns 1/nil so we're just going with it here.
+	instanceType = "none",
+	lootMethod = "freeforall",
+	masterLooterPartyId = nil,
 }
 Bagshui.environment.BsGameInfo = GameInfo
 Bagshui.components.GameInfo = GameInfo
@@ -260,16 +272,191 @@ end
 
 
 
+--- Storage helper for `GameInfo:UpdateLocation()`.
+--- Returns nil if the string is empty.
+---@param str any
+---@return any
+local function nilForEmptyString(str)
+	return string.len(str or "") > 0 and str or nil
+end
+
+
+
+-- Tracking variables used to determine whether UpdateLocation() should raise BAGSHUI_GAME_UPDATE.
+
+local oldZone, oldRealZone, oldSubZone, oldMinimapZone, oldInInstance, oldInstanceType
+
+--- Store current location data.
+function GameInfo:UpdateLocation()
+	oldZone = self.currentZone
+	oldRealZone = self.currentRealZone
+	oldSubZone = self.currentSubZone
+	oldMinimapZone = self.currentMinimapZone
+	oldInInstance = self.isInInstance
+	oldInstanceType = self.instanceType
+
+	self.currentZone = nilForEmptyString(_G.GetZoneText())
+	self.currentRealZone = nilForEmptyString(_G.GetRealZoneText())
+	self.currentSubZone = nilForEmptyString(_G.GetSubZoneText())
+	self.currentMinimapZone = nilForEmptyString(_G.GetMinimapZoneText())
+	self.isInInstance, self.instanceType = _G.IsInInstance()
+
+	if
+		oldZone ~= self.currentZone
+		or oldRealZone ~= self.currentRealZone
+		or oldSubZone ~= self.currentSubZone
+		or oldMinimapZone ~= self.currentMinimapZone
+		or oldInInstance ~= self.isInInstance
+		or oldInstanceType ~= self.instanceType
+	then
+		Bagshui:RaiseEvent("BAGSHUI_GAME_UPDATE")
+	end
+end
+
+
+
+-- Tracking variables used to determine whether UpdateLocation() should raise BAGSHUI_GAME_UPDATE.
+
+local oldPlayerGroupType, oldLootMethod, oldMasterLooter
+
+-- Reusable variable for `GetLootMethod()` return value.
+local masterLooterPartyId
+
+--- Store current group (as in party/raid) data.
+function GameInfo:UpdateGroup()
+	oldPlayerGroupType = self.playerGroupType
+	oldLootMethod = self.lootMethod
+	oldMasterLooter = self.isMasterLooter
+
+	-- There's no GetGroupType() but we can infer it.=
+	self.playerGroupType = (
+		(_G.GetNumRaidMembers() or 0) > 0 and BS_GAME_PLAYER_GROUP_TYPE.RAID
+		or (_G.GetNumPartyMembers() or 0) > 0 and BS_GAME_PLAYER_GROUP_TYPE.PARTY
+		or BS_GAME_PLAYER_GROUP_TYPE.SOLO
+	)
+
+	-- Don't need the third return value from GetLootMethod() because 
+	-- the second is 0 if the current player is the master looter.
+	self.lootMethod, masterLooterPartyId = _G.GetLootMethod()
+	self.isMasterLooter = (self.lootMethod == "master" and masterLooterPartyId == 0)
+
+	if
+		oldPlayerGroupType ~= self.playerGroupType
+		or oldLootMethod ~= self.lootMethod
+		or oldMasterLooter ~= self.isMasterLooter
+	then
+		Bagshui:RaiseEvent("BAGSHUI_GAME_UPDATE")
+	end
+end
+
+
+
+--- Zone output helper for the GameInfo slash handler.
+--- Only prints both zones if they're different and non-nil.
+---@param z1 string? First zone.
+---@param z2 string? Second zone.
+local function printNonNilZones(z1, z2)
+	local mainZone = z1 or z2
+	if not mainZone then
+		return
+	end
+	Bs:PrintBare(BS_INDENT .. mainZone)
+	if mainZone == z2 or not z2 then
+		return
+	end
+	Bs:PrintBare(BS_INDENT .. z2)
+end
+
+
+
 --- Event handling.
 ---@param event string Event identifier.
 ---@param arg1 any? Argument 1 from the event.
 function GameInfo:OnEvent(event, arg1)
+	if event == "PLAYER_ENTERING_WORLD" then
+		self:UpdateLocation()
+		self:UpdateGroup()
+		return
+	end
+
+	if
+		string.find(event, "ZONE")
+	then
+		self:UpdateLocation()
+		return
+	end
+
+	if
+		string.find(event, "PARTY")
+		or string.find(event, "RAID")
+	then
+		self:UpdateGroup()
+		return
+	end
+
 	if event == "BAGSHUI_LOCALIZATION_LOADED" then
 		self:PopulatePostLocalizationInfo()
+		return
 	end
 end
 
+
+
+--- Slash command helper called from `ItemInfo`'s slash handler.
+--- This lets us have `/Bagshui Info Location` etc.
+---@param tokens table Tokenized input from slash command.
+---@return boolean handled `true` if ItemInfo shouldn't continue processing.
+function GameInfo:HandleInfoSlash(tokens)
+
+	if
+		BsUtil.MatchLocalizedOrNon(tokens[2], "location")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "instance")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "zone")
+	then
+		Bs:Print(string.format(L.Symbol_Colon, L.Location))
+
+		Bs:PrintBare(string.format(L.Symbol_Colon, L.Zone))
+		printNonNilZones(self.currentZone, self.currentSubZone)
+		Bs:PrintBare(string.format(L.Symbol_Colon, L.Subzone))
+		printNonNilZones(self.currentSubZone, self.currentMinimapZone)
+
+		Bs:PrintBare(string.format(L.Symbol_Colon, L.Instance))
+		if not self.isInInstance or self.instanceType == "none" then
+			Bs:PrintBare(BS_INDENT .. L.NoneParenthesis)
+		else
+			Bs:PrintBare(BS_INDENT .. self.instanceType)
+		end
+		return true
+
+	elseif
+		BsUtil.MatchLocalizedOrNon(tokens[2], "group")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "party")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "loot")
+		or BsUtil.MatchLocalizedOrNon(tokens[2], "raid")
+	then
+		Bs:Print(string.format(L.Symbol_Colon, _G.GROUP))
+		Bs:PrintBare(BS_INDENT .. self.playerGroupType)
+
+		Bs:PrintBare(string.format(L.Symbol_Colon, _G.LOOT))
+		Bs:PrintBare(BS_INDENT .. string.format(L.Symbol_Colon, _G.LOOT_METHOD) .. " " .. self.lootMethod)
+		Bs:PrintBare(BS_INDENT .. "IsLootMaster? " .. tostring(self.isMasterLooter))
+		return true
+	end
+end
+
+
+
 Bagshui:RegisterEvent("BAGSHUI_LOCALIZATION_LOADED", GameInfo)
+-- Location events.
+Bagshui:RegisterEvent("PLAYER_ENTERING_WORLD", GameInfo)
+Bagshui:RegisterEvent("MINIMAP_ZONE_CHANGED", GameInfo)
+Bagshui:RegisterEvent("ZONE_CHANGED", GameInfo)
+Bagshui:RegisterEvent("ZONE_CHANGED_NEW_AREA", GameInfo)
+Bagshui:RegisterEvent("ZONE_CHANGED_INDOORS", GameInfo)
+-- Group events.
+Bagshui:RegisterEvent("PARTY_LOOT_METHOD_CHANGED", GameInfo)
+Bagshui:RegisterEvent("PARTY_MEMBERS_CHANGED", GameInfo)
+Bagshui:RegisterEvent("RAID_ROSTER_UPDATE", GameInfo)
 
 
 end)

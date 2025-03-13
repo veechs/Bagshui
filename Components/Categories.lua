@@ -95,8 +95,9 @@ local Categories = Bagshui.prototypes.ObjectList:New({
 	finalizedCategoryRules = {},
 
 	-- Error tracking.
-	errors = {},  -- Errors for all categories.
-	recentErrors = {},  -- Errors only stored until `Categories:ClearErrors()` is called.
+	errors = {},  -- Category ID to error message mapping for quick retrieval.
+	errorTimestamps = {},  -- Track when errors occurred so we know whether re-testing is needed.
+	recursedCategories = {},  -- Any category that contains a MatchCategory() rule function call.
 
 	-- There's some initialization that needs to happen on `PLAYER_ENTERING_WORLD`
 	-- (see `Categories:OnEvent()`), but that event fires when zoning and we
@@ -139,6 +140,7 @@ function Categories:Init()
 	-- Register events.
 	Bagshui:RegisterEvent("PLAYER_ENTERING_WORLD", self)
 	Bagshui:RegisterEvent("BAGSHUI_CATEGORIES_CACHE_LOAD", self)
+	Bagshui:RegisterEvent("BAGSHUI_CATEGORY_UPDATE", self)
 
 	self.initialized = true
 
@@ -171,6 +173,53 @@ function Categories:OnEvent(event, arg1)
 	-- Queued event has fired, so perform the item cache load.
 	if event == "BAGSHUI_CATEGORIES_CACHE_LOAD" then
 		self:LoadListItemsIntoGameCache()
+		return
+	end
+
+	-- Re-validate categories in error state if the error was due to a MatchCategory() rule function dependency.
+	if event == "BAGSHUI_CATEGORY_UPDATE" then
+		local prevErrorMessages = self:GetErrors()
+
+		-- For all categories that have a MatchCategory() rule function other
+		-- than the one that was just saved and triggered this event:
+		-- 1. Clear their errors.
+		-- 2. Re-test.
+		-- This needs to be done in two loops because we don't track the
+		-- dependency relationships.
+		--
+		-- The `Categories.recursedCategories` table is updated  in
+		-- `Categories:FinalizeRule()` based on whether a MatchCategory() rule
+		-- function was used (could be other things in the future if needed).
+
+		-- Loop 1: Clear errors.
+		for categoryId, categoryInfo in pairs(self.list) do
+			if
+				self.recursedCategories[categoryId]
+				and categoryId ~= self.lastUpdatedCategoryId
+			then
+				self.errors[categoryId] = nil
+			end
+		end
+
+		-- Loop 2: Re-test everybody.
+		for categoryId, categoryInfo in pairs(self.list) do
+			if
+				self.recursedCategories[categoryId]
+				and categoryId ~= self.lastUpdatedCategoryId
+			then
+				self:FinalizeRule(categoryId, categoryInfo, nil, true)
+			end
+		end
+
+		-- Refresh the category list if visible.
+		if
+			self:GetErrors() ~= prevErrorMessages
+			and self.objectManager
+			and self.objectManager.uiFrame
+			and self.objectManager.uiFrame:IsVisible()
+		then
+			self.objectManager:UpdateList()
+		end
 		return
 	end
 
@@ -223,6 +272,9 @@ end
 ---@param category table New category information.
 function Categories:DoPreSaveOperations(categoryId, category)
 
+	-- Reset revalidation tracking (used in `Categories:OnEvent()` for `BAGSHUI_CATEGORY_UPDATE`).
+	self.lastUpdatedCategoryId = nil
+
 	-- Don't allow empty rules or lists
 	if category.rule and string.len(tostring(category.rule)) == 0 then
 		category.rule = nil
@@ -247,6 +299,10 @@ end
 ---@param categoryId string|number ID of the new category.
 ---@param category table New category information.
 function Categories:DoPostSaveOperations(categoryId, category)
+
+	-- Don't revalidate this category because it was just saved
+	-- (used in `Categories:OnEvent()` for `BAGSHUI_CATEGORY_UPDATE`).
+	self.lastUpdatedCategoryId = categoryId
 
 	-- Sort list entries so they look good in the editor.
 	if type(category.list) == "table" and table.getn(category.list) > 0 then
@@ -278,9 +334,6 @@ function Categories:FinalizeAllRules()
 	for categoryId, _ in pairs(self.list) do
 		self:FinalizeCategoryRules(categoryId, true)
 	end
-	-- Need to reset recent errors to avoid the error indicator from showing up
-	-- in the Inventory window regardless of errors in the current Structure.
-	self:ClearErrors()
 end
 
 
@@ -314,11 +367,30 @@ end
 ---@param categoryId string|number ID of the category.
 ---@param category table Category object.
 ---@param ruleIdSuffix string? Suffix to uniquely identify the compiled rule.
----@param recompile boolean true to force recompilation.
----@return function compiledRule
-function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
+---@param recompile boolean? true to force recompilation.
+---@param recursed boolean? This call is coming from a `MatchCategory()` rule function,
+---@return function|string compiledRule
+function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile, recursed)
 	assert(categoryId, "categoryId must be specified")
 	assert(category, "category must be specified")
+
+	-- When a rule is in the process of being edited, short-circuit and return
+	-- the edited version. Without this, MatchCategory() loops wouldn't be detected
+	-- until the category is saved.
+	if
+		self.objectManager
+		and self.objectManager.editors
+	then
+		for _, editor in ipairs(self.objectManager.editors) do
+			if
+				editor.objectId == categoryId
+				and editor.uiFrame:IsVisible()
+				and editor:IsDirty()
+			then
+				return editor.updatedObject.rule
+			end
+		end
+	end
 
 	--Bagshui:PrintDebug("FinalizeRule: "..categoryId)
 	local finalRuleId = self:BuildFinalizedRuleId(categoryId, ruleIdSuffix)
@@ -331,7 +403,7 @@ function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
 
 	-- Otherwise, proceed with compiling/recompiling the rule.
 	local finalRule = ""
-	category.ruleError = nil
+	self.errors[categoryId] = nil
 
 	-- Remove previously compiled rule if it exists.
 	-- This does mean that when a rule is changed and the recompile fails, the rule will become invalid.
@@ -343,6 +415,11 @@ function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
 		finalRule = category.rule
 	end
 
+	-- During a MatchCategory() loop, we *must* stop here or we'll overflow the call stack.
+	-- To prevent that, just immediately return the rule without trying to compile it.
+	if recursed then
+		return finalRule
+	end
 
 	-- Handling item lists in MatchCategory() instead of here to improve efficiency;
 	-- it just loops through the list looking for an ID match instead of invoking
@@ -358,15 +435,18 @@ function Categories:FinalizeRule(categoryId, category, ruleIdSuffix, recompile)
 	if string.len(finalRule) > 0 then
 
 		-- Validate before compiling and store status.
-		local valid, errorMessage = BsRules:Validate(category.rule)
+		local valid, errorMessage = BsRules:Validate(category.rule, categoryId)
 		if valid then
 			-- Compile the rule once we know it's good.
 			self.finalizedCategoryRules[finalRuleId] = BsRules:Compile(finalRule)
-			self:ClearError(categoryId)
 		else
-			category.ruleError = errorMessage
 			self:ReportError(categoryId, errorMessage)
 		end
+
+		-- Identify this as a category that needs to be re-tested every time there's
+		-- a category edit of any kind (see `Categories:OnEvent()` for `BAGSHUI_CATEGORY_UPDATE`).
+		-- [MatchCategory() sets the _matchCategory_originalCaller property on the Rules class for us.]
+		self.recursedCategories[categoryId] = categoryId == BsRules._matchCategory_originalCaller or nil
 
 	end
 
@@ -391,7 +471,7 @@ end
 ---@param item table An item from the Bagshui inventory cache (should be based on `BS_ITEM_SKELETON`).
 ---@param character table? Character information table (uses `Bagshui.currentCharacterInfo` if not provided).
 ---@param sortedSequenceNumbers number[] An array of numbers that correspond to indexes of the `categoriesToGroups` table. This is what dictates priority of category evaluation.
----@param categoriesToGroups table Table of `{ <sequence number> = { categoryId1 = groupId1, categoryId2, = groupId2 } }`. (The `categoryIdsGroupedBySequence` table produced by `Inventory:UpdateLayoutLookupTables()`).
+---@param categoriesToGroups table Table of `{ <sequence number> = { categoryId1 = groupId1, categoryId2 = groupId2 } }`. (The `categoryIdsGroupedBySequence` table produced by `Inventory:UpdateLayoutLookupTables()`).
 ---@param defaultCategoryId string|number? If no matching category is found, assign the item to this category. (When not specified, use `Categories.defaultCategoryId`).
 function Categories:Categorize(item, character, sortedSequenceNumbers, categoriesToGroups, defaultCategoryId)
 	if not item then
@@ -441,12 +521,18 @@ local category, ruleIdSuffix, finalRule, status, retVal, errorMessage
 ---@param categoryId string|number ID of the category.
 ---@param item table An item from the Bagshui inventory cache.
 ---@param character table? Character information table (uses `Bagshui.currentCharacterInfo` if not provided).
----@param ruleSession number Rule session ID from `Rules:SetItemAndCharacter()`.
+---@param ruleSession number? Rule session ID from `Rules:SetItemAndCharacter()`.
+---@param recursed boolean? This call is coming from a `MatchCategory()` rule function,
 ---@return boolean
-function Categories:MatchCategory(categoryId, item, character, ruleSession)
+function Categories:MatchCategory(categoryId, item, character, ruleSession, recursed)
 	category = self:Get(categoryId)
 	if not category then
 		return false
+	end
+
+	-- MatchCategory() rule function help: Add to call stack.
+	if BsRules._matchCategory_callStack then
+		table.insert(BsRules._matchCategory_callStack, categoryId)
 	end
 
 	-- Very fast processing for catchall category.
@@ -478,10 +564,13 @@ function Categories:MatchCategory(categoryId, item, character, ruleSession)
 		end
 	end
 
-	-- If the rule is in error status, just fail (checking this here makes sense
-	-- because item lists can't have errors).
-	if category.ruleError then
-		self:ReportError(categoryId, category.ruleError)
+	-- If the rule is in error status and hasn't been changed since the error occurred,
+	-- just fail (checking this here makes sense because item lists can't have errors)
+	if
+		self.errors[categoryId]
+		and (self.errorTimestamps[categoryId] or 0) >= category.dateModified
+	then
+		self:ReportError(categoryId, self.errors[categoryId])
 		return false
 	end
 
@@ -491,15 +580,21 @@ function Categories:MatchCategory(categoryId, item, character, ruleSession)
 	end
 
 	-- Get the compiled rule to be evaluated.
-	finalRule = self:FinalizeRule(categoryId, category, ruleIdSuffix, false)
+	finalRule = self:FinalizeRule(categoryId, category, ruleIdSuffix, false, recursed)
 
 	-- Final check to ensure there's a rule to execute.
-	if not finalRule or type(finalRule) ~= "function" then
+	if
+		not finalRule
+		or (
+			not recursed  -- Don't stop here or MatchCategory() won't work.
+			and type(finalRule) ~= "function"
+		)
+	then
 		return false
 	end
 
 	-- Do the test.
-	retVal, errorMessage = BsRules:Match(finalRule, item, character, ruleSession)
+	retVal, errorMessage = BsRules:Match(finalRule, item, character, ruleSession, nil, recursed)
 
 	if errorMessage == nil then
 		-- Successful rule evaluation, return rule function value.
@@ -521,10 +616,10 @@ local formattedMessage
 ---@param errorMessage any
 function Categories:ReportError(categoryId, errorMessage)
 	assert(categoryId, "categoryId must be specified")
-	if not self.errors[categoryId] or not self.recentErrors[categoryId] then
+	if not self.errors[categoryId] then
 		formattedMessage = self:FormatErrorMessage(errorMessage, categoryId)
 		self.errors[categoryId] = formattedMessage
-		self.recentErrors[categoryId] = formattedMessage
+		self.errorTimestamps[categoryId] = _G.time()
 		-- Don't spam chat with errors at startup.
 		if self.initialized then
 			Bagshui:PrintError(formattedMessage, L.Category)
@@ -549,46 +644,27 @@ end
 
 
 
---- Reset error tracking. Only clears `recentErrors` unless `all` is `true`.
----@param all boolean?
-function Categories:ClearErrors(all)
-	BsUtil.TableClear(self.recentErrors)
-	if all then
-		BsUtil.TableClear(self.errors)
-	end
-end
-
-
-
---- Reset all error tracking for a specific category.
----@param categoryId string|number ID of the category.
----@param all boolean?
-function Categories:ClearError(categoryId, all)
-	assert(categoryId, "categoryId must be specified")
-	self.recentErrors[categoryId] = nil
-	self.errors[categoryId] = nil
-end
-
-
-
---- Get all current errors as a single newline-separated string.
---- Returns the contents of `recentErrors` unless `all` is `true`.
----@param all boolean?
+--- Get all category errors as a single newline-separated string.
+---@param filter table<string,boolean>? Category IDs to check for errors.
 ---@return string errors
-function Categories:GetErrors(all)
-	local errorTable = all and self.errors or self.recentErrors
-	if BsUtil.TrueTableSize(errorTable) == 0 then
+function Categories:GetErrors(filter)
+	if BsUtil.TrueTableSize(self.errors) == 0 then
 		return ""
 	end
 	local errors = ""
 	for _, categoryId in ipairs(self.sortedIdLists.name) do
-		if errorTable[categoryId] then
-			errors = errors .. (string.len(errors) > 0 and BS_NEWLINE or "") .. errorTable[categoryId]
+		if
+			self.errors[categoryId]
+			and (
+				type(filter) ~= "table"
+				or filter[categoryId]
+			)
+		then
+			errors = errors .. (string.len(errors) > 0 and BS_NEWLINE or "") .. self.errors[categoryId]
 		end
 	end
 	return errors
 end
-
 
 
 

@@ -95,8 +95,10 @@ function Hooks:SetHook(wowApiFunctionName, newFunction, registrationAction, clas
 			end
 
 			-- Make sure the hookFunction is valid.
-			assert(type(hookFunction) == "function", "Could not install hook function for '" .. wowApiFunctionName .. "' -- newFunction parameter is not a valid function.")
-
+			if type(hookFunction) ~= "function" then
+				Bagshui:PrintWarning("Could not install hook function for '" .. wowApiFunctionName .. "' -- newFunction parameter is not a valid function.")
+				return
+			end
 
 			-- Store the original function reference.
 			self.originalHookFunctions[wowApiFunctionName] = originalFunction
