@@ -1,6 +1,6 @@
 # Bagshui Changelog
 
-## [1.4.6] - 2025-03-15
+## 1.4.6 - 2025-03-15
 ### Fixed
 * Alt/Ctrl+click and right-click [compatibility](https://github.com/veechs/Bagshui/issues/118) with ["Old Interface" Aux](https://github.com/mrrosh/aux-addon_old-interface/). <sup><small>🪲 [@StrayDemon-13](https://github.com/StrayDemon-13)</small></sup>
 
