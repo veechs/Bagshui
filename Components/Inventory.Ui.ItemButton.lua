@@ -1027,7 +1027,7 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 					local oldIsAltKeyDown = _G.IsAltKeyDown
 					_G.this = itemButton.bagshuiData.getIdProxy or _G.this  -- Have to force the use of the item button proxy for GetID()/GetParent():GetID().
 					_G.IsAltKeyDown = BsUtil.ReturnTrue
-					_G.ContainerFrameItemButton_OnClick("LeftButton")
+					_G.Aux_ContainerFrameItemButton_OnClick("LeftButton")
 					_G.IsAltKeyDown = oldIsAltKeyDown
 					_G.this = oldGlobalThis
 
