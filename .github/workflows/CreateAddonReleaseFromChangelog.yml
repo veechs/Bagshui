@@ -28,6 +28,9 @@ jobs:
     steps:
     # Must check out repository to query the changelog.
     - uses: actions/checkout@v4
+      # Required to override main branch protection.
+      with:
+        ssh-key: ${{ secrets.DEPLOY_KEY }}
     
     # Get version and releaae notes.
     - name: Query Changelog
