@@ -1006,6 +1006,39 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 
 
 			elseif
+				-- "Old" Aux <https://github.com/mrrosh/aux-addon_old-interface/>.
+				-- Unlike the newer aux, old Aux has Alt/Control/Shift+click handling
+				-- but does *not* do right-click. It also hooks ContainerFrameItemButton_OnClick()
+				-- instead of UseContainerItem() so it really is totally different.
+				-- Must come before Blizzard Auction House because the old
+				-- version doesn't have its own frame and uses the Blizz one.
+				_G.IsAddOnLoaded("aux-addon")
+				and _G.AuxVersion
+				and _G.Aux
+				and _G.Aux_ContainerFrameItemButton_OnClick
+				and self.ui:IsFrameVisible("AuctionFrame")
+			then
+				if
+					mouseButton == "RightButton"
+					and self.settings.rightClickAttach
+				then
+					-- Make right-clicking behave like all other auction house right-clicks (send to Sell tab).
+					local oldGlobalThis = _G.this
+					local oldIsAltKeyDown = _G.IsAltKeyDown
+					_G.this = itemButton.bagshuiData.getIdProxy or _G.this  -- Have to force the use of the item button proxy for GetID()/GetParent():GetID().
+					_G.IsAltKeyDown = BsUtil.ReturnTrue
+					_G.ContainerFrameItemButton_OnClick("LeftButton")
+					_G.IsAltKeyDown = oldIsAltKeyDown
+					_G.this = oldGlobalThis
+
+				else
+					-- Let things fall through the normal path so `Aux_ContainerFrameItemButton_OnClick()`
+					-- will handle Alt/Control/Shift+click.
+					clickHandled = false
+				end
+
+
+			elseif
 				-- Blizzard Auction House - Right-click/Alt+click.
 				self:IsItemClickActionAllowed(mouseButton, "AuctionFrame")
 			then
