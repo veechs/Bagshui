@@ -168,7 +168,7 @@
 * Tweak Recipes category to include Top Half/Bottom Half Advanced Volumes (thanks Melo)
 * Try to make it clear during Direct Assignment in Edit Mode that a [custom Category is required](https://github.com/veechs/Bagshui/wiki/FAQ#why-cant-i-edit-built-in-objects).
 
-## 1.2.2a - 2025-01-08
+## 1.2.2 - 2025-01-08
 ### Fixed
 * [Windows that try to go for an adventure off the screen](https://github.com/veechs/Bagshui/issues/18) should now be brought back. `/bagshui Bags ResetPosition` (or `Bank`) has also been made available in case manual intervention is required.
 
