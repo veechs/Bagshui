@@ -137,6 +137,8 @@ local Profiles = Bagshui.prototypes.ObjectList:New({
 	defaults = Bagshui.config.Profiles.defaults,
 	wikiPage = BS_WIKI_PAGES.Profiles,
 
+	firstLoginCopies = {},
+
 	debugResetOnLoad = false and BS_DEBUG,
 })
 Bagshui.environment.BsProfiles = Profiles
@@ -383,14 +385,14 @@ function Profiles:GetUsableProfileId(profileId, profileType)
 
 	-- First fallback is a profile named after the current character.
 	local characterProfileId
-	if not self.list[profileId] then
+	if not profileId or not self.list[profileId] then
 		for existingProfileId, existingProfileInfo in pairs(self.list) do
 			if existingProfileInfo.name == Bagshui.currentCharacterId then
 				characterProfileId = existingProfileId
 			end
 		end
 	end
-	-- Only fall back to the character-named profile if it's not a first login.
+	-- Only immediately fall back to the character-named profile if it's not a first login.
 	if profileId and characterProfileId then
 		return characterProfileId
 	end
@@ -421,8 +423,17 @@ function Profiles:GetUsableProfileId(profileId, profileType)
 	local newProfileId
 	-- Don't try to create the same character profile multiple times.
 	if characterProfileId then
-		-- When the character profile already exists, overwrite this profile type's settings.
-		self:Copy(defaultProfileId, characterProfileId, profileTypeStorageKey)
+		-- On first login when cloning is needed, the character profile may have
+		-- already been created by another Inventory class instance or because a
+		-- different profile type was requested first. We need to be sure the
+		-- settings are correct, but also only set them once. Doing it multiple
+		-- times can mess up the pointer for the Inventory layout table until
+		-- the UI is reloaded (issue #121).
+		local fullId = characterProfileId .. profileTypeStorageKey
+		if not self.firstLoginCopies[fullId] then
+			self:Copy(defaultProfileId, characterProfileId, profileTypeStorageKey)
+			self.firstLoginCopies[fullId] = true
+		end
 		newProfileId = characterProfileId
 	else
 		-- Character profile doesn't exist yet.
