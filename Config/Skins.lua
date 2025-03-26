@@ -109,6 +109,8 @@ Bagshui.config.Skins = {
 		inventoryDockedScale = 0.8,
 		---@type number Outer margin for Edit Mode.
 		inventoryEditModeMargin = 3,
+		---@type function Called when the window is shown or moved.
+		inventoryPositionFunc = nil,
 
 		---@type table { left, right, top, bottom }: Item slot IconTexture SetTexCoord parameters.
 		itemSlotIconTexCoord = nil,
@@ -356,6 +358,23 @@ if (pfUI and pfUI.api and pfUI.env and pfUI.env.C) then
 						lastUpdate = _G.GetTime()
 					end
 				end)
+			end,
+
+			inventoryPositionFunc = function(inventory)
+				-- Register the window for tooltip dodge when it's in the bottom right.
+				if pfUI.tooltip and pfUI.tooltip.dodge then
+					Bagshui:ManageBoundaryFrames()
+					if
+						inventory.uiFrame:GetBottom() < Bagshui.boundaryFrames.TOP:GetTop() / 3
+						and inventory.uiFrame:GetRight() > Bagshui.boundaryFrames.RIGHT:GetRight() * 0.75
+					then
+						if not BsUtil.TableContainsValue(pfUI.tooltip.dodge, inventory.uiFrame:GetName()) then
+							table.insert(pfUI.tooltip.dodge, inventory.uiFrame:GetName())
+						end
+					else
+						BsUtil.TableRemoveArrayItem(pfUI.tooltip.dodge, inventory.uiFrame:GetName())
+					end
+				end
 			end,
 		}
 

@@ -137,7 +137,11 @@ local Profiles = Bagshui.prototypes.ObjectList:New({
 	defaults = Bagshui.config.Profiles.defaults,
 	wikiPage = BS_WIKI_PAGES.Profiles,
 
-	firstLoginCopies = {},
+	-- Track when `GetUsableProfileId()` has performed a copy operation so it won't
+	-- occur multiple times when multiple inventory classes request it in sequence.
+	-- More details in `GetUsableProfileId()`.
+	---@type table<string,boolean>
+	profileCreationCopyDone = {},
 
 	debugResetOnLoad = false and BS_DEBUG,
 })
@@ -200,6 +204,21 @@ function Profiles:Init()
 
 end
 
+
+
+--- When a profile is deleted, also clean up the flags that track whether
+--- the initialization for that profile ID has happened in case the ID is reused.
+---@param objectId string|number
+---@return boolean success
+function Profiles:Delete(objectId)
+	if self._super.Delete(self, objectId) then
+		for _, profileType in pairs(BS_PROFILE_TYPE) do
+			self.profileCreationCopyDone[objectId .. profileType] = nil
+		end
+		return true
+	end
+	return false
+end
 
 
 --- Retrieve a copy of a profile for exporting.
@@ -430,9 +449,9 @@ function Profiles:GetUsableProfileId(profileId, profileType)
 		-- times can mess up the pointer for the Inventory layout table until
 		-- the UI is reloaded (issue #121).
 		local fullId = characterProfileId .. profileTypeStorageKey
-		if not self.firstLoginCopies[fullId] then
+		if not self.profileCreationCopyDone[fullId] then
 			self:Copy(defaultProfileId, characterProfileId, profileTypeStorageKey)
-			self.firstLoginCopies[fullId] = true
+			self.profileCreationCopyDone[fullId] = true
 		end
 		newProfileId = characterProfileId
 	else

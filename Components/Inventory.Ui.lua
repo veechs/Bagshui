@@ -999,6 +999,7 @@ function Inventory:UiFrame_OnShow()
 	self.resortNeeded = true
 	self.inventoryUpdateAllowed = true
 	self.cacheUpdateNeeded = true
+	self:NotifySkinOfPositionChange()
 	-- Do NOT use QueueUpdate() here.
 	self:Update()
 end
@@ -1053,6 +1054,7 @@ function Inventory:UiFrame_OnDragStop()
 		self.uiFrame:StopMovingOrSizing()
 		self:FixSettingsMenuPosition()
 		self:SaveWindowPosition()
+		self:NotifySkinOfPositionChange()
 	end
 end
 
@@ -1304,6 +1306,15 @@ function Inventory:GetWindowOffset(point)
 	end
 
 	return offset
+end
+
+
+
+-- Let the skin know that the window position has changed.
+function Inventory:NotifySkinOfPositionChange()
+	if type(BsSkin.inventoryPositionFunc) == "function" then
+		BsSkin.inventoryPositionFunc(self)
+	end
 end
 
 
