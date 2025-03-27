@@ -1103,6 +1103,14 @@ BsLocalization:AddLocale("enUS", {
 ["windowDoubleClickActions"] = "Double-Click",
 ["windowDoubleClickActions_TooltipText"] = "Double-click a blank part of the inventory window to show/hide all toolbars." .. BS_NEWLINE .. "Alt+double-click to toggle position lock.",
 
+["emptySlotBackgroundImage"] = "Image",
+["emptySlotBackgroundImage_TooltipTitle"] = "Empty Slot Background Image",
+["emptySlotBackgroundImage_TooltipText"] = "Disable to use a solid background for empty item slots.",
+
+["emptySlotBackgroundColor"] = "Color",
+["emptySlotBackgroundColor_TooltipTitle"] = "Empty Slot Background Color",
+["emptySlotBackgroundColor_TooltipText"] = "Color to display in the background of empty slots.",
+
 ["globalInfoTooltips"] = "Everywhere",
 ["globalInfoTooltips_TooltipTitle"] = "Hook All Item Tooltips ",
 ["globalInfoTooltips_TooltipText"] = "Show the Bagshui Info Tooltip when Alt is held while any item tooltip is displayed (i.e. Character window, chat links, etc.).",
@@ -1145,14 +1153,6 @@ BsLocalization:AddLocale("enUS", {
 ["itemQualityBadges"] = "!!Quality!!",
 ["itemQualityBadges_TooltipTitle"] = "Item Quality Badges",
 ["itemQualityBadges_TooltipText"] = "Show icons in the bottom left for item rarity levels.",
-
-["emptySlotBackgroundImage"] = "Image",
-["emptySlotBackgroundImage_TooltipTitle"] = "Empty Slot Background Image",
-["emptySlotBackgroundImage_TooltipText"] = "Disable to use a solid background for empty item slots.",
-
-["emptySlotBackgroundColor"] = "Color",
-["emptySlotBackgroundColor_TooltipTitle"] = "Empty Slot Background Color",
-["emptySlotBackgroundColor_TooltipText"] = "Color to display in the background of empty slots.",
 
 ["itemUsableBadges"] = "Unusable",
 ["itemUsableBadges_TooltipTitle"] = "Item Unusable Badges",
