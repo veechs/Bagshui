@@ -583,12 +583,14 @@ Bagshui.config.RuleFunctions = {
 				return false
 			end
 
-			-- Borrowing some code from ItemRack because it doesn't provide an
-			-- isolated function to parse an itemLink into their format.
-			local found ,_, itemRackItemId = string.find(rules.item.itemLink or "", "item:(%d+:%d+:%d+):%d+")
-			if not found or (type(itemRackItemId) == "string" and string.len(itemRackItemId) == 0) then
+			-- Parsing into distinct codes instead of using ItemRack's "code:enchantCode:subCode"
+			-- ID format so we can ignore enchant codes.
+			local found , _, code, enchantCode, subCode = string.find(rules.item.itemLink or "", "item:(%d+):(%d+):(%d+)")
+			if not found then
 				return false
 			end
+			-- Pattern to ignore enchant codes.
+			local itemRackIdMatch = code .. ":%d+:" .. subCode
 
 			local matchAny = (table.getn(ruleArguments) == 0)
 
@@ -596,7 +598,7 @@ Bagshui.config.RuleFunctions = {
 				local outfitName = string.lower(BsUtil.Trim(outfitName))
 				for _, item in pairs(outfitItems) do
 					-- Type check is needed here because ItemRack stores the outfit icon as a string at the same level.
-					if type(item) == "table" and item.id == itemRackItemId then
+					if type(item) == "table" and type(item.id) == "string" and (string.find(item.id, itemRackIdMatch)) then
 						if matchAny then
 							return true
 						else
