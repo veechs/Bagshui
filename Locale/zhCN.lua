@@ -356,6 +356,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Menu_Settings_Options"] = "选项",
 ["Menu_Settings_Profile"] = "配置文件",
 ["Menu_Settings_Size"] = "大小",
+["Menu_Settings_SizeAndLayering"] = "尺寸和分层",
 ["Menu_Settings_Tinting"] = "物品着色",
 ["Menu_Settings_Toggles"] = "切换",
 ["Menu_Settings_Toolbar"] = "工具栏",
@@ -367,7 +368,7 @@ BsLocalization:AddLocale("zhCN", {
 
 -- Category Menu.
 -- 类别菜单。
-["Menu_Category_Move_TooltipText"] = "拾取此类别以便将其移动到新组。",
+["Menu_Category_Move_TooltipText"] = "点击此类别以便将其移动到新组。",
 ["Menu_Category_Edit_TooltipText"] = "在编辑器中打开此类别。",
 ["Menu_Category_Remove_TooltipText"] = "从当前组中移除此类别。!!Info_NoDelete!!",
 
@@ -376,29 +377,29 @@ BsLocalization:AddLocale("zhCN", {
 ["Menu_Group_Rename_TooltipTitle"] = "重命名组",
 ["Menu_Group_Rename_TooltipText"] = "更改此组的标签。",
 ["Menu_Group_Move_TooltipTitle"] = "移动组",
-["Menu_Group_Move_TooltipText"] = "拾取此组以便将其移动到新位置。",
+["Menu_Group_Move_TooltipText"] = "点击此组以便将其移动到新位置。",
 ["Menu_Group_Delete_TooltipTitle"] = "删除组",
 ["Menu_Group_Delete_TooltipText"] = "完全删除此组并取消分配任何类别。!!Warning_NoUndo!!",
 
-["Menu_Group_Add_Category_TooltipText"] = "将现有类别分配到此组。",
+["Menu_Group_Add_Category_TooltipText"] = "将现有类别分配给此组。",
 ["Menu_Group_Configure_Category_TooltipText"] = "显示此类别的上下文菜单。",
-["Menu_Group_New_Category_TooltipTitle"] = "新类别",
-["Menu_Group_New_Category_TooltipText"] = "创建新类别并将其分配到此组。",
-["Menu_Group_Move_Category_TooltipText"] = "拾取当前分配到此组的类别以便将其移动到其他组。",
-["Menu_Group_Remove_Category_TooltipText"] = "移除此组中当前分配的类别。!!Info_NoDelete!!",
-["Menu_Group_Edit_Category_TooltipText"] = "编辑当前分配到此组的类别。",
-["Menu_Group_DefaultColor_TooltipTitle"] = "使用默认组 %s 颜色",  -- %s = 背景/边框
-["Menu_Group_DefaultColor_TooltipText"] = "应用在设置中定义的组 %s 颜色。",  -- %s = 背景/边框
+["Menu_Group_New_Category_TooltipTitle"] = "新建类别",
+["Menu_Group_New_Category_TooltipText"] = "创建新类别并将其分配给此组。",
+["Menu_Group_Move_Category_TooltipText"] = "点击当前分配给此组的类别，以便将其移动到另一个组。",
+["Menu_Group_Remove_Category_TooltipText"] = "移除当前分配给此组的类别。!!Info_NoDelete!!",
+["Menu_Group_Edit_Category_TooltipText"] = "编辑当前分配给此组的类别。",
+["Menu_Group_DefaultColor_TooltipTitle"] = "使用默认组%s颜色",  -- %s = 背景/边框
+["Menu_Group_DefaultColor_TooltipText"] = "应用在设置中定义的组%s颜色。",  -- %s = 背景/边框
 ["Menu_Group_DefaultSortOrder_TooltipTitle"] = "使用默认排序顺序",
-["Menu_Group_DefaultSortOrder_TooltipText"] = "应用当前结构的默认排序顺序：" .. BS_NEWLINE .. "%s",  -- %s = <默认排序顺序名称>
+["Menu_Group_DefaultSortOrder_TooltipText"] = "应用当前结构的默认排序顺序：" .. BS_NEWLINE .. "%s",  -- %s = <默认排序顺序的名称>
 ["Menu_Group_HideGroup"] = "隐藏组",
-["Menu_Group_HideGroup_TooltipText"] = "除非显示隐藏已切换为开启，否则不显示此组。",
+["Menu_Group_HideGroup_TooltipText"] = "除非启用【显示隐藏】，否则不显示此组。",
 ["Menu_Group_HideStockBadge"] = "隐藏库存徽章",
-["Menu_Group_HideStockBadge_TooltipText"] = "防止显示此组的库存更改徽章（新增/增加/减少）。",
+["Menu_Group_HideStockBadge_TooltipText"] = "阻止为此组显示库存变化徽章（新/增加/减少）。",
 ["Menu_Group_Settings_TooltipTitle"] = "组设置",
 ["Menu_Group_Settings_TooltipText"] = "管理组特定选项，包括背景和边框颜色。",
-["Menu_Group_Color_TooltipTitle"] = "组 %s 颜色",  -- %s = 背景/边框
-["Menu_Group_Color_TooltipText"] = "设置此组的 %s。",  -- %s = 背景/边框
+["Menu_Group_Color_TooltipTitle"] = "组%s颜色",  -- %s = 背景/边框
+["Menu_Group_Color_TooltipText"] = "设置此组的%s。",  -- %s = 背景/边框
 ["Menu_Group_SortOrder_TooltipTitle"] = "组排序顺序",
 ["Menu_Group_SortOrder_TooltipText"] = "更改此组内物品的排序方式。",
 
@@ -406,30 +407,30 @@ BsLocalization:AddLocale("zhCN", {
 -- 物品菜单。
 ["Menu_Item_AssignToCategory"] = "直接分配",
 ["Menu_Item_AssignToCategory_TooltipTitle"] = "直接类别分配",
-["Menu_Item_AssignToCategory_TooltipText"] = "将此物品的 ID 分配到一个或多个自定义类别（而不是使用规则函数）。",
-["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "将物品分配到新的自定义类别。",
-["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "内置类别为只读 - 请参阅 Bagshui Wiki 上的 FAQ 了解原因。",
+["Menu_Item_AssignToCategory_TooltipText"] = "将此物品的ID分配给一个或多个自定义类别（而不是使用规则函数）。",
+["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "将物品分配给新的自定义类别。",
+["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "内置类别是只读的 - 请参阅Bagshui Wiki上的FAQ了解原因。",
 ["Menu_Item_AssignToClassCategory"] = "直接分配到",
 ["Menu_Item_Information_TooltipTitle"] = "物品信息",
-["Menu_Item_Information_TooltipText"] = "查看此物品属性的详细信息并访问物品信息窗口。",
-["Menu_Item_Information_Submenu_TooltipText"] = "点击以打开物品信息窗口。",
+["Menu_Item_Information_TooltipText"] = "查看有关此物品属性的详细信息并访问物品信息窗口。",
+["Menu_Item_Information_Submenu_TooltipText"] = "点击打开物品信息窗口。",
 ["Menu_Item_Manage_TooltipTitle"] = "管理物品",
-["Menu_Item_Manage_TooltipText"] = "Bagshui 特定的物品操作。",
+["Menu_Item_Manage_TooltipText"] = "Bagshui特定的物品操作。",
 ["Menu_Item_MatchedCategories"] = "匹配",
 ["Menu_Item_MatchedCategories_TooltipTitle"] = "匹配的类别",
-["Menu_Item_MatchedCategories_TooltipText"] = "匹配此物品的所有类别列表，按顺序排列。",
-["Menu_Item_MatchedCategory_TooltipText"] = "点击以编辑。",
-["Menu_Item_Move_TooltipText"] = "拾取此物品以便直接分配到新类别。",
+["Menu_Item_MatchedCategories_TooltipText"] = "按顺序排列的所有匹配此物品的类别列表。",
+["Menu_Item_MatchedCategory_TooltipText"] = "点击编辑。",
+["Menu_Item_Move_TooltipText"] = "点击此物品以便将其直接分配给新类别。",
 ["Menu_Item_RemoveFromEquippedGear"] = "从已装备中移除",
-["Menu_Item_RemoveFromEquippedGear_TooltipText"] = "将此物品从已装备的装备列表中移除（即 Equipped() 规则将不再匹配）。",
+["Menu_Item_RemoveFromEquippedGear_TooltipText"] = "将此物品从您已装备的装备列表中移除（即Equipped()规则将不再匹配）。",
 ["Menu_Item_ResetStockState"] = "重置库存状态",
-["Menu_Item_ResetStockState_TooltipText"] = "清除此物品的新增/增加/减少状态。",
+["Menu_Item_ResetStockState_TooltipText"] = "清除此物品的新/增加/减少状态。",
 
 -- Item Stock State.
 -- 物品库存状态。
 ["StockState"] = "库存状态",
-["StockLastChange"] = "上次更改",
--- BS_ITEM_STOCK_STATE 本地化，格式为 `Stock_<BS_ITEM_STOCK_STATE 值>`。
+["StockLastChange"] = "最后更改",
+-- BS_ITEM_STOCK_STATE本地化为`Stock_<BS_ITEM_STOCK_STATE值>`。
 ["Stock_New"] = "!!New!!",
 ["Stock_Up"] = "增加",
 ["Stock_Down"] = "减少",
@@ -437,7 +438,7 @@ BsLocalization:AddLocale("zhCN", {
 
 -- Item Information window title.
 -- 物品信息窗口标题。
-["BagshuiItemInformation"] = "Bagshui 物品信息",
+["BagshuiItemInformation"] = "Bagshui物品信息",
 
 
 
@@ -719,7 +720,7 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_ActiveQuest_ExampleDescription1"] = "检查物品是否是当前角色任务日志中的任务目标。",
 
 ["RuleFunction_Bag_GenericDescription"] = "检查物品是否在指定的背包编号中",
-["RuleFunction_Bag_ExampleDescription"] = "检查物品是否在指定的背包编号中 (%d是%s中的第#%d个物品。)",  -- "(0 是背包中的第 1 个容器)"
+["RuleFunction_Bag_ExampleDescription"] = "检查物品是否在指定的背包编号中 (%d作为第#%d个物品存放于%s中。)",  -- "(0 是背包中的第 1 个容器)"
 ["RuleFunction_Bag_ExampleExtra1"] = 'Bag(num1, num2, numN)',
 ["RuleFunction_Bag_ExampleDescriptionExtra1"] = "检查物品是否在任何指定的背包编号中",
 

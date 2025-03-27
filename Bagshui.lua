@@ -881,6 +881,7 @@ function Bagshui:Init()
 	-- Need to adjust this by the scale so it behaves as expected.
 	BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD = BS_WINDOW_OFFSCREEN_RESCUE_THRESHOLD / _G.UIParent:GetScale()
 
+	self:PrintDebug(string.find("使用: 召唤或解散一只可供骑乘的机械陆行鸟", [[使用: 召唤和解散一..-可骑乘的]]))
 end
 
 
