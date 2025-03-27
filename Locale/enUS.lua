@@ -810,7 +810,7 @@ BsLocalization:AddLocale("enUS", {
 ["RuleFunction_MatchCategory_Example4"] = 'MatchCategory(ID1, ID2, IDN)',  -- DO NOT LOCALIZE THE PARAMETER.
 ["RuleFunction_MatchCategory_ExampleDescription4"] = "Check if the item matches any of the specified Categories." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. 'Remember that built-in Categories use strings that must be "quoted" and custom Categories use numbers.',
 
-["RuleFunction_MinLevetl_GenericDescription"] = "Check if the item is usable based on the specified level.",
+["RuleFunction_MinLevel_GenericDescription"] = "Check if the item is usable based on the specified level.",
 ["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
 ["RuleFunction_MinLevel_ExampleDescription1"] = "Check if the item is usable at <level> or above.",
 ["RuleFunction_MinLevel_Example2"] = 'MinLevel(min, max)',
