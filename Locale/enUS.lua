@@ -426,12 +426,12 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Group_SortOrder_TooltipText"] = "Change how items are sorted within this group.",
 
 -- Item Menu.
-["Menu_Item_AssignToCategory"] = "Direct Assignment",
+["Menu_Item_AssignToCategory"] = "Category Assignment",
 ["Menu_Item_AssignToCategory_TooltipTitle"] = "Direct Category Assignment",
 ["Menu_Item_AssignToCategory_TooltipText"] = "Assign this item's ID to one or more custom categories (as opposed to using rule functions).",
 ["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "Assign the item to a new custom category.",
 ["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "Built-in Categories are read-only - see FAQ on the Bagshui Wiki for reasoning.",
-["Menu_Item_AssignToClassCategory"] = "Direct Assignment to",
+["Menu_Item_AssignToClassCategory"] = "Assign to Class Category",
 ["Menu_Item_EquipBag"] = "Equip Bag",
 ["Menu_Item_EquipBag_TooltipText"] = "Replace one of the currently equipped bags.",
 ["Menu_Item_Information_TooltipTitle"] = "Item Information",
@@ -644,7 +644,7 @@ BsLocalization:AddLocale("enUS", {
 ["CategoryEditor_Field_class"] = "Class",
 ["CategoryEditor_Field_rule"] = "Rule",
 ["CategoryEditor_Field_rule_TooltipText"] = "One or more Bagshui rule functions, combined with and/or/not keywords, optionally grouped via parentheses. See documentation for help.",
-["CategoryEditor_Field_list"] = "Directly Assigned",
+["CategoryEditor_Field_list"] = "Assigned Items",
 ["CategoryEditor_Field_list_TooltipText"] = "List of items that are directly assigned to this category instead of using rule functions.",
 ["CategoryEditor_ID_TooltipTitle"] = "Category ID",
 ["CategoryEditor_ID_TooltipText"] = "Pass to the MatchCategory() rule function to check if an item matches this Category.",

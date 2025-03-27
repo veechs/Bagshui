@@ -1193,14 +1193,6 @@ function Inventory:InitMenus()
 	table.insert(
 		classMenu, 3,
 		{
-			text = LIGHTYELLOW_FONT_COLOR_CODE .. L.ClassCategory .. FONT_COLOR_CODE_CLOSE,
-			isTitle = true,
-			notCheckable = true,
-		}
-	)
-	table.insert(
-		classMenu, 4,
-		{
 			text = "Category placeholder",
 			isTitle = true,
 			notCheckable = true,
@@ -1229,9 +1221,9 @@ function Inventory:InitMenus()
 				menu.levels[1][1].tCoordBottom = BsSkin.itemSlotIconTexCoord[4]
 			end
 
-			menu.levels[1][4].text = BsCategories:GetName(categoryId, true) or tostring(categoryId)
+			menu.levels[1][3].text = BsCategories:GetName(categoryId, true) or tostring(categoryId)
 
-			for i = 5, table.getn(menu.levels[1]) do
+			for i = 4, table.getn(menu.levels[1]) do
 				local menuItem = menu.levels[1][i]
 				menuItem.checked = BsCategories:ItemInDirectAssignmentList(
 					nil,
