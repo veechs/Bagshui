@@ -293,6 +293,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 	local gameTooltipAnchorPoint = BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint)
 	local tooltipAnchorFrame = self.editMode and itemButton:GetParent() or itemButton
 	local tooltipOffset = BsSkin.tooltipExtraOffset
+	_G.GameTooltip:ClearAllPoints()
 	_G.GameTooltip:SetOwner(
 		itemButton,
 		-- Using ANCHOR_PRESERVE here for Edit Mode instead of ANCHOR_NONE

@@ -536,8 +536,6 @@ function Inventory:RenameGroup(groupId, groupIsNew)
 			-- Clear text on hide so it doesn't bleed over to other dialogs.
 			OnHide = BsUtil.StaticPopupDialogs_ClearTextOnHide
 		}
-
-		self.renameGroup_Data = {}
 	end
 
 	-- Current group name and text to prompt user with.
@@ -554,6 +552,11 @@ function Inventory:RenameGroup(groupId, groupIsNew)
 	-- Lock group highlight so it's more clear what group is being renamed.
 	self.editModeGroupHighlight = groupId
 	self:EditModeWindowUpdate()
+
+	-- This seems to get removed sometimes so we'll make sure it stays.
+	if not self.renameGroup_Data then
+		self.renameGroup_Data = {}
+	end
 
 	-- Set properties we need the dialog scripts to know.
 	self.renameGroup_Data.groupId = groupId

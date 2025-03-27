@@ -1,5 +1,15 @@
 # Bagshui Changelog
 
+## 1.4.8 - 2025-03-26
+### Changed
+* pfUI tooltip "Dodge"-mode lovers, rejoice! Bagshui now tells pfUI when to anchor the tooltip to its windows. Thanks to [@shagu](https://github.com/shagu) for [making this possible](https://github.com/shagu/pfUI/issues/1391). <sup><small>🫶 Bahamutxd</small></sup>
+
+## 1.4.7 - 2025-03-26
+### Fixed
+* The first time a character logged in, [using Edit Mode in Bags would not change the Structure for Bank and vice-versa](https://github.com/veechs/Bagshui/issues/121). <sup><small>🪲 [@Szalor](https://github.com/Szalor)</small></sup>
+* Renaming a group could throw an error under certain circumstances.
+* Tooltips in Edit Mode for left-anchored inventory windows will no longer decide to be super wide.
+
 ## 1.4.6 - 2025-03-15
 ### Fixed
 * Alt/Ctrl+click and right-click [compatibility](https://github.com/veechs/Bagshui/issues/118) with ["Old Interface" Aux](https://github.com/mrrosh/aux-addon_old-interface/). <sup><small>🪲 [@StrayDemon-13](https://github.com/StrayDemon-13)</small></sup>

@@ -8,6 +8,10 @@
 [![Bagshui](https://github.com/veechs/Bagshui/wiki/images/BagshuiScreenshots.png)](https://github.com/veechs/Bagshui/wiki/Screenshots)  
 <sup>[More screenshots](https://github.com/veechs/Bagshui/wiki/Screenshots)</sup>
 
+
+<a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
+
+
 ## Features
 
 * Single window inventory for Bags, Bank, and Keyring.
