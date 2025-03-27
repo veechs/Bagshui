@@ -1,5 +1,12 @@
 # Bagshui Changelog
 
+## 1.4.9 - 2025-03-27
+### Changed
+* zh-CN localization updates by [@Sunelegy](https://github.com/Sunelegy).
+
+### Fixed
+* ItemRack integration now also ignores enchant codes since, like Outfitter, it seems they aren't always updated. <sup><small>🪲 Surtugal</small></sup>
+
 ## 1.4.8 - 2025-03-26
 ### Changed
 * pfUI tooltip "Dodge"-mode lovers, rejoice! Bagshui now tells pfUI when to anchor the tooltip to its windows. Thanks to [@shagu](https://github.com/shagu) for [making this possible](https://github.com/shagu/pfUI/issues/1391). <sup><small>🫶 Bahamutxd</small></sup>
