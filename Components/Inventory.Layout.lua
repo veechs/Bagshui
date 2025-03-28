@@ -718,8 +718,12 @@ function Inventory:UpdateWindow()
 
 					-- Determine how many items are in each group in this row based on group visibility.
 					if not self.editMode and not self.showHidden and hideGroup then
-						-- Set the groupItemCounts for this group to 0 if it's not visible.
-						self.groupItemCounts[groupId] = 0
+						-- Set the groupItemCounts for this group to 0 if it's not visible unless it contains
+						-- items from the bag that has highlight lock set.
+						self.groupItemCounts[groupId] =
+							self.highlightItemsInContainerLocked
+							and self:GetGroupItemCountForLayout(groupId, self.highlightItemsInContainerLocked)
+							or 0
 					else
 						self.groupItemCounts[groupId] = self:GetGroupItemCountForLayout(groupId)
 					end
@@ -1283,7 +1287,12 @@ function Inventory:AssignItemsToSlots(
 			end
 
 			-- Determine whether this item is hidden.
-			if not self.editMode and not self.showHidden and self.hideItems[item.id] then
+			if
+				not self.editMode
+				and not self.showHidden
+				and self.highlightItemsInContainerLocked ~= item.bagNum  -- Unhide items when bag highlighting is locked on.
+				and self.hideItems[item.id]
+			then
 				hideItem = true
 			end
 
@@ -1398,8 +1407,9 @@ end
 --- Return the number of items in a group that will be visible, accounting for stacked slots and hidden items.  
 --- Also updates `self.hasHiddenItems`.
 ---@param groupId number ID of group to get the number of items for.
+---@param zeroUnlessHasItemsInBagNum number? Return 0 unless the group has items that are in the specified bag number -- in that case, return the normal count.
 ---@return integer visibleItemCount
-function Inventory:GetGroupItemCountForLayout(groupId)
+function Inventory:GetGroupItemCountForLayout(groupId, zeroUnlessHasItemsInBagNum)
 	-- No items.
 	if not self.groupItems[groupId] then
 		return 0
@@ -1414,6 +1424,7 @@ function Inventory:GetGroupItemCountForLayout(groupId)
 	local visibleItemCount = 0
 	local itemVisible
 	local hasEmptySlots = false
+	local hasItemsInFilterBag = false
 
 	-- We'll be using the permanent self.emptySlotStacks items, so reset their counts first.
 	self:ResetEmptySlotStackCounts()
@@ -1422,6 +1433,11 @@ function Inventory:GetGroupItemCountForLayout(groupId)
 	for _, item in ipairs(self.groupItems[groupId]) do
 		-- Assume the item will be counted
 		itemVisible = true
+
+		-- Have we found an item in the bag that will require a full count to be returned?
+		if zeroUnlessHasItemsInBagNum and item.bagNum == zeroUnlessHasItemsInBagNum then
+			hasItemsInFilterBag = true
+		end
 
 		-- Empty slot stacks and hidden items.
 		if self:UpdateEmptySlotStackCount(item) then
@@ -1438,7 +1454,11 @@ function Inventory:GetGroupItemCountForLayout(groupId)
 			-- We need to update hasHiddenItems even if we're not actually hiding this item so that the toolbar icon will be enabled.
 			self.hasHiddenItems = true
 			-- Need to count the item when in Edit Mode or hidden items are shown.
-			itemVisible = (self.editMode or self.showHidden)
+			itemVisible = (
+				self.editMode
+				or self.showHidden
+				or self.highlightItemsInContainerLocked == item.bagNum
+			)
 		end
 
 		-- Increment count if visible.
@@ -1454,6 +1474,11 @@ function Inventory:GetGroupItemCountForLayout(groupId)
 				visibleItemCount = visibleItemCount + 1
 			end
 		end
+	end
+
+	-- We were asked for a full count ONLY If this group has items in a specific bag.
+	if zeroUnlessHasItemsInBagNum and not hasItemsInFilterBag then
+		return 0
 	end
 
 	return visibleItemCount

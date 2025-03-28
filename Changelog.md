@@ -23,6 +23,10 @@
 * Equipping gear should now more consistently update the history.
 * Key internal data is now validated (things you should hopefully never need to care about).
 
+## 1.4.10 - 2025-03-28
+### Fixed
+* Locking a bag's highlight via Alt+Click now [temporarily unhides all items in that bag](https://github.com/veechs/Bagshui/issues/125). <sup><small>🪲 [@RetroCro](https://github.com/RetroCro)</small></sup>
+
 ## 1.4.9 - 2025-03-27
 ### Changed
 * zh-CN localization updates by [@Sunelegy](https://github.com/Sunelegy).
