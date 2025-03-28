@@ -50,10 +50,18 @@ function Bags:BagSlotButton_Init(bagSlotButton)
 	--- If there was an item in the cursor when the slot was clicked, catch it and prevent the original
 	--- from being called, since since PaperDollItemSlotButton will interpret that as trying to *equip*
 	--- the item in that slot, instead of trying to put it in the bag. Note that due to the behavior of
-	--- `PutItemInBag()`, this will *not* intercept BOE bags. Changing this would require detouring into
-	--- `Bagshui:PickupItem()` when a bag is on the cursor, which we're not currently tracking.
+	--- `PutItemInBag()`, this will *not* intercept bags, but that's handled in the bag slot button's OnClick.
 	bagSlotButton:SetScript("OnClick", function()
-		if not _G.PutItemInBag(_G.this.bagshuiData.inventorySlotId) then
+		if
+			-- Pass through to the default Bagshui OnClick for bags
+			-- so native bag swapping can be invoked.
+			(
+				_G.CursorHasItem()
+				and BsItemInfo:IsContainer(Bagshui.cursorItem)
+			)
+			-- Otherwise, allow PutItemInBag() to catch cursor items and move them.
+			or not _G.PutItemInBag(_G.this.bagshuiData.inventorySlotId)
+		then
 			oldOnClick()
 		end
 	end)

@@ -48,7 +48,6 @@ function Inventory:EditModeWindowUpdate(forceResort, itemSlotColorsOnly, calledF
 		self.cacheUpdateNeeded = false
 		self.windowUpdateNeeded = true
 		self.forceResort = (forceResort == true)
-		self.lastCategorizeItems = 0  -- Force clearing errors in `Inventory:CategorizeItems()`.
 		self:Update()
 		-- Don't cause a stack overflow with recursive events.
 		if not calledFromEvent then
@@ -488,10 +487,10 @@ function Inventory:RenameGroup(groupId, groupIsNew)
 			text = "",
 			button1 = _G.OKAY,
 			button2 = _G.CANCEL,
-			hasEditBox = 1,
+			hasEditBox = true,
 			timeout = 0,
-			whileDead = 1,
-			hideOnEscape = 1,
+			whileDead = true,
+			hideOnEscape = true,
 			EditBoxOnEnterPressed = BsUtil.StaticPopupDialogs_EnterClicksFirstButton,
 			-- Extra property to be used in OnShow to fill the edit box.
 			-- Blizzard doesn't provide an easy way to do this in Vanilla as the
@@ -597,10 +596,10 @@ function Inventory:DeleteGroup(groupId)
 			text = L.EditMode_Prompt_DeleteGroup,
 			button1 = L.Delete,
 			button2 = L.Cancel,
-			showAlert = 1,
+			showAlert = true,
 			timeout = 0,
-			whileDead = 1,
-			hideOnEscape = 1,
+			whileDead = true,
+			hideOnEscape = true,
 
 			-- Delete the group.
 			-- The groupId parameter comes from the dialog's data property which is set below.

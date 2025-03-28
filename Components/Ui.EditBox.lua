@@ -25,6 +25,7 @@ function Ui:CreateEditBox(name, parent, inherits, fontObject, multiLine, noBackg
 	)
 
 	editBox.bagshuiData = {
+		selectAllOnFocus = selectAllOnFocus,
 		-- There doesn't seem to be a built-in way to check whether an edit box
 		-- currently has focus, so we'll track it.
 		hasFocus = false
@@ -52,7 +53,7 @@ function Ui:CreateEditBox(name, parent, inherits, fontObject, multiLine, noBackg
 		-- Focus tracking.
 		function self._createEditBox_OnFocusGained()
 			_G.this.bagshuiData.hasFocus = true
-			if selectAllOnFocus then
+			if _G.this.bagshuiData.selectAllOnFocus then
 				_G.this:HighlightText()
 			end
 		end
@@ -192,6 +193,29 @@ function Ui:CreateScrollableEditBox(namePrefix, parent, borderStyle, editBoxInhe
 
 	return scrollFrame, editBox
 end
+
+
+
+--- Wrapper for `EditBox:SetText()` that also sets the `EditBox.bagshuiData.readOnlyText` property.
+---@param editBox table EditBox widget.
+---@param str string? Text to set.
+---@param readOnly boolean? `true` to make read-only.
+function Ui:SetEditBoxText(editBox, str, readOnly)
+	editBox:SetText(str)
+	if editBox.bagshuiData then
+		editBox.bagshuiData.readOnlyText = readOnly and str or nil
+	end
+end
+
+
+
+--- Wrapper for `Ui:SetEditBoxText()` that automatically sets the `EditBox.bagshuiData.readOnlyText` property.
+---@param editBox table EditBox widget.
+---@param str string? Text to set.
+function Ui:SetEditBoxTextReadOnly(editBox, str, readOnly)
+	self:SetEditBoxText(editBox, str, true)
+end
+
 
 
 end)

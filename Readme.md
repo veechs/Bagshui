@@ -23,8 +23,11 @@
 * Color tinting of unusable items.
 * Badges to indicate stock changes, quality, quest items, and unusability.
 * Empty slot stacking and custom graphics for profession bag slots.
+* Automated bag swapping – no more manual item shuffling!
+* Selling protection to safeguard valuable items.
+* Clam (Open Container), Disenchant, Pick Lock, and Hearthstone buttons.
 * [Colorblind mode](https://github.com/veechs/Bagshui/wiki/Accessibility#colorblind-mode) to help identify item quality and unusability.
-* Lots of little niceties like a Hearthstone button, pfUI skinning, and more.
+* Lots of other little niceties like item restacking, pfUI skinning, and more.
 
 <details>
 
@@ -152,9 +155,15 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 <sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `×#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
 
 
+## Donations
+Developing Bagshui is fun, but also a lot of work! Your support is hugely appreciated.
+<a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
+
+
 ## Credits
 
 Bagshui owes [so much to so many people](Credits.md).
+
 
 ## Localization
 

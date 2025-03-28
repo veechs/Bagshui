@@ -345,11 +345,11 @@ function Ui:ShowUrl(url)
 		_G.StaticPopupDialogs[dialogName] = {
 			text = L.HowToUrl,
 			button1 = _G.OKAY,
-			hasEditBox = 1,
-			hasWideEditBox = 1,
+			hasEditBox = true,
+			hasWideEditBox = true,
 			timeout = 0,
-			whileDead = 1,
-			hideOnEscape = 1,
+			whileDead = true,
+			hideOnEscape = true,
 
 			-- Extra property to be used in OnShow to fill the edit box.
 			-- Blizzard doesn't provide an easy way to do this in Vanilla as the
