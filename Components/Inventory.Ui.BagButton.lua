@@ -240,9 +240,9 @@ function InventoryUi:CreateBagSlotButtons()
 				)
 				and not inventory.editMode
 			then
+				local oldHighlightItemsInContainerLocked = inventory.highlightItemsInContainerLocked
 
-				-- Toggle highlight lock for this button
-				-- this.bagshuiData.highlightLocked = not this.bagshuiData.highlightLocked
+				-- Toggle highlight lock for this button.
 				inventory.highlightItemsInContainerLocked =
 					inventory.highlightItemsInContainerLocked ~= bagNum
 					and bagNum
@@ -250,7 +250,13 @@ function InventoryUi:CreateBagSlotButtons()
 
 				inventory.highlightItemsInContainerId = bagNum
 				inventory:UpdateBagBar()
-				inventory:UpdateItemSlotColors()
+				-- When the highlight lock is changed, we need to do a full window update
+				-- so hidden items in this bag can be shown or hidden.
+				if oldHighlightItemsInContainerLocked ~= inventory.highlightItemsInContainerLocked then
+					inventory:ForceUpdateWindow()
+				else
+					inventory:UpdateItemSlotColors()
+				end
 
 				-- Don't pick up bag or do anything else if alt key was down.
 				if _G.IsAltKeyDown() then
