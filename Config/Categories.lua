@@ -488,9 +488,10 @@ Bagshui.config.Categories = {
 			id = "Mounts",
 			name = L.Mounts,
 			rule = string.format(
-				'Tooltip("%s", "%s")',
+				'Tooltip("%s", "%s", "%s")',
 				L.TooltipIdentifier_Mount,
-				L.TooltipIdentifier_MountAQ40
+				L.TooltipIdentifier_MountAQ40,
+				L.TooltipIdentifier_MountTurtleWoW
 			),
 		},
 
@@ -500,7 +501,13 @@ Bagshui.config.Categories = {
 		{
 			id = "Companions",
 			name = L.Companions,
-			rule = string.format('Tooltip("%s")', L.TooltipIdentifier_Companion),
+			rule = string.format(
+				'Tooltip("%s", "%s")',
+				L.TooltipIdentifier_Companion,
+				L.TooltipIdentifier_CompanionTurtleWoW,
+				-- Throwing TW toys in here too until someone complains. ;)
+				L.TooltipIdentifier_ToyTurtleWoW
+			),
 		},
 
 

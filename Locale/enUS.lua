@@ -453,14 +453,17 @@ BsLocalization:AddLocale("enUS", {
 
 ["TooltipIdentifier_Buff_AlsoIncreases"] = [[also increases your]],
 ["TooltipIdentifier_Buff_WellFed"] = [[well fed]],
-["TooltipIdentifier_Companion"] = [[Right Click to summon and dismiss your]],
+["TooltipIdentifier_Companion"] = [[Use: Right Click to summon and dismiss your]],
+["TooltipIdentifier_CompanionTurtleWoW"] = [[Use: Adds a companion to the player's companion collection]],
 ["TooltipIdentifier_Drink"] = [[Must remain seated while drinking]],
 ["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
 ["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
 ["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
+["TooltipIdentifier_MountTurtleWoW"] = [[Use: Adds a mount to the player's mount collection]],  -- Turtle has a completely different tooltip for mounts.
 ["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
+["TooltipIdentifier_ToyTurtleWoW"] = [[Use: Add a toy to the player's toy collection]],
 
 -- Tooltip parsing -- extracting data from tooltips.
 ["TooltipParse_Charges"] = [[^(%d+) Charges$]],  -- MUST contain the (%d) capture group.
