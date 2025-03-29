@@ -394,12 +394,24 @@ function SortOrders:SortGroup(groupItems, groupConfig, defaultSortOrderId)
 					valB = SortGroup_GetReversedByWordsPropertyString(itmB, valB, itemProperty)
 				end
 
+				-- Can't do anything if both are nil.
+				if type(valA) == "nil" and type(valB) == "nil" then
+					return false
+				end
+
 				-- Make sure sort is not case-sensitive.
 				if type(valA) == "string" then
 					valA = string.lower(valA)
 				end
 				if type(valB) == "string" then
 					valB = string.lower(valB)
+				end
+
+				-- Make sure we don't try to compare to nil.
+				if (type(valA) ~= "nil" and type(valB) == "nil") then
+					valB = type(valA) == "number" and 0 or ""
+				elseif (type(valA) == "nil" and type(valB) ~= "nil") then
+					valA = type(valB) == "number" and 0 or ""
 				end
 
 				-- Return the proper value depending on whether this is ascending or

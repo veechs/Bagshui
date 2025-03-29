@@ -23,6 +23,11 @@
 * Equipping gear should now more consistently update the history.
 * Key internal data is now validated (things you should hopefully never need to care about).
 
+## 1.4.11 - 2025-03-29
+### Fixed
+* Mounts, companions, and toys should all be [correctly categorized now](https://github.com/veechs/Bagshui/issues/116) on both Turtle WoW and true Vanilla. Thanks as always to [@Sunelegy](https://github.com/Sunelegy) for zhCN guidance.<sup><small>🗃️ [@jilinge2](https://github.com/jilinge2)</small></sup>
+* Attempt to protect against [rare errors during sorting](https://github.com/veechs/Bagshui/issues/127). <sup><small>🪲 bonho</small></sup>
+
 ## 1.4.10 - 2025-03-28
 ### Fixed
 * Locking a bag's highlight via Alt+Click now [temporarily unhides all items in that bag](https://github.com/veechs/Bagshui/issues/125). <sup><small>🪲 [@RetroCro](https://github.com/RetroCro)</small></sup>
