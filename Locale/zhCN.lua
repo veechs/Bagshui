@@ -487,16 +487,21 @@ BsLocalization:AddLocale("zhCN", {
 ["NameIdentifier_Recipe_BottomHalf"] = [[下半部分]],
 ["NameIdentifier_Recipe_TopHalf"] = [[上半部分]],
 
+-- The "Use:"-prefixed tooltips here have the `..-` pattern in place of a colon
+-- because it's unclear whether all zhCN clients use "：" or if some use ": ".
 ["TooltipIdentifier_Buff_AlsoIncreases"] = [[同时增加你的]],
 ["TooltipIdentifier_Buff_WellFed"] = [[进食充分]],
-["TooltipIdentifier_Companion"] = [[右键点击以召唤和解散你的]],
+["TooltipIdentifier_Companion"] = [[使用..-右键点击以召唤或解散你的]],
+["TooltipIdentifier_CompanionTurtleWoW"] = [[右键点击以召唤和解散你的]],
 ["TooltipIdentifier_Drink"] = [[必须在坐下时饮用]],
 ["TooltipIdentifier_Food"] = [[必须在坐下时进食]],
-["TooltipIdentifier_Mount"] = [[使用：召唤和解散一个可骑乘的]],
-["TooltipIdentifier_MountAQ40"] = [[使用：发出高频声音]],
+["TooltipIdentifier_Mount"] = [[使用..-召唤或解散一只可供骑乘的]],
+["TooltipIdentifier_MountAQ40"] = [[使用..-发出高频声波]],
+["TooltipIdentifier_MountTurtleWoW"] = [[使用..-在玩家的坐骑收藏中增加一个新坐骑]],
 ["TooltipIdentifier_PotionHealth"] = [[/恢复%d+到%d+点生命值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_PotionMana"] = [[/恢复%d+到%d+点法力值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_QuestItem"] = [[任务物品]],
+["TooltipIdentifier_ToyTurtleWoW"] = [[使用..-将玩具添加到玩家的玩具收藏中]],
 
 -- Tooltip parsing -- extracting data from tooltips.
 -- 提示框解析 -- 从提示框中提取数据。
