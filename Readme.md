@@ -156,7 +156,7 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 
 ## Donations
-Developing Bagshui is fun, but also a lot of work! Your support is hugely appreciated.
+Developing Bagshui is fun, but also a lot of work! Your support is hugely appreciated.  
 <a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
 
 
