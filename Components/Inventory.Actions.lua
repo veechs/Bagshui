@@ -564,7 +564,9 @@ function Inventory:SwapBag(sourceItem, bagNum, phase, force)
 				BsUtil.TableClear(self.tempMoveTargets)
 				self:UpdateSwapBagProgress(bagNum, true)
 				self.forceResort = true
-				self:Update()
+				-- Need to use QueueUpdate() here to ensure forceResort is consumed properly
+				-- with the other window changes that are going to be happening at the same time.
+				self:QueueUpdate()
 			end,
 			-- Progress callback.
 			function()
