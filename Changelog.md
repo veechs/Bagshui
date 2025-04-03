@@ -3,25 +3,25 @@
 ## 1.5.0 - 2025-03-29
 ### Changes
 * **Automated bag swapping**<br>One of the most-requested features! Just equip a new bag and Bagshui [takes care of the rest](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-swap-bags-when-i-get-bigger-ones).<br><sup><small>Sufficient free space is required, but you can visit the Bank to supplement without cleaning your Bags.</small></sup><br><sup><small>🫶&nbsp;[@Nikki1993](https://github.com/Nikki1993), Kralomax, and everyone on the TW Discord who has asked</small></sup>
-* **Shiny new buttons**<br>**Clam** (Open Container), **Disenchant**, and **Pick Lock** added to the bottom toolbar. <sup><small>🫶&nbsp;[@melbaa](https://github.com/melbaa), [@Azzc0](https://github.com/Azzc0)</small>
+* **Shiny new toolbar buttons**<br>**Clam** (Open Container), **Disenchant**, and **Pick Lock**. <sup><small>🫶&nbsp;[@melbaa](https://github.com/melbaa), [@Azzc0](https://github.com/Azzc0)</small>
 * **Selling protection for your valuables**<br>Ever accidentally right-clicked the wrong thing at a vendor? High quality, active quest, and soulbound items now require confirmation.<sup><small>🫶&nbsp;[@selax1](https://github.com/selax1)</small></sup><br><sup><small>Configurable in **Settings** > **General**. Can also include anything you've ever equipped.</small></sup>
-* **Better gear sorting**<br>Equipment is now sorted by character sheet slot order (head first, fingers last) instead of by slot name, which should be a little more intuitive. <sup><small>🫶&nbsp;Kord2998</small></sup>
+* **More sensible gear slot sorting**<br>Equipment is now sorted by character sheet order (head first, fingers last) instead of slot name, which should be a little more intuitive. <sup><small>🫶&nbsp;Kord2998</small></sup>
 * **Improved utilization display**<br>Even if you hide bag slots, you can now show free/used totals. <sup><small>🫶&nbsp;[@thecreth](https://github.com/thecreth)</small></sup><br><sup><small>Super customizable in **Settings** > **View** > **Utilization**.</small></sup>
-* **New [rule functions](https://github.com/veechs/Bagshui/wiki/Rules#available-rule-functions)**<br>`MatchCategory()`, `RecentlyChanged()`, `Zone()`/`Subzone()`, `PlayerInGroup()`, and `LootMethod()`/`LootMaster()` allow more dynamic categorization than ever before. Plus `Openable()` for chests and lockboxes. <sup><small>🫶&nbsp;[@melbaa](https://github.com/melbaa)</small></sup>
+* **Powerful new [rule functions](https://github.com/veechs/Bagshui/wiki/Rules#available-rule-functions)**<br>`MatchCategory()`, `RecentlyChanged()`, `Zone()`/`Subzone()`, `PlayerInGroup()`, and `LootMethod()`/`LootMaster()` allow more dynamic categorization than ever before. Plus `Openable()` for chests and lockboxes. <sup><small>🫶&nbsp;[@melbaa](https://github.com/melbaa)</small></sup>
 * **But wait, there’s more…**
   * Synchronized searches between open inventory windows. <sup><small>🫶&nbsp;[@thecreth](https://github.com/thecreth)</small></sup>
   * The **Organize** toolbar button is smarter and should only light up if there's something to do.
   * New **Openable** default Category and Group.
   * Hidden Groups have an indicator in Edit Mode.
   * `/Bagshui Info <ItemId>` will open the Item Information window for an arbitrary item.
-  * Empty slot graphics can be hidden and a custom color set. <sup><small>🫶&nbsp;[@RetroCro](https://github.com/RetroCro)</small></sup>
+  * Empty slot graphics can be hidden and a custom background color set. <sup><small>🫶&nbsp;[@RetroCro](https://github.com/RetroCro)</small></sup>
   * Settings menu has been given a thorough polishing.
 
 ### Fixed
 * Dropping a profession now correctly removes it from Bagshui's reagents and crafts tracking.
-* Highlight changes should be much more reliable.
+* Highlight Changes mode should be much more reliable.
 * Equipping gear should now more consistently update the history.
-* Key internal data is now validated (things you should hopefully never need to care about).
+* Key internal data is now validated to avoid errors (things you should hopefully never need to care about).
 
 ## 1.4.11 - 2025-03-29
 ### Fixed
