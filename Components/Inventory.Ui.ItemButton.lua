@@ -470,7 +470,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 					-- At merchant (not on buyback tab).
 					_G.ShowContainerSellCursor(item.bagNum, item.slotNum)
 
-				elseif (item.readable or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
+				elseif (item.readable == 1 or (_G.IsControlKeyDown() and not _G.IsAltKeyDown())) and item.emptySlot ~= 1 then
 					-- Readable items (books, etc) / Control key dressup.
 					_G.ShowInspectCursor()
 
@@ -504,6 +504,7 @@ function Inventory:ItemButton_OnEnter(itemButton)
 			BsSettings.showInfoTooltipsWithoutAlt
 			and not _G.IsShiftKeyDown()
 		)
+		or self.itemPendingSale
 	then
 
 		-- 4th parameter: Always place the info tooltip under GameTooltip in edit mode.
@@ -515,29 +516,38 @@ function Inventory:ItemButton_OnEnter(itemButton)
 			if not buttonInfo.isEmptySlotStack then
 
 				-- Populate the tooltip.
-				if _G.IsControlKeyDown() then
+				if
+					_G.IsControlKeyDown()
+					and not self.itemPendingSale
+				then
 					-- All item properties.
 					BsItemInfo:AddTooltipInfo(item, BsInfoTooltip)
 
 				else
 					-- Normal mode.
 
-					-- We only want blank lines between sections after one section has been added.
-					local spacerNeeded = false
+					-- Sell protection confirmation instructions.
+					if
+						self.ui:IsFrameVisible("MerchantFrame")
+						and self.itemPendingSale == item
+					then
+						self:AddBagshuiInfoTooltipLine(BS_FONT_COLOR.UI_ORANGE .. L.Inventory_Item_SellProtection_ConfirmSale .. FONT_COLOR_CODE_CLOSE)
+						self:AddBagshuiInfoTooltipLine(LIGHTYELLOW_FONT_COLOR_CODE .. string.format(L.Inventory_Item_SellProtection_Reason, self:GetItemSellProtectionReason(item)) .. FONT_COLOR_CODE_CLOSE)
+						self:AddBagshuiInfoTooltipLine(GRAY_FONT_COLOR_CODE .. L.Inventory_Item_SellProtection_OverrideHint .. FONT_COLOR_CODE_CLOSE)
+					end
 
 					-- Inventory counts.
-					spacerNeeded = BsCatalog:AddTooltipInfo(item.itemString, BsInfoTooltip)
+					BsCatalog:AddTooltipInfo(item.itemString, BsInfoTooltip)
 
 					-- Only show more in-depth info when Alt is held, even if showInfoTooltipsWithoutAlt is on.
 					if _G.IsAltKeyDown() then
 
 						-- Active quest info.
 						if Bagshui.activeQuestItems[item.name] then
-							if spacerNeeded then
+							if BsInfoTooltip:NumLines() > 0 then
 								self:AddBagshuiInfoTooltipLine(" ")
 							end
 							self:AddBagshuiInfoTooltipLine(tostring(Bagshui.activeQuestItems[item.name].obtained or "?") .. "/" .. tostring(Bagshui.activeQuestItems[item.name].needed or "?"), string.format(L.Symbol_Colon, L.ItemPropFriendly_activeQuest))
-							spacerNeeded = true
 						end
 
 						-- Stock state.
@@ -546,16 +556,15 @@ function Inventory:ItemButton_OnEnter(itemButton)
 							and item.bagshuiStockState ~= nil
 							and item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE
 						then
-							if spacerNeeded then
+							if BsInfoTooltip:NumLines() > 0 then
 								self:AddBagshuiInfoTooltipLine(" ")
 							end
 							self:AddBagshuiInfoTooltipLine(L["Stock_" .. item.bagshuiStockState], string.format(L.Symbol_Colon, L.StockState))
 							self:AddBagshuiInfoTooltipLine(BsUtil.FormatTimeRemainingString(_G.time() - item.bagshuiDate), string.format(L.Symbol_Colon, L.StockLastChange))
-							spacerNeeded = true
 						end
 
 						-- Assigned category and bag name.
-						if spacerNeeded then
+						if BsInfoTooltip:NumLines() > 0 then
 							self:AddBagshuiInfoTooltipLine(" ")
 						end
 						self:AddBagshuiInfoTooltipLine((BsCategories:GetName(item.bagshuiCategoryId) or L.Error_ItemCategoryUnknown), string.format(L.Symbol_Colon, L.Category), false)
@@ -709,8 +718,8 @@ end
 
 
 --- OnLeave: Reset everything and hide the tooltip.
-function Inventory:ItemButton_OnLeave()
-	local itemButton = _G.this
+function Inventory:ItemButton_OnLeave(itemButton)
+	itemButton = itemButton or _G.this
 
 	-- Clear Edit Mode category highlighting.
 	if self.editState.cursorItemType ~= BS_INVENTORY_OBJECT_TYPE.CATEGORY or self.editState.cursorItem == nil then
@@ -929,6 +938,28 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				return
 			end
 
+			-- Reset pending item sale.
+			if
+				self.itemPendingSale
+				and (
+					mouseButton == "LeftButton"
+					or self.itemPendingSale ~= item
+				)
+			then
+				self:ClearItemPendingSale(itemButton)
+				return
+			end
+
+			-- Bag swapping.
+			if
+				Bagshui.cursorBagSlotNum
+				and BsItemInfo:IsContainer(item)
+				and self.inventoryIdsToContainerIds[Bagshui.cursorBagSlotNum]
+			then
+				self:SwapBag(item, self.inventoryIdsToContainerIds[Bagshui.cursorBagSlotNum])
+				return
+			end
+
 			-- Try to do something with the item. When that fails, go on to default actions.
 			local clickHandled = true
 			local callPickupContainerItemFromBagshuiPickupItem = false
@@ -948,11 +979,57 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 
 			elseif
 				-- Item information menu Alt+right-click blocks everything else.
-				mouseButton == "RightButton" and _G.IsAltKeyDown()
+				mouseButton == "RightButton"
+				and _G.IsAltKeyDown()
+				and not _G.IsControlKeyDown()
+				and not _G.IsShiftKeyDown()
 			then
 				self.menus:OpenMenu("Item", item, nil, "cursor")
 				-- Makes sense to return here since there's no need for a window update.
 				return
+
+
+			elseif
+				-- Sell protection: Trigger confirmation prompt.
+				self.ui:IsFrameVisible("MerchantFrame")
+				and mouseButton == "RightButton"
+				and not _G.IsControlKeyDown()
+				and not (
+					_G.IsControlKeyDown()
+					and _G.IsAltKeyDown()
+					and _G.IsShiftKeyDown()
+				)
+				and self:GetItemSellProtectionReason(item)
+			then
+				self.itemPendingSale = item
+				self.highlightItemsInContainerId = item.bagNum
+				self.highlightItemsContainerSlot = item.slotNum
+				self:ItemButton_OnEnter(itemButton)
+				self:UpdateItemSlotColors()
+				-- Don't let default actions happen because we don't want the tooltip hidden.
+				return
+
+
+			elseif
+				-- Sell protection: Sale confirmed.
+				self.ui:IsFrameVisible("MerchantFrame")
+				and (
+					-- Confirming the previously-selected item.
+					(
+						self.itemPendingSale == item
+						and mouseButton == "RightButton"
+						and _G.IsControlKeyDown()
+					)
+					or
+					-- All modifiers down to bypass sale protection.
+					(
+						_G.IsControlKeyDown()
+						and _G.IsAltKeyDown()
+						and _G.IsShiftKeyDown()
+					)
+				)
+			then
+				self:ContainerItemAction(item, "Use", false)
 
 
 			elseif
@@ -1103,7 +1180,7 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				-- meaning of global this while any code outside our control
 				-- is executed.
 				local oldGlobalThis = _G.this
-				_G.this = itemButton.bagshuiData.getIdProxy
+				_G.this = itemButton.bagshuiData.getIdProxy or _G.this
 
 				if mouseButton == "LeftButton" then
 					-- Normal left-click.
@@ -1128,6 +1205,8 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				_G.this = oldGlobalThis
 			end
 
+			-- Clear pending sale item (must happen before window update).
+			self:ClearItemPendingSale(nil, true)
 			-- Hide tooltip on click -- UpdateWindow() will call ItemSlotAndGroupMouseOverCheck(), which will show it again if needed.
 			self:ItemButton_OnLeave()
 			-- Something was clicked, so make sure the window is up to date.

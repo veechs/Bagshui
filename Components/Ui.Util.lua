@@ -54,18 +54,21 @@ end
 ---@param widget table UI widget.
 ---@param widgetWidth number
 ---@param widgetHeight number
+---@param anchorPoint string? Point on the holding frame to anchor (default: TOPLEFT).
 ---@param anchorToFrame table The holding frame will be anchored to this frame.
----@param anchorToPoint string The holding frame will be anchored to this point on anchorToFrame.
+---@param anchorToPoint string? The holding frame will be anchored to this point on anchorToFrame (default: BOTTOMLEFT).
 ---@param xOffset number? Horizontal offset for holding frame (default: 0).
 ---@param yOffset number? Vertical offset for holding frame (default: -10).
+---@param tooltipTitle string? Tooltip title to display when widget is moused over. Can be updated by modifying `<holdingFrame>.bagshuiData.tooltipTitle`.
+---@param tooltipText string? Tooltip body to display when widget is moused over. Can be updated by modifying `<holdingFrame>.bagshuiData.tooltipText`.
 ---@return table holdingFrame
-function Ui:CreateLabeledWidget(parent, labelText, labelWidth, widget, widgetWidth, widgetHeight, anchorToFrame, anchorToPoint, xOffset, yOffset)
+function Ui:CreateLabeledWidget(parent, labelText, labelWidth, widget, widgetWidth, widgetHeight, anchorPoint, anchorToFrame, anchorToPoint, xOffset, yOffset, tooltipTitle, tooltipText)
 	parent = parent or widget:GetParent()
 
 	local holdingFrame = _G.CreateFrame("Frame", nil, parent)
 	holdingFrame:SetWidth(parent:GetWidth())
 	holdingFrame:SetHeight(widgetHeight)
-	holdingFrame:SetPoint("TOPLEFT", anchorToFrame, anchorToPoint or "BOTTOMLEFT", xOffset or 0, yOffset or -10)
+	holdingFrame:SetPoint(anchorPoint or "TOPLEFT", anchorToFrame, anchorToPoint or "BOTTOMLEFT", xOffset or 0, yOffset or -10)
 
 	local labelFrame, label = self:CreateLabel(holdingFrame, nil, "GameFontNormal", true)
 
@@ -92,7 +95,41 @@ function Ui:CreateLabeledWidget(parent, labelText, labelWidth, widget, widgetWid
 		ui = self,
 		initialWidgetWidth = widgetWidth,
 		initialWidgetHeight = widgetHeight,
+		tooltipTitle = tooltipTitle,
+		tooltipText = tooltipText,
 	}
+
+	local oldOnEnter = widget:GetScript("OnEnter")
+	widget:SetScript("OnEnter", function()
+		if oldOnEnter then
+			oldOnEnter()
+		end
+		if holdingFrame.bagshuiData.tooltipTitle or holdingFrame.bagshuiData.tooltipText then
+			_G.GameTooltip:ClearLines()
+			_G.GameTooltip_SetDefaultAnchor(_G.GameTooltip, _G.this)
+			if holdingFrame.bagshuiData.tooltipTitle then
+				_G.GameTooltip:AddLine(holdingFrame.bagshuiData.tooltipTitle, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, true)
+			end
+			if holdingFrame.bagshuiData.tooltipText then
+				_G.GameTooltip:AddLine(tooltipText, nil, nil, nil, true)
+			end
+			_G.GameTooltip:SetWidth(10)
+			Bagshui:ShowTooltipAfterDelay(_G.GameTooltip, _G.this, holdingFrame)
+		end
+	end)
+
+	local oldOnLeave = widget:GetScript("OnLeave")
+	widget:SetScript("OnLeave", function()
+		if oldOnLeave then
+			oldOnLeave()
+		end
+		if _G.GameTooltip:IsOwned(_G.this) then
+			Bagshui:ShortenTooltipDelay(_G.this, true)
+			_G.GameTooltip:Hide()
+		end
+	end)
+
+
 	return holdingFrame
 end
 

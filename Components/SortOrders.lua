@@ -103,6 +103,10 @@ function SortOrders:Init()
 	self._super.Init(self)
 
 
+	-- Ensure no invalid fields in Sort Orders.
+	self:CleanSortOrders()
+
+
 	-- Link the list of sort orders to the defaultSortOrder setting's list of valid choices.
 	-- This will let the Settings class know which sort orders are valid.
 	Bagshui.prototypes.Settings._settingInfo.defaultSortOrder.choices = self.list
@@ -140,9 +144,14 @@ function SortOrders:Init()
 				-- slotNum ASC
 				local tooltipText
 				for _, sort in pairs(self.list[id].fields) do
+					local sortField = self:GetFieldIdentifier(sort.field, sort.lookup, "::")
+					local sortFieldFriendly =
+						self.sortFields[sortField]
+						and self.sortFields[sortField].friendlyName
+						or (sort.field .. (sort.lookup and ("." .. sort.lookup) or ""))
 					tooltipText =
 						(tooltipText and tooltipText .. BS_NEWLINE or "")
-						.. self.sortFields[self:GetFieldIdentifier(sort.field, sort.lookup, "::")].friendlyName
+						.. sortFieldFriendly
 					if sort.reverseWords then
 						tooltipText = string.format(L.Suffix_Reversed, tooltipText)
 					end
@@ -258,29 +267,56 @@ end
 
 
 --- Test whether the given sort order is valid.
---- Throws an error if it's invalid.
+--- Throws an error if it's invalid (unless `removeIfInvalid` passed).
 ---@param sortOrderId string|number
 ---@param sortOrderInfo table<string,any> Sort order object to validate.
+---@param removeIfInvalid boolean? Remove the sort field instead of throwing an error when it's invalid.
 ---@return boolean
-function SortOrders:ValidateSortOrder(sortOrderId, sortOrderInfo)
+function SortOrders:ValidateSortOrder(sortOrderId, sortOrderInfo, removeIfInvalid)
 	assert(sortOrderId, "sortOrderId is required to perform validation")
 	local baseError = "Sort order " .. sortOrderId .. " failed validation: "
 	assert(sortOrderInfo.name, baseError .. "name is missing")
 	assert(sortOrderInfo.fields, baseError .. "fields is missing")
 
-	for _, sort in pairs(sortOrderInfo.fields) do
+	-- Walk backwards so we can use table.remove().
+	for index = table.getn(sortOrderInfo.fields), 1, -1 do
+		local sort = sortOrderInfo.fields[index]
 		local fieldId = self:GetFieldIdentifier(sort.field, sort.lookup)
-		assert(self.sortFields[fieldId], baseError .. self:GetFieldIdentifier(sort.field, sort.lookup, ".") .. " is not a valid sort field")
-
-		-- Ensure a valid value for asc/desc.
-		if BsUtil.Trim(string.lower(sort.direction or "")) == "desc" then
-			sort.direction = "desc"
-		else
-			sort.direction = "asc"
+		if not self.sortFields[fieldId] then
+			if removeIfInvalid then
+				table.remove(sortOrderInfo.fields, index)
+			else
+				-- This should really never be hit if everything else is handled
+				-- well, so there's no need to make it pretty. It's really more
+				-- for the built-in sort orders than anything.
+				assert(false, baseError .. self:GetFieldIdentifier(sort.field, sort.lookup, ".") .. " is not a valid sort field")
+			end
 		end
+
+		self:ValidateSortFieldDirection(sort)
 	end
 
 	return true
+end
+
+
+
+--- Set the sort direction of a field to "asc" if it's not currently "desc".
+---@param sortFieldTable table A table from the list of sort fields within a sort order. Should typically have `field` and `direction` keys.
+function SortOrders:ValidateSortFieldDirection(sortFieldTable)
+	sortFieldTable.direction = BsUtil.Trim(string.lower(sortFieldTable.direction or "")) == "desc" and "desc" or "asc"
+end
+
+
+
+--- Loop through all Sort Orders and make sure they're good before trying to use them.
+--- This basically just removes any invalid sort fields (anything not in
+--- BS_ITEM_PROPERTIES_ALLOWED_IN_SORT_ORDERS), so be sure to take care of any migration
+--- by updating Config\SortOrders.lua first.
+function SortOrders:CleanSortOrders()
+	for id, sortOrderInfo in pairs(self.list) do
+		self:ValidateSortOrder(id, sortOrderInfo, true)
+	end
 end
 
 

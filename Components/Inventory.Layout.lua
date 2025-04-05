@@ -5,9 +5,19 @@
 Bagshui:AddComponent(function()
 local Inventory = Bagshui.prototypes.Inventory
 
+-- When deciding whether there are differences between a dry run and current state,
+-- some tables need to be compared deeper than the default of 1 level. Set those here.
+local LAYOUT_LOOKUP_TABLE_COMPARE_DEPTH = {
+	categoryIdsGroupedBySequence = 2,
+	groupItems = 2,
+}
+
+-- Reusable variable for use in `Inventory:Update()`.
+local update_cascadeInventory
 
 --- This is the main workhorse for orchestrating UI changes; it's called when almost anything happens.
-function Inventory:Update()
+---@param cascade boolean? After completing the update process for this inventory, trigger it for any docked inventory.
+function Inventory:Update(cascade)
 	-- self:PrintDebug(string.format("Update() windowUpdateBlocked=%s", tostring(self.windowUpdateBlocked)))
 
 	-- Only update if we haven't been blocked from doing so.
@@ -21,6 +31,14 @@ function Inventory:Update()
 	if not self:Visible() and not self.forceCacheUpdate then
 		self.windowUpdateBlocked = false
 		return
+	end
+
+	-- Decide whether we'll need to cascade, and pass everything along.
+	update_cascadeInventory = cascade and (self.dockedInventory or self.dockedToInventory)
+	if update_cascadeInventory then
+		update_cascadeInventory.forceCacheUpdate = update_cascadeInventory.forceCacheUpdate or self.forceCacheUpdate
+		update_cascadeInventory.forceResort = update_cascadeInventory.forceResort or self.forceResort
+		update_cascadeInventory.windowUpdateNeeded = update_cascadeInventory.windowUpdateNeeded or self.windowUpdateNeeded
 	end
 
 	-- We're updating!
@@ -41,7 +59,10 @@ function Inventory:Update()
 
 	-- Perform all updates in the necessary order.
 	self:ValidateLayout()
+	self:ManageDryRun(true)  -- First call decides whether we're in dry run mode (`self.dryRun`).
+	self:UpdateLayoutLookupTables()
 	self:CategorizeAndSort()
+	self:ManageDryRun(false)  -- Second call re-points lookup tables if needed and sets `self.enableResortIcon`.
 	self:FindSpecialItems()
 	self:UpdateWindow()
 	self:UpdateBagBar()
@@ -49,16 +70,23 @@ function Inventory:Update()
 
 	-- Reset status.
 	self.windowUpdateBlocked = false
+
+	-- Automatically cascade updates to docked inventory.
+	if update_cascadeInventory then
+		update_cascadeInventory:Update()
+	end
 end
 
 
 
---- Force a window redraw without updating the inventory cache.
-function Inventory:ForceUpdateWindow()
-	self.cacheUpdateNeeded = false
+--- Force a window redraw with optional cache update.
+---@param cascade boolean? Parameter for `Inventory:Update()`.
+---@param updateCache boolean? `true` to trigger a cache update.
+function Inventory:ForceUpdateWindow(cascade, updateCache)
+	self.cacheUpdateNeeded = updateCache or false
 	self.windowUpdateNeeded = true
 	self.forceResort = false
-	self:Update()
+	self:Update(cascade)
 end
 
 
@@ -107,6 +135,83 @@ end
 
 
 
+--- Control whether the current layout update is a dry run or not.
+--- **Should not be called directly!** Use `Inventory:Update()` to coordinate the process.
+--- 
+--- Doing a dry run means storing information in the `proposedLayoutState` tables
+--- instead of `currentLayoutState`. The proposed state can then be compared
+--- to current to decide whether resorting is needed.
+--- 
+--- This must be called twice during the `Update()` process - once prior to categorizing/sorting
+--- with a parameter of `true` and again just after with `false` (or nil) before calling `UpdateWindow()`.
+---@param phase1 boolean? Pass `true` the first time the function is called.
+function Inventory:ManageDryRun(phase1)
+	if phase1 then
+		-- Determine whether this is real or if we're just simulating to decide whether there are changes.
+		self.dryRun = false
+		-- Ensure items don't shift around when the window is open under normal usage.
+		-- self.forceResort can be used to override (usually when the user clicks the Resort button).
+		if
+			(
+				not self.resortNeeded
+				or self:Visible()
+			)
+			and not self.forceResort
+		then
+			self.dryRun = true
+			self:PrintDebug("++++DRY RUN ON++++")
+		else
+			self:PrintDebug("----dry run off----")
+		end
+
+		-- Reset force resort flag.
+		self.forceResort = false
+
+		-- Point layout state tracking keys to the correct tables.
+		for key, _ in pairs(self.currentLayoutState) do
+			self[key] = self[self.dryRun and "proposedLayoutState" or "currentLayoutState"][key]
+		end
+
+	else
+		-- Resetting tables to current if needed.
+		-- Decide whether the resort icon needs to be enabled.
+		self.enableResortIcon = false
+		-- Special stuff for dry run mode:
+		-- - Manage the resort icon.
+		-- - Re-point layout state tables.
+		if
+			self.dryRun
+			-- Safety check to ensure pointers are always reset.
+			or self.groups ~= self.currentLayoutState.groups
+		then
+			-- We can immediately know to enable resorting if any empty slot is peeled off its stack.
+			self.enableResortIcon = (self.emptySlotStackingAllowed and self.hasSlotsWithStackingPrevented)
+
+			for key, _ in pairs(self.currentLayoutState) do
+				if
+					self.dryRun
+					and not self.enableResortIcon  -- No need to keep checking once we've hit true.
+					and not BsUtil.ObjectsEqual(
+						self.proposedLayoutState[key],
+						self.currentLayoutState[key],
+						nil, nil,
+						LAYOUT_LOOKUP_TABLE_COMPARE_DEPTH[key] or 1
+					)
+				then
+					self.enableResortIcon = true
+				end
+
+				-- Always swap back to the "current" layout state for UpdateWindow() instead
+				-- of the dry run one so that nothing moves around undesirably.
+				self[key] = self.currentLayoutState[key]
+			end
+		end
+	end
+	
+end
+
+
+
 --- Assign inventory items to Bagshui categories and sort into the correct order for display.  
 --- **Should not be called directly!** Use `Inventory:Update()` to coordinate the process.
 ---
@@ -117,53 +222,8 @@ end
 function Inventory:CategorizeAndSort()
 	--self:PrintDebug("CategorizeAndSort()")
 
-	-- sortingAllowed tracks whether items can be moved between groups and sorted within groups.
-	-- Defaults to true but is turned off when the inventory window is open and the user hasn't
-	-- explicitly requested a resort.
-	self.sortingAllowed = true
-
-	-- Ensure items don't shift around when the window is open under normal usage.
-	-- self.forceResort can be used to override (usually when the user clicks the Resort button).
-	if
-		(
-			not self.resortNeeded
-			or self:Visible()
-		)
-		and not self.forceResort
-	then
-		-- self:PrintDebug("CategorizeAndSort() - sorting not allowed")
-		-- There was a change that would have triggered a resort, but it wasn't allowed, so enable the toolbar icon.
-		if self.resortNeeded then
-			self.enableResortIcon = true
-		end
-		-- Don't allow anything to move around; just update categorization.
-		self.sortingAllowed = false
-	end
-
-	-- self:PrintDebug("---------- CategorizeAndSort() PROCEEDING --------------")
-	-- self:PrintDebug("forceResort: " .. tostring(self.forceResort))
-	-- self:PrintDebug("visible: " .. tostring(self:Visible()))
-	-- self:PrintDebug("sortingAllowed: " .. tostring(self.sortingAllowed))
-
-	-- Reset force resort flag.
-	self.forceResort = false
-
-	-- Only refresh lookup tables when sorting can be performed.
-	if self.sortingAllowed then
-		self:UpdateLayoutLookupTables()
-
-		-- We're taking care of getting everything moved to the correct places now,
-		-- so the resort icon can be disabled.
-		self.enableResortIcon = false
-	end
-
 	-- Categorize items and assign to groups.
 	self:CategorizeItems()
-
-	-- Nothing more to do when items can't be moved.
-	if not self.sortingAllowed then
-		return
-	end
 
 	-- Sort items within groups.
 	self:SortGroups()
@@ -198,9 +258,6 @@ end
 --- - `categoriesToGroups` is exactly what it sounds like - the mapping of category IDs to group IDs (which are simply row:position)
 --- and is used by `CategorizeAndSort()` when filling the groupItems table.
 function Inventory:UpdateLayoutLookupTables()
-	if not self.sortingAllowed then
-		return
-	end
 	--self:PrintDebug("UpdateLayoutLookupTables()")
 	-- self:PrintDebug(BsCategories.list)
 
@@ -209,12 +266,17 @@ function Inventory:UpdateLayoutLookupTables()
 	local defaultCategoryFound = false
 
 	-- Wipe all the lookup tables managed by this function.
-	BsUtil.TableClear(self.groups)
+	BsUtil.TableClear(self.activeCategoryIds)
 	BsUtil.TableClear(self.activeGroups)
-	BsUtil.TableClear(self.groupsIdsToFrames)
-	BsUtil.TableClear(self.categoryIdsGroupedBySequence)
-	BsUtil.TableClear(self.sortedCategorySequenceNumbers)
 	BsUtil.TableClear(self.categoriesToGroups)
+	BsUtil.TableClear(self.categorySequenceNumbers)
+	BsUtil.TableClear(self.groups)
+	BsUtil.TableClear(self.sortedCategorySequenceNumbers)
+	-- Don't remove unused sequence number tables - no need to upset the garbage collector.
+	-- (This could be slightly more efficient with something like Compost, but it's not a huge deal.)
+	for _, categoryIds in pairs(self.categoryIdsGroupedBySequence) do
+		BsUtil.TableClear(categoryIds)
+	end
 
 	-- Process the layout and update lookup tables.
 	for rowNum, rowGroups in ipairs(self.layout) do
@@ -265,14 +327,19 @@ function Inventory:AddCategoryToLookupTables(categoryId, groupId)
 
 		-- Get info about the category.
 		local categoryDetails = BsCategories.list[categoryId]
-		-- self:PrintDebug(categoryDetails)
+
+		-- This is an active category (used when checking for errors).
+		self.activeCategoryIds[categoryId] = true
 
 		-- We haven't seen this sequence number yet.
 		if self.categoryIdsGroupedBySequence[categoryDetails.sequence] == nil then
-			-- Add it to sortedCategorySequenceNumbers so it can be used during categorization.
-			table.insert(self.sortedCategorySequenceNumbers, categoryDetails.sequence)
-			-- Initialize a place for it in the categoryIdsGroupedBySequence table.
 			self.categoryIdsGroupedBySequence[categoryDetails.sequence] = {}
+		end
+
+		-- Add sequence number to sortedCategorySequenceNumbers so it can be used during categorization.
+		if not self.categorySequenceNumbers[categoryDetails.sequence] then
+			self.categorySequenceNumbers[categoryDetails.sequence] = true
+			table.insert(self.sortedCategorySequenceNumbers, categoryDetails.sequence)
 		end
 
 		-- Create the category-to-group relationship in categoryIdsGroupedBySequence[<sequence>][<categoryId].
@@ -300,29 +367,20 @@ function Inventory:CategorizeItems()
 
 	-- groupItems stores the list of items that belongs to each group.
 	-- Start clean each time we categorize and sort.
-	-- This can only occur when items are allowed to be moved around!
-	if self.sortingAllowed then
-		-- groupItems is a table of tables, so only wipe the 2nd level tables to keep the garbage collector happy.
-		for groupId, _ in pairs(self.groupItems) do
-			BsUtil.TableClear(self.groupItems[groupId])
-		end
-		-- Using groups instead of activeGroups here just to ensure every possibility is initialized.
-		for groupId, _ in pairs(self.groups) do
-			if not self.groupItems[groupId] then
-				self.groupItems[groupId] = {}
-			end
+
+	-- groupItems is a table of tables, so only wipe the 2nd level tables to keep the garbage collector happy.
+	for groupId, _ in pairs(self.groupItems) do
+		BsUtil.TableClear(self.groupItems[groupId])
+	end
+	-- Using groups instead of activeGroups here just to ensure every possibility is initialized.
+	for groupId, _ in pairs(self.groups) do
+		if not self.groupItems[groupId] then
+			self.groupItems[groupId] = {}
 		end
 	end
 
 	local defaultGroupId = self.categoriesToGroups[BsCategories.defaultCategory]
 	local groupId
-
-	-- Reset error tracking for the categorization process so that category errors
-	-- are only displayed once per category and only every 10 seconds.
-	if _G.GetTime() - (self.lastCategorizeItems or 0) > 10 then
-		BsCategories:ClearErrors()
-	end
-	self.lastCategorizeItems = _G.GetTime()
 
 	-- Perform the actual categorization.
 	for _, bagNum in ipairs(self.containerIds) do
@@ -344,33 +402,30 @@ function Inventory:CategorizeItems()
 						self.categoryIdsGroupedBySequence
 					)
 
-					-- Nothing more to do if we can't sort.
-					if self.sortingAllowed then
-						-- Fall back to the default group if one wasn't assigned.
-						groupId = self.inventory[bagNum][slotNum].bagshuiGroupId
-						if string.len(tostring(groupId or "")) == 0 then
-							groupId = defaultGroupId
-						end
-
-						-- Empty slots are now allowed to stack since they've been through the categorizing process.
-						-- (When an empty slot is first seen during a cache update, it gets the _bagshuiPreventEmptySlotStack
-						-- property set so that empty slots don't just "disappear" into a stack when the window is open
-						-- and the user moves an item out of a slot.)
-						if self.inventory[bagNum][slotNum].emptySlot == 1 then
-							self.inventory[bagNum][slotNum]._bagshuiPreventEmptySlotStack = nil
-						end
-
-						-- Final safety check to ensure we don't somehow try to assign to a group that doesn't exist.
-						if not self.groupItems[groupId] then
-							groupId = defaultGroupId
-						end
-
-						-- Add to group positions lookup table.
-						table.insert(
-							self.groupItems[groupId],
-							self.inventory[bagNum][slotNum]
-						)
+					-- Fall back to the default group if one wasn't assigned.
+					groupId = self.inventory[bagNum][slotNum].bagshuiGroupId
+					if string.len(tostring(groupId or "")) == 0 then
+						groupId = defaultGroupId
 					end
+
+					-- Empty slots are now allowed to stack since they've been through the categorizing process.
+					-- (When an empty slot is first seen during a cache update, it gets the _bagshuiPreventEmptySlotStack
+					-- property set so that empty slots don't just "disappear" into a stack when the window is open
+					-- and the user moves an item out of a slot.)
+					if not self.dryRun and self.inventory[bagNum][slotNum].emptySlot == 1 then
+						self.inventory[bagNum][slotNum]._bagshuiPreventEmptySlotStack = nil
+					end
+
+					-- Final safety check to ensure we don't somehow try to assign to a group that doesn't exist.
+					if not self.groupItems[groupId] then
+						groupId = defaultGroupId
+					end
+
+					-- Add to group positions lookup table.
+					table.insert(
+						self.groupItems[groupId],
+						self.inventory[bagNum][slotNum]
+					)
 
 				end -- bagNumSlots loop
 
@@ -381,7 +436,7 @@ function Inventory:CategorizeItems()
 	end -- self.containerIds loop
 
 	-- Show the error button if there were problems.
-	self.errorText = BsCategories:GetErrors()
+	self.errorText = BsCategories:GetErrors(self.activeCategoryIds)
 
 end
 
@@ -413,8 +468,15 @@ function Inventory:UpdateWindow()
 		Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline = nil
 	end
 
+	-- Can only highlight changes if there's something to highlight.
+	self.highlightChangesEnabled = (
+		self.hasChanges
+		or (self.dockedInventory and self.dockedInventory.hasChanges)
+		or (self.dockedToInventory and self.dockedToInventory.hasChanges)
+	) or false
+
 	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
-	if not self.hasChanges and self.highlightChanges then
+	if not self.highlightChangesEnabled then
 		self.highlightChanges = false
 	end
 
@@ -450,9 +512,22 @@ function Inventory:UpdateWindow()
 
 	self.uiFrame:SetFrameStrata(self.settings.windowStrata)
 
+	-- Update the utilization display setting.
+	-- Done here because it's consumed in `UpdateBagBar()` and `UpdateToolbar()`.
+	self.alwaysShowUsageSummary = (
+		self.settings.bagUsageDisplay == BS_INVENTORY_BAG_USAGE_DISPLAY.ALWAYS
+		or (
+			self.settings.bagUsageDisplay == BS_INVENTORY_BAG_USAGE_DISPLAY.SMART
+			and not self.settings.stackEmptySlots
+		)
+		or false
+	)
+
 
 	-- Only do the intensive work of redrawing the UI if we have to.
 	if self.windowUpdateNeeded then
+
+		BsUtil.TableClear(self.groupsIdsToFrames)
 
 		local uiFrames = self.ui.frames
 		local groupFrames = uiFrames.groups
@@ -474,13 +549,23 @@ function Inventory:UpdateWindow()
 		local firstFrame, widestRowLastFrame, topmostFrame
 
 		-- Window component visibility.
-		local showHeader = (self.settings.showHeader and not self.dockTo) or self.temporarilyShowWindowHeader
-		local showFooter = (self.settings.showFooter and not self.dockTo) or self.temporarilyShowWindowFooter
+		local showHeader = (
+			(self.settings.showHeader and not self.dockTo)
+			or self.temporarilyShowWindowHeader
+		)
+		local showFooter =(
+			(self.settings.showFooter and not self.dockTo)
+			or self.temporarilyShowWindowFooter
+			or self.temporarilyShowBagBar
+		)
 
 		-- Reset hidden group and item tracking.
 		self.hasHiddenGroups = false  -- Updated in this function.
 		self.hasHiddenItems = false  -- Updated in GetGroupItemCountForLayout().
-		self.hasChanges = false  -- Updated in AssignItemsToSlots().
+		self.hasOpenables = false  -- Updated in AssignItemsToSlots().
+		self.nextOpenableItemBagNum = nil  -- Updated in AssignItemsToSlots().
+		self.nextOpenableItemSlotNum = nil  -- Updated in AssignItemsToSlots().
+		self.nextOpenableItemSlotButton = nil  -- Updated in AssignItemsToSlots().
 
 		-- Full reset of empty slot stack counts is needed so that the tracking of which
 		-- bag they represent is rebuilt.
@@ -586,7 +671,7 @@ function Inventory:UpdateWindow()
 
 		-- Reset tracking tables.
 		BsUtil.TableClear(self.groupItemCounts)  -- How many items are in each group.
-		BsUtil.TableClear(self.groupWidthsInItems)  -- Group width in items (actual count EXCEPT in Edit Mode, where 0 becomes 1 to force the group to be visible when empty)
+		BsUtil.TableClear(self.groupWidthsInItems)  -- Group width in items (actual count EXCEPT in Edit Mode, where 0 becomes 1 to force the group to be visible when empty).
 		BsUtil.TableClear(self.actualGroupWidths)  -- Group width in screen units.
 
 		-- Groups are placed starting at the bottom of the main frame and working upwards.
@@ -598,11 +683,6 @@ function Inventory:UpdateWindow()
 			numGroupsInRow = table.getn(self.layout[rowNum])
 			-- Use that information to figure out the number of the end group.
 			uiGroupNumEnd = uiGroupNumStart + numGroupsInRow - 1
-
-			-- Ensure all group UI elements exist.
-			for groupNum = uiGroupNumStart, uiGroupNumEnd do
-				self.ui:CreateGroup(groupNum)
-			end
 
 			-- Determine anchoring.
 			if anchorLeft then
@@ -1001,54 +1081,19 @@ function Inventory:UpdateWindow()
 			-- Ensure main frame anchor is correct.
 			uiFrames.main:SetPoint("BOTTOM", uiFrames.footer, "TOP", 0, 0)
 
-			-- Show/hide Bag Bar.
-			if self.settings.showBagBar then
+			-- Show/hide Bag Bar and mini utilization summary.
+			if self.settings.showBagBar or self.temporarilyShowBagBar then
 				uiFrames.bagBar:Show()
+				self.ui.frames.miniSpaceSummaryBottom:Hide()
 			else
 				uiFrames.bagBar:Hide()
-			end
-
-			-- Variables for hearthstone button position based on whether money frame is shown.
-			local hearthButtonAnchorToFrame = uiButtons.toolbar.hearthstone.bagshuiData.defaultAnchorToFrame
-			local hearthButtonAnchorToPoint = uiButtons.toolbar.hearthstone.bagshuiData.defaultAnchorToPoint
-
-			-- Show/hide Money frame.
-			if self.settings.showMoney then
-				uiFrames.money:Show()
-				uiFrames.money:SetAlpha(self.editMode and 0.2 or 1)
-				-- Use label colors for money text.
-				for _, text in pairs(uiFrames.money.bagshuiData.texts) do
-					text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+				if self.alwaysShowUsageSummary then
+					self.ui.frames.miniSpaceSummaryBottom:Show()
 				end
-			else
-				uiFrames.money:Hide()
-				-- Move the hearthstone button to the money frame's position.
-				_, hearthButtonAnchorToFrame, hearthButtonAnchorToPoint = uiFrames.money:GetPoint(1)
 			end
 
-			-- Show/hide Hearthstone button.
-			if
-				self.hearthButton
-				and self.settings.showFooter
-				and self.settings.showHearthstone
-				and self.hearthstoneItemRef
-			then
-				uiButtons.toolbar.hearthstone:SetPoint(
-					"RIGHT",
-					hearthButtonAnchorToFrame,
-					hearthButtonAnchorToPoint,
-					uiButtons.toolbar.hearthstone.bagshuiData.defaultXOffset,
-					0
-				)
-				uiButtons.toolbar.hearthstone:Show()
-
-				-- Display cooldown.
-				local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
-				self.ui:SetIconButtonCooldown(uiButtons.toolbar.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
-
-			else
-				uiButtons.toolbar.hearthstone:Hide()
-			end
+			-- Remove space summary from top toolbar.
+			self.ui.frames.miniSpaceSummaryTop:Hide()
 
 			-- Apply bag bar scaling and opacity.
 			local bagBarScale = (itemSlotSize / uiButtons.itemSlots[1].bagshuiData.originalSizeAdjusted) * BsSkin.bagBarScale
@@ -1063,7 +1108,6 @@ function Inventory:UpdateWindow()
 					bagSlotButton.bagshuiData.buttonComponents.border:SetScale(1 / bagBarScale)
 				end
 			end
-
 
 			-- Determine footer height based on whether the bag bar is visible.
 			local footerHeight = math.max(
@@ -1141,7 +1185,6 @@ function Inventory:UpdateWindow()
 			-- WoW will change the anchor point to TOPLEFT when the frame is dragged, so we need to reset it.
 			self:FixWindowPosition()
 		end
-
 	end
 
 	-- Check for mouse over state for interact-able elements to ensure tooltips stay current.
@@ -1285,9 +1328,15 @@ function Inventory:AssignItemsToSlots(
 				-- Add the item to the button (texture, tooltip, etc.).
 				self.ui:AssignItemToItemButton(button, item, groupId)
 
-				-- Update tracking of whether there are highlight-able items.
-				if item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE then
-					self.hasChanges = true
+				-- Should the Clam button be enabled?
+				if item.openable == 1 then
+					self.hasOpenables = true
+					-- The first openable item we come across will be the one the Clam button targets.
+					if not self.nextOpenableItemBagNum then
+						self.nextOpenableItemBagNum = item.bagNum
+						self.nextOpenableItemSlotNum = item.slotNum
+						self.nextOpenableItemSlotButton = button
+					end
 				end
 
 				-- Increment counters.
@@ -1715,7 +1764,8 @@ end
 --- Update free/available slot counts. Subclasses should override for special bag bar stuff.
 function Inventory:UpdateBagBar()
 
-	local shouldShowSpaceInformation = false
+	local showBagUsage = self.settings.bagUsageAlwaysShow
+	local showUsageSummary = false
 
 	-- We always need to do one loop through the bag buttons to refresh the appearance and make some decisions.
 	for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
@@ -1797,97 +1847,154 @@ function Inventory:UpdateBagBar()
 
 		-- Display free space information when the mouse is over any button.
 		if bagSlotButton.bagshuiData.mouseIsOver then
-			shouldShowSpaceInformation = true
+			showBagUsage = true
+			showUsageSummary = true
 		end
 
 	end
 
 	-- Also display free space information when the mouse is over the summary area.
-	if self.ui.frames.spaceSummary.bagshuiData.mouseIsOver then
-		shouldShowSpaceInformation = true
+	if
+		self.alwaysShowUsageSummary
+		or self.ui.frames.spaceSummary.bagshuiData.mouseIsOver
+	then
+		showUsageSummary = true
 	end
 
 	-- Cancel free space display in Edit Mode.
 	if self.editMode then
-		shouldShowSpaceInformation = false
+		showBagUsage = false
+		showUsageSummary = false
 	end
 
 	-- Width of bag space summary text area to the right of the bag bar that will be added
 	-- to the overall bag bar width.
 	local summaryWidth = 0
 
-	-- Don't bother with calculations if space information isn't going to be shown.
-	if shouldShowSpaceInformation then
+	-- Reset space tracking - don't need to worry about whether the table members
+	-- are initialized because that's handled below. Here we're only iterating over
+	-- what already exists.
+	for _, spaceInfo in pairs(self.containerSpace) do
+		spaceInfo.available = 0
+		spaceInfo.used = 0
+		spaceInfo.total = 0
+	end
+	self.availableSlots, self.usedSlots, self.totalSlots = 0, 0, 0
 
-		-- Reset space tracking - don't need to worry about whether the table members
-		-- are initialized because that's handled below. Here we're only iterating over
-		-- what already exists.
-		for _, spaceInfo in pairs(self.containerSpace) do
-			spaceInfo.available = 0
-			spaceInfo.used = 0
-			spaceInfo.total = 0
-		end
-		self.availableSlots, self.usedSlots, self.totalSlots = 0, 0, 0
-
-		-- Gether free space information.
-		for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
-			-- Step through bag slot buttons and determine available/used/total space.
-			local container = self.containers[bagSlotButton.bagshuiData.bagNum]
-			local available, used = 0, 0
-			local slotText = ""
-			if container.numSlots > 0 then
-				used = container.slotsFilled
-				if container.slotsFilled < container.numSlots then
-					available = container.numSlots - used
-					slotText = string.format("%s/%s", used, container.numSlots)
-				else
-					slotText = L.Full
-				end
+	-- Gether free space information.
+	for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
+		-- Step through bag slot buttons and determine available/used/total space.
+		local container = self.containers[bagSlotButton.bagshuiData.bagNum]
+		local available, used = 0, 0
+		local slotText = ""
+		if container.numSlots > 0 then
+			used = container.slotsFilled
+			if container.slotsFilled < container.numSlots then
+				available = container.numSlots - used
+				slotText = string.format("%s/%s", used, container.numSlots)
+			else
+				slotText = L.Full
 			end
+		end
+		if showBagUsage then
 			bagSlotButton.bagshuiData.buttonComponents.stock:SetText(slotText)
 			bagSlotButton.bagshuiData.buttonComponents.stock:Show()
-
-			local genericType = container.genericType or BsGameInfo.itemSubclasses["Container"]["Bag"]
-
-			-- Initialize space tracking if needed.
-			if not self.containerSpace[genericType] then
-				self.containerSpace[genericType] = {
-					available = 0,
-					used = 0,
-					total = 0
-				}
-			end
-
-			-- Update calculations.
-			local spaceInfo = self.containerSpace[genericType]
-			spaceInfo.available = spaceInfo.available + available
-			spaceInfo.used = spaceInfo.used + used
-			spaceInfo.total = spaceInfo.total + container.numSlots
-			self.availableSlots = self.availableSlots + available
-			self.usedSlots = self.usedSlots + used
-			self.totalSlots = self.totalSlots + container.numSlots
+		else
+			bagSlotButton.bagshuiData.buttonComponents.stock:Hide()
 		end
 
-		-- Set text.
-		self.ui.frames.spaceSummary.bagshuiData.text:SetText(self.availableSlots)
+		local genericType = container.genericType or BsGameInfo.itemSubclasses["Container"]["Bag"]
+
+		-- Initialize space tracking if needed.
+		if not self.containerSpace[genericType] then
+			self.containerSpace[genericType] = {
+				available = 0,
+				used = 0,
+				total = 0
+			}
+		end
+
+		-- Update calculations.
+		local spaceInfo = self.containerSpace[genericType]
+		spaceInfo.available = spaceInfo.available + available
+		spaceInfo.used = spaceInfo.used + used
+		spaceInfo.total = spaceInfo.total + container.numSlots
+		self.availableSlots = self.availableSlots + available
+		self.usedSlots = self.usedSlots + used
+		self.totalSlots = self.totalSlots + container.numSlots
+	end
+
+	-- Figure out what to display in the summary based on settings.
+
+	local textParts = BsUtil.Split(self.settings.bagUsageFormat, "_")
+
+	local mainText = tostring(textParts[1] == "Used" and self.usedSlots or self.availableSlots)
+	local miniText = mainText
+	local subText
+	if textParts[2] then
+		if textParts[2] == "Total" then
+			subText = self.totalSlots
+		elseif textParts[3] == "Total" then
+			subText = string.format(
+				"%s/%s",
+				(textParts[2] == "Used" and self.usedSlots or self.availableSlots),
+				self.totalSlots
+			)
+			-- miniText = miniText .. " (" .. subText .. ")"
+		end
+	end
+
+
+	if showUsageSummary then
+		self.ui.frames.spaceSummary.bagshuiData.text:SetText(mainText)
 		self.ui.frames.spaceSummary.bagshuiData.text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
-		self.ui.frames.spaceSummary.bagshuiData.subtext:SetText(string.format("%s/%s", self.usedSlots, self.totalSlots))
-		self.ui.frames.spaceSummary.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		self.ui.frames.miniSpaceSummaryBottom.bagshuiData.text:SetText(miniText)
+		self.ui.frames.miniSpaceSummaryBottom.bagshuiData.text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		self.ui.frames.miniSpaceSummaryTop.bagshuiData.text:SetText(miniText)
+		self.ui.frames.miniSpaceSummaryTop.bagshuiData.text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		if subText then
+			self.ui.frames.spaceSummary.bagshuiData.text:ClearAllPoints()
+			self.ui.frames.spaceSummary.bagshuiData.text:SetPoint("BOTTOM", self.ui.frames.spaceSummary, "CENTER", 0, -2)
+			self.ui.frames.spaceSummary.bagshuiData.subtext:SetText(subText)
+			self.ui.frames.spaceSummary.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+			self.ui.frames.spaceSummary.bagshuiData.subtext:Show()
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:SetText(subText)
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:Show()
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:SetText(subText)
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:Show()
+		else
+			self.ui.frames.spaceSummary.bagshuiData.subtext:Hide()
+			self.ui.frames.spaceSummary.bagshuiData.text:ClearAllPoints()
+			self.ui.frames.spaceSummary.bagshuiData.text:SetPoint("CENTER", self.ui.frames.spaceSummary, "CENTER")
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:Hide()
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:SetText("")
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:Hide()
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:SetText("")
+		end
 
 		-- Resize and show/hide.
 		summaryWidth = math.max(self.ui.frames.spaceSummary.bagshuiData.text:GetStringWidth(), self.ui.frames.spaceSummary.bagshuiData.subtext:GetStringWidth())
 		self.ui.frames.spaceSummary:SetWidth(summaryWidth)
 		self.ui.frames.spaceSummary:SetAlpha(1)  -- Reversing the SetAlpha(0) call that happens when we hide the summary.
 
+		self.ui.frames.miniSpaceSummaryBottom:SetWidth(
+			self.ui.frames.miniSpaceSummaryBottom.bagshuiData.text:GetStringWidth()
+			+ self.ui.frames.miniSpaceSummaryBottom.bagshuiData.subtext:GetStringWidth()
+			+ 2
+		)
+		self.ui.frames.miniSpaceSummaryTop:SetWidth(
+			self.ui.frames.miniSpaceSummaryTop.bagshuiData.text:GetStringWidth()
+			+ self.ui.frames.miniSpaceSummaryTop.bagshuiData.subtext:GetStringWidth()
+			+ 2
+		)
 	else
-		-- Hide totals.
-		for _, bagSlotButton in ipairs(self.ui.buttons.bagSlots) do
-			bagSlotButton.bagshuiData.buttonComponents.stock:Hide()
-		end
-
 		-- Hide space summary.
 		self.ui.frames.spaceSummary:SetAlpha(0)  -- Using SetAlpha() instead of Hide() so it's still responsive to mouseover.
 	end
+
+	
 
 	-- Set the Bag Bar to the correct width.
 	self.ui.frames.bagBar:SetWidth(
@@ -1945,7 +2052,7 @@ function Inventory:UpdateToolbar()
 	self:SetToolbarButtonState(
 		toolbarButtons.highlightChanges,
 		nil,
-		self.hasChanges and not self.editMode,
+		self.highlightChangesEnabled and not self.editMode,
 		self.highlightChanges,
 		L.Toolbar_UnHighlightChanges_TooltipTitle,
 		L.Toolbar_HighlightChanges_TooltipTitle
@@ -2010,9 +2117,105 @@ function Inventory:UpdateToolbar()
 		toolbarButtons.offline.bagshuiData.tooltipText = nil
 	end
 
+	-- Money frame.
+	if self.settings.showMoney then
+		self.ui.frames.money:Show()
+		self.ui.frames.money:SetAlpha(self.editMode and 0.2 or 1)
+		-- Use label colors for money text.
+		for _, text in pairs(self.ui.frames.money.bagshuiData.texts) do
+			text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
+		end
+	else
+		self.ui.frames.money:Hide()
+	end
+
+	-- Hearthstone button.
+	if
+		self.hearthButton
+		and self.settings.showFooter
+		and self.settings.showHearthstone
+		and self.hearthstoneItemRef
+	then
+		toolbarButtons.hearthstone:Show()
+
+		-- Display cooldown.
+		local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
+		self.ui:SetIconButtonCooldown(toolbarButtons.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
+
+	else
+		toolbarButtons.hearthstone:Hide()
+	end
+
+	-- Clam (open container) button.
+	self:SetToolbarButtonState(
+		toolbarButtons.clam,
+		(
+			self.clamButton
+			and self.settings.showClam
+			or false
+		),
+		(
+			self.hasOpenables
+			and not self.editMode
+			-- Don't allow at Bank because UseContainerItem() moves the item
+			-- instead of opening it.
+			and not Bagshui.components.Bank.atBank
+			-- Avoid messing with item highlighting during a pending sale.
+			and not self.itemPendingSale
+		)
+	)
+
+	-- Disenchant button.
+	self:SetToolbarButtonState(
+		toolbarButtons.disenchant,
+		(
+			self.disenchantButton
+			and BsCharacter.spellNamesToIds[toolbarButtons.disenchant.bagshuiData.spellName]
+			and self.settings.showDisenchant
+			or false
+		),
+		not self.editMode
+	)
+
+	-- Pick Lock button.
+	self:SetToolbarButtonState(
+		toolbarButtons.pickLock,
+		(
+			self.pickLockButton
+			and BsCharacter.spellNamesToIds[toolbarButtons.pickLock.bagshuiData.spellName]
+			and self.settings.showPickLock
+			or false
+		),
+		not self.editMode
+	)
+
+	-- Utilization summaries.
+	if
+		self.alwaysShowUsageSummary
+		and (
+			not self.settings.showFooter
+			or (
+				self.settings.showFooter
+				and not self.settings.showBagBar
+			)
+		)
+	then
+		if self.settings.showFooter then
+			self.ui.frames.miniSpaceSummaryBottom:Show()
+			self.ui.frames.miniSpaceSummaryTop:Hide()
+		else
+			self.ui.frames.miniSpaceSummaryBottom:Hide()
+			self.ui.frames.miniSpaceSummaryTop:Show()
+		end
+	else
+		self.ui.frames.miniSpaceSummaryBottom:Hide()
+		self.ui.frames.miniSpaceSummaryTop:Hide()
+	end
+
 	-- Re-anchor all toolbar widgets based on visibility.
-	self:UpdateToolbarAnchoring(self.ui.ordering.leftToolbar, "LEFT")
-	self:UpdateToolbarAnchoring(self.ui.ordering.rightToolbar, "RIGHT")
+	self:UpdateToolbarAnchoring("topLeftToolbar", "LEFT")
+	self:UpdateToolbarAnchoring("topRightToolbar", "RIGHT")
+	self:UpdateToolbarAnchoring("bottomRightToolbar", "RIGHT")
 
 	-- Disable unusable stuff in Edit Mode.
 	local editModeState = (self.editMode) and "Disable" or "Enable"
@@ -2052,26 +2255,31 @@ function Inventory:SetToolbarButtonState(
 	end
 	button[visible and "Show" or "Hide"](button)
 
-	if enable == nil then
-		enable = true
+	if button.Enable then
+		if enable == nil then
+			enable = true
+		end
+		button[enable and "Enable" or "Disable"](button)
 	end
-	button[enable and "Enable" or "Disable"](button)
 
-	if lockHighlight then
-		if lockedHighlightTooltip then
-			button.bagshuiData.tooltipTitle = lockedHighlightTooltip
+	if button.LockHighlight then
+		if lockHighlight then
+			if lockedHighlightTooltip then
+				button.bagshuiData.tooltipTitle = lockedHighlightTooltip
+			end
+			button:LockHighlight()
+		else
+			if unlockedHighlightTooltip then
+				button.bagshuiData.tooltipTitle = unlockedHighlightTooltip
+			end
+			button:UnlockHighlight()
 		end
-		button:LockHighlight()
-	else
-		if unlockedHighlightTooltip then
-			button.bagshuiData.tooltipTitle = unlockedHighlightTooltip
-		end
-		button:UnlockHighlight()
 	end
 
 	-- Update tooltip if it's visible so that text stays current.
 	if
-		button.bagshuiData.mouseIsOver
+		button.bagshuiData.isIconButton
+		and button.bagshuiData.mouseIsOver
 		and BsIconButtonTooltip:IsVisible()
 		and BsIconButtonTooltip:IsOwned(button)
 	then
@@ -2082,10 +2290,12 @@ end
 
 
 --- Toolbar icons need their anchors updated based on what's shown.
----@param widgetList (table|number)[] WoW UI widgets, in display order. Numbers are spacing directives that override the default.
+---@param widgetOrderTable string Name of table in `self.ui.ordering`, which is an array of WoW UI widgets, in display order. Can also include numbers as spacing directives that override the default.
 ---@param anchorPoint "LEFT"|"RIGHT" Place to anchor each widget. This point will be anchored to the opposing point of the previous widget.
-function Inventory:UpdateToolbarAnchoring(widgetList, anchorPoint)
-	local defaultOffset = (anchorPoint == "RIGHT" and -1 or 1) * BsSkin.toolbarSpacing
+function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
+	local widgetList = self.ui.ordering[widgetOrderTable]
+	local invert = (anchorPoint == "RIGHT" and -1 or 1)
+	local defaultOffset = invert * BsSkin.toolbarSpacing
 	local nextOffset
 
 	-- Go through the list of widgets in order, but skip the first one since
@@ -2094,8 +2304,8 @@ function Inventory:UpdateToolbarAnchoring(widgetList, anchorPoint)
 		local widget = widgetList[widgetPosition]
 		-- Ignore spacing directives when finding widgets.
 		if type(widget) == "table" and widget:IsShown() then
-			-- Assume default spacing.
-			nextOffset = defaultOffset
+			-- Assume default spacing, adjusted if customized for the widget.
+			nextOffset = defaultOffset + (widget.bagshuiData and widget.bagshuiData.autoLayoutXOffset or 0)
 			-- Walk backwards through the list of widgets and anchor to the first visible one.
 			for anchorPosition = widgetPosition - 1, 1, -1 do
 

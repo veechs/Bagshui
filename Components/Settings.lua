@@ -699,7 +699,7 @@ end
 
 
 
---- Validation: BS_SETTING_TYPE.BOOL  
+--- Validation: BS_SETTING_TYPE.BOOL
 --- Understands 1 -> true, "true" -> true.
 ---@param value any Setting value to validate.
 ---@param settingInfo any Configuration for the setting being validated.

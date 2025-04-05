@@ -12,7 +12,6 @@ local ALL_PROFESSION_BAGS = "~AllProfessionBags~"
 local PROFESSION_BAGS = "~ProfessionBags~"
 
 
-
 -- Property names/values of tables in this array should match `Rules:AddFunction()`
 -- parameters, however the `templates` property should *not* be used in this file.
 -- Instead, there are two options for adding built-in rule templates:
@@ -234,7 +233,7 @@ Bagshui.config.RuleFunctions = {
 
 				if string.find(tostring(arg), "^/.-/$") then
 					-- Already a pattern; nothing to do.
-					
+
 				elseif type(arg) == "number" or string.find(tostring(arg), "^%d+$") then
 					-- It's just a number: 12345 and "12345" -> "^item:12345:".
 					arg = "^item:" .. tostring(arg) .. ":"
@@ -298,6 +297,112 @@ Bagshui.config.RuleFunctions = {
 			return false
 		end,
 		hideFromUi = true,
+	},
+
+
+	-- Player is the master looter.
+	{
+		functionNames = {
+			"LootMaster",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			return BsGameInfo.isMasterLooter
+		end,
+		-- This is hidden and rolled into the templates for LootMethod().
+		hideFromUi = true,
+	},
+
+
+	-- Loot method matches the given string.
+	{
+		functionNames = {
+			"LootMethod",
+			"LootMode",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			return rules:TestValue(BsGameInfo.lootMethod, ruleArguments)
+		end,
+		-- Templates come from localization.
+	},
+
+
+	-- Item matches another category.
+	-- This is one of the most complex rule functions because it's critical to avoid
+	-- a loop where category 1 wants to match 2 which wants to match 1. To make this
+	-- work requires cooperation from the Categories and Rules classes to help manage
+	-- the call stack tracking (`Rules._matchCategory_callStack`) and other aspects.
+	{
+		functionNames = {
+			"MatchCategory",
+			"Match",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			rules:RequireArguments(ruleArguments)
+
+			-- Set up special table for loop prevention.
+			-- Managed here and in:
+			-- - Categories:MatchCategory()
+			-- - Rules:Match()
+			if not rules._matchCategory_callStack then
+				rules._matchCategory_callStack = {}
+			end
+
+			-- This controls which property on the `rules` object error messages
+			-- get stored in. By default we assume we're inside a stack of
+			-- `MatchCategory()` rule function calls and so we assume we'll need
+			-- to use the special property that will be picked up at the end
+			-- of this function.
+			local errorProperty = "_matchCategory_errorMessage"
+			-- When the call stack is empty, this is the originating category,
+			-- and any errors belong to it.
+			if table.getn(rules._matchCategory_callStack) == 0 then
+				errorProperty = "errorMessage"
+				rules._matchCategory_errorMessage = nil
+				-- Store the ID of the category that started this.
+				-- Used by the Categories class to track which categories have MatchCategory() rules.
+				if rules.currentCategoryId then
+					rules._matchCategory_originalCaller = rules.currentCategoryId
+				end
+			end
+
+			-- Try to match categories.
+			for _, categoryId in ipairs(ruleArguments) do
+				-- Custom category IDs are numeric and built-ins are strings, so anything
+				-- that converts to a number should be treated as such.
+				categoryId = tonumber(categoryId) or categoryId
+
+				-- Check potential error conditions before allowing the Categories:MatchCategory() call to proceed.
+				if BsUtil.TableContainsValue(rules._matchCategory_callStack, categoryId) then
+					-- We've seen this category ID before, so stop before we overflow the call stack.
+					-- Build out the error message so it shows the dependency list: ID1 → ID2 → ID1.
+					rules[errorProperty] =
+						BsUtil.Trim(L.Error_Rule_MatchCategory_Loop)
+						.. " " .. table.concat(rules._matchCategory_callStack, " → ")
+						.. " → " .. categoryId
+					return false
+
+				elseif BsCategories.errors[categoryId] then
+					-- The category referenced by this one has an error, so evaluation can't continue.
+					rules[errorProperty] = string.format(L.Error_Rule_MatchCategory_DownstreamError, categoryId)
+					return false
+				end
+
+				-- Make the real MatchCategory() call.
+				if BsCategories:MatchCategory(categoryId, rules.item, rules.character, rules.currentSession, true) then
+					return true
+				end
+
+			end
+
+			-- We want to lift the error message from the depths of the call stack and
+			-- only return it for the category at the top.
+			if errorProperty == "errorMessage" then
+				rules[errorProperty] = rules._matchCategory_errorMessage
+			end
+
+			return false
+		end,
+		-- Templates come from localization.
 	},
 
 
@@ -366,6 +471,34 @@ Bagshui.config.RuleFunctions = {
 		ruleFunction = function(rules, ruleArguments)
 			return rules:TestItemAttribute("name", ruleArguments)
 		end,
+		-- Templates come from localization.
+	},
+
+
+	-- Item can be opened.
+	{
+		functionNames = {
+			"Openable",
+			"Locked",
+			"Opens",
+			"Pickable",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			if table.getn(ruleArguments) > 0 then
+				if ruleArguments[1] then
+					return rules.item.lockPickable == 1
+				else
+					return rules.item.openable == 1
+				end
+			else
+				return rules.item.openable == 1 or rules.item.lockPickable == 1
+			end
+		end,
+		environmentVariables = {
+			Locked = true,
+			NotLocked = false,
+			Unlocked = false,
+		},
 		-- Templates come from localization.
 	},
 
@@ -647,6 +780,29 @@ Bagshui.config.RuleFunctions = {
 	},
 
 
+	-- Player is in a group.
+	-- The PlayerGroup() name was chosen so there's no possibility of thinking
+	-- this is somehow checking whether an item is in a layout Structure Group.
+	{
+		functionNames = {
+			"PlayerInGroup",
+			"PlayerGroup",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			if table.getn(ruleArguments) == 0 then
+				return BsGameInfo.playerGroupType ~= BS_GAME_PLAYER_GROUP_TYPE.SOLO
+			else
+				return rules:TestValue(BsGameInfo.playerGroupType, ruleArguments)
+			end
+		end,
+		environmentVariables = {
+			Party = BS_GAME_PLAYER_GROUP_TYPE.PARTY,
+			Raid = BS_GAME_PLAYER_GROUP_TYPE.RAID,
+		},
+		-- Templates come from localization.
+	},
+
+
 	-- Item is crafted by a learned profession recipe.
 	{
 		functionNames = {
@@ -690,6 +846,29 @@ Bagshui.config.RuleFunctions = {
 				or rules:TestItemAttribute("qualityLocalized", ruleArguments, "string,number")
 		end,
 		-- Template are autogenerated in RuleFunctionTemplates.lua.
+	},
+
+
+	-- Item stock state has changed.
+	{
+		functionNames = {
+			"RecentlyChanged",
+			"Changed",
+			"rc",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			if table.getn(ruleArguments) == 0 then
+				return rules.item.bagshuiStockState ~= BS_ITEM_STOCK_STATE.NO_CHANGE
+			else
+				return rules:TestItemAttribute("bagshuiStockState", ruleArguments)
+			end
+		end,
+		environmentVariables = {
+			New = BS_ITEM_STOCK_STATE.NEW,
+			Up = BS_ITEM_STOCK_STATE.UP,
+			Down = BS_ITEM_STOCK_STATE.DOWN,
+		},
+		-- Template come from localization.
 	},
 
 
@@ -778,6 +957,22 @@ Bagshui.config.RuleFunctions = {
 	},
 
 
+	-- Current subzone.
+	{
+		functionNames = {
+			"Subzone",
+			"sz",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			return (
+				rules:TestValue(BsGameInfo.currentSubZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
+				or rules:TestValue(BsGameInfo.currentMinimapZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
+			)
+		end,
+		-- Template come from localization.
+	},
+
+
 	-- Tooltip contains the given string.
 	{
 		functionNames = {
@@ -789,6 +984,7 @@ Bagshui.config.RuleFunctions = {
 		end,
 		-- Templates come from localization.
 	},
+
 
 	-- Transmog() stub.
 	{
@@ -939,6 +1135,22 @@ Bagshui.config.RuleFunctions = {
 		ruleFunctionTemplateFormatStrings = {
 			"AtlasLoot"
 		}
+	},
+
+
+	-- Current zone.
+	{
+		functionNames = {
+			"Zone",
+			"z",
+		},
+		ruleFunction = function(rules, ruleArguments)
+			return (
+				rules:TestValue(BsGameInfo.currentZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
+				or rules:TestValue(BsGameInfo.currentRealZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
+			)
+		end,
+		-- Template come from localization.
 	},
 
 }

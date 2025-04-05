@@ -8,7 +8,7 @@ Bagshui:AddComponent(function()
 -- See Components\Profiles.lua for details, especially the `profileSkeleton` declaration.
 ---@type table<string, any>[]
 Bagshui.config.Profiles = {
-	version = 2,
+	version = 3,
 
 	defaults = {
 		-- This is the default profile, which specifies the default layout.
@@ -37,6 +37,12 @@ Bagshui.config.Profiles = {
 								categories = {
 									"Mounts",
 									"Companions",
+								},
+							},
+							{
+								name = L.Openable,
+								categories = {
+									"Openable",
 								},
 							},
 							{
@@ -303,6 +309,7 @@ Bagshui.config.Profiles = {
 									"Juju",
 									"KeyAndKeyLike",
 									"Mounts",
+									"Openable",
 									"Potions",
 									"PotionsHealth",
 									"PotionsMana",
@@ -471,6 +478,111 @@ Bagshui.config.Profiles = {
 					table.insert(
 						profile.structure.primary.layout[2][1].categories,
 						"Tokens"
+					)
+					table.sort(profile.structure.primary.layout[2][1].categories)
+				end
+			end
+		end
+
+
+		-- In v3, the Openable Category was added to both the Bagshui and OneBagshui Structures.
+		if oldVersion < 3 then
+			for id, profile in pairs(profiles.list) do
+				-- Only add Openable if there hasn't been significant editing.
+				if
+					-- Based on default Bagshui Structure.
+					profile.structure
+					and profile.structure.primary
+					and profile.structure.primary.layout
+					and type(profile.structure.primary.layout[1]) == "table"
+					-- Mounts/Companions
+					and (
+						type(profile.structure.primary.layout[1][3]) == "table"
+						and profile.structure.primary.layout[1][3].name == string.format("%s/%s", L.Mounts, L.Companions)
+						and type(profile.structure.primary.layout[1][3].categories) == "table"
+						and table.getn(profile.structure.primary.layout[1][3].categories) == 2
+						and BsUtil.TableContainsValue(profile.structure.primary.layout[1][3].categories, "Mounts")
+						and BsUtil.TableContainsValue(profile.structure.primary.layout[1][3].categories, "Companions")
+					)
+					-- Junk
+					and (
+						type(profile.structure.primary.layout[1][4]) == "table"
+						and profile.structure.primary.layout[1][4].name == L.Junk
+						and type(profile.structure.primary.layout[1][4].categories) == "table"
+						and table.getn(profile.structure.primary.layout[1][4].categories) == 1
+						and profile.structure.primary.layout[1][4].categories[1] == "QualGray"
+					)
+					-- Safeguard to make sure profile default exists.
+					and Bagshui.config.Profiles
+					and Bagshui.config.Profiles.defaults
+					and Bagshui.config.Profiles.defaults[1]
+					and Bagshui.config.Profiles.defaults[1].structure
+					and Bagshui.config.Profiles.defaults[1].structure.primary
+					and Bagshui.config.Profiles.defaults[1].structure.primary.layout
+					and Bagshui.config.Profiles.defaults[1].structure.primary.layout[1]
+					and Bagshui.config.Profiles.defaults[1].structure.primary.layout[1][4]
+				then
+					-- Openable is a separate Group in Bagshui.
+					table.insert(
+						profile.structure.primary.layout[1],
+						4,
+						BsUtil.TableCopy(Bagshui.config.Profiles.defaults[1].structure.primary.layout[1][4])
+					)
+
+				elseif
+					-- Based on OneBagshui Structure.
+					profile.structure
+					and profile.structure.primary
+					and profile.structure.primary.layout
+					and type(profile.structure.primary.layout[2]) == "table"
+					and type(profile.structure.primary.layout[2][1]) == "table"
+					and profile.structure.primary.layout[2][1].name == L.Inventory
+					and type(profile.structure.primary.layout[2][1].categories) == "table"
+					and table.getn(profile.structure.primary.layout[2][1].categories) == 38
+					-- Yes this is silly but it only will ever run once.
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "ActiveQuest")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Armor")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Bags")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Bandages")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "ClassBooks")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "ClassItems")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "ClassReagents")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Companions")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Consumables")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Disguises")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Drink")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Elixirs")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "EmptySlot")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "EquippedGear")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Explosives")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Food")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "FoodBuffs")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Juju")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "KeyAndKeyLike")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Mounts")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Potions")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "PotionsHealth")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "PotionsMana")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "ProfessionCrafts")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "ProfessionReagents")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "QualGray")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Quest")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Recipes")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Runes")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Scrolls")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "SoulboundGear")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Teleports")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Tokens")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "TradeGoods")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "TradeTools")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Uncategorized")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "WeaponBuffs")
+					and BsUtil.TableContainsValue(profile.structure.primary.layout[2][1].categories, "Weapons")
+				then
+					-- Openable is used for sorting in OneBagshui (if changed away from Manual sort, obvs).
+					table.insert(
+						profile.structure.primary.layout[2][1].categories,
+						"Openable"
 					)
 					table.sort(profile.structure.primary.layout[2][1].categories)
 				end

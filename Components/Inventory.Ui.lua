@@ -7,6 +7,7 @@ local Inventory = Bagshui.prototypes.Inventory
 
 
 --- Set up everything related to the UI that needs to be done at startup.
+--- This could probably be broken into multiple functions because it's a bit of a monstrosity at this point.
 function Inventory:InitUi()
 
 	-- Instance of the `InventoryUi` class specific to this Inventory class instance.
@@ -72,6 +73,11 @@ function Inventory:InitUi()
 	end
 
 	uiFrame:SetScript("OnMouseDown", function()
+		-- Clear a pending item sale.
+		if self.itemPendingSale then
+			self:ClearItemPendingSale()
+		end
+
 		if _G.arg1 == "LeftButton" then
 			-- Close non-Settings menus on left mouse down (Settings is closed OnMouseUp).
 			if not self.menus:IsMenuOpen("Settings") then
@@ -124,7 +130,6 @@ function Inventory:InitUi()
 							self.settings.showFooter = false
 
 						end
-						self:PrintDebug("toolbars are different")
 					end
 					self.ignoreNextSettingChange = true
 					-- self.settings.showHeader = not self.settings.showHeader
@@ -232,7 +237,71 @@ function Inventory:InitUi()
 	ui.text.noData:SetAlpha(0.4)
 	ui.text.noData:Hide()
 
+
 	-- Toolbar.
+
+	-- Shared functions for spell cast buttons.
+
+	--- Return `true` if the current button does *not* have an associated spell
+	--- in its `bagshuiData.spellName` property.
+	---@return boolean
+	local function inventory_SpellButton_NoSpell()
+		return (
+			not _G.this.bagshuiData
+			or not _G.this.bagshuiData.spellName
+			or not BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName]
+		)
+	end
+
+	--- Cast the configured spell on a button.
+	local function inventory_SpellButton_OnClick()
+		if inventory_SpellButton_NoSpell() then
+			return
+		end
+		_G.CastSpell(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
+	end
+
+	--- Show the spell tooltip associated with a button.
+	local function inventory_SpellButton_OnEnter()
+		if inventory_SpellButton_NoSpell() then
+			return
+		end
+		_G.GameTooltip:SetOwner(_G.this, "ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint))
+		_G.GameTooltip:SetSpell(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
+		_G.GameTooltip:Show()
+		return false
+	end
+
+	--- Hide the tooltip.
+	local function inventory_SpellButton_OnLeave()
+		if _G.GameTooltip:IsOwned(_G.this) then
+			_G.GameTooltip:Hide()
+		end
+		return false
+	end
+
+	-- Permanent variables for OnUpdate to keep the garbage collector happy.
+	local spellButton_OnUpdate_cooldownStart, spellButton_OnUpdate_cooldownDuration, spellButton_OnUpdate_cooldownEnable
+
+	--- Manage the spell cooldown.
+	local function inventory_SpellButton_OnUpdate()
+		if inventory_SpellButton_NoSpell() then
+			return
+		end
+		spellButton_OnUpdate_cooldownStart,
+			spellButton_OnUpdate_cooldownDuration,
+			spellButton_OnUpdate_cooldownEnable
+			= _G.GetSpellCooldown(BsCharacter.spellNamesToIds[_G.this.bagshuiData.spellName], _G.BOOKTYPE_SPELL)
+		if spellButton_OnUpdate_cooldownEnable and (spellButton_OnUpdate_cooldownDuration or 0) > 0 then
+			self.ui:SetIconButtonCooldown(
+				_G.this,
+				spellButton_OnUpdate_cooldownStart,
+				spellButton_OnUpdate_cooldownDuration,
+				spellButton_OnUpdate_cooldownEnable
+			)
+		end
+	end
+
 
 	-- Top left icon.
 	buttons.toolbar.menu = ui:CreateIconButton({
@@ -249,8 +318,31 @@ function Inventory:InitUi()
 			self.ui.tooltips.mini:Hide()
 			self.menus:OpenMenu("Main", nil, nil, _G.this, -5, -5)
 		end,
+		onEnter = function()
+			_G.this.bagshuiData.overrideTooltip = (
+				(
+					not self.settings.showFooter
+					and not self.alwaysShowUsageSummary
+				) or (
+					self.settings.bagUsageDisplay ~= BS_INVENTORY_BAG_USAGE_DISPLAY.ALWAYS
+					and not self.settings.showBagBar
+				)
+			)
+
+			if _G.this.bagshuiData.overrideTooltip then
+				self:ShowUsageSummary(_G.this, false)
+				return false
+			end
+		end,
+		onLeave = function()
+			if _G.this.bagshuiData.overrideTooltip then
+				self:HideUsageSummary(_G.this, false)
+				return false
+			end
+		end,
 		texture = self.inventoryType,
-		tooltipTitle = L.Toolbar_Menu_TooltipTitle
+		tooltipTitle = L.Toolbar_Menu_TooltipTitle,
+		tooltipAnchorPoint = "",
 	})
 
 	-- Offline indicator.
@@ -339,7 +431,6 @@ function Inventory:InitUi()
 		name = "Catalog",
 		parentFrame = header,
 		anchorToFrame = nextAnchor,
-		xOffset = nextOffset,
 		onClick = function()
 			BsCatalog:Toggle()
 		end,
@@ -353,7 +444,7 @@ function Inventory:InitUi()
 
 	-- Right toolbar order, consumed by `Inventory:UpdateToolbarAnchoring()`
 	-- to manage anchoring based on what is visible.
-	self.ui.ordering.rightToolbar = {
+	self.ui.ordering.topRightToolbar = {
 		buttons.toolbar.close,
 		-BsSkin.toolbarCloseButtonOffset,
 		buttons.toolbar.catalog,
@@ -366,7 +457,6 @@ function Inventory:InitUi()
 			name = inventoryType,
 			parentFrame = header,
 			anchorToFrame = nextAnchor,
-			xOffset = nextOffset,
 			onClick = function()
 				inventoryClass:Toggle()
 			end,
@@ -376,9 +466,9 @@ function Inventory:InitUi()
 		nextAnchor = buttons.toolbar[inventoryType]
 		nextOffset = -BsSkin.toolbarSpacing
 
-		table.insert(self.ui.ordering.rightToolbar, buttons.toolbar[inventoryType])
+		table.insert(self.ui.ordering.topRightToolbar, buttons.toolbar[inventoryType])
 	end
-	table.insert(self.ui.ordering.rightToolbar, -BsSkin.toolbarGroupSpacing)
+	table.insert(self.ui.ordering.topRightToolbar, -BsSkin.toolbarGroupSpacing)
 
 	-- Add remainder of toolbar buttons right to left.
 	nextOffset = -BsSkin.toolbarGroupSpacing
@@ -397,13 +487,12 @@ function Inventory:InitUi()
 		buttons.toolbar[item.id] = button
 
 		nextAnchor = button
-		nextOffset = -BsSkin.toolbarSpacing
 
 		-- Store special spacing directives so they can be read by Inventory:UpdateToolbarAnchoring().
 		if item.xOffset and item.xOffset ~= nextOffset then
-			table.insert(self.ui.ordering.rightToolbar, item.xOffset)
+			table.insert(self.ui.ordering.topRightToolbar, item.xOffset)
 		end
-		table.insert(self.ui.ordering.rightToolbar, button)
+		table.insert(self.ui.ordering.topRightToolbar, button)
 	end
 
 
@@ -421,6 +510,10 @@ function Inventory:InitUi()
 			if self.dockedInventory then
 				self.dockedInventory:UpdateItemSlotColors()
 			end
+			if not self.searchTextSetFromEvent then
+				Bagshui:RaiseEvent("BAGSHUI_INVENTORY_SEARCH", nil, self.inventoryType, self.searchText)
+			end
+			self.searchTextSetFromEvent = false
 		end,
 
 		-- OnEnterPressed -- open Catalog if a modifier is down.
@@ -446,7 +539,7 @@ function Inventory:InitUi()
 	frames.searchBox:SetPoint("TOPRIGHT", buttons.toolbar.resort, -BsSkin.toolbarGroupSpacing - 12, 2)
 	frames.searchBox:Hide()
 
-	table.insert(self.ui.ordering.rightToolbar, frames.searchBox)
+	table.insert(self.ui.ordering.topRightToolbar, frames.searchBox)
 
 	-- Hide search box when empty.
 	local oldOnEditFocusLost = frames.searchBox:GetScript("OnEditFocusLost")
@@ -479,12 +572,12 @@ function Inventory:InitUi()
 	ui.frames.status:Show()
 
 	-- The last thing anchored to the leftmost right toolbar icon is the status text. 
-	table.insert(self.ui.ordering.rightToolbar, ui.frames.status)
+	table.insert(self.ui.ordering.topRightToolbar, ui.frames.status)
 
 
 	-- Left toolbar order, consumed by `Inventory:UpdateToolbarAnchoring()`
 	-- to manage anchoring based on what is visible.
-	self.ui.ordering.leftToolbar = {
+	self.ui.ordering.topLeftToolbar = {
 		buttons.toolbar.menu,
 		buttons.toolbar.offline,
 		buttons.toolbar.error,
@@ -548,101 +641,84 @@ function Inventory:InitUi()
 	-- Actual bag slot setup.
 	ui:CreateBagSlotButtons()
 
-	-- Create free space display.
-	frames.spaceSummary = _G.CreateFrame("Frame", nil, frames.bagBar)
+
+	-- Shared functions for utilization displays.
+
+	local function usageSummary_OnEnter()
+		self:ShowUsageSummary(_G.this, true)
+	end
+	local function usageSummary_OnLeave()
+		self:HideUsageSummary(_G.this, true)
+	end
+
+
+	--- Create a space utilization display.
+	--- Frame and FontStrings will *not* have positions set.
+	---@param parent table? Parent frame.
+	---@param justifyH string? FontString justification.
+	---@return table spaceSummary
+	local function CreateSpaceSummary(parent, justifyH)
+		local spaceSummary = _G.CreateFrame("Frame", nil, parent)
+		spaceSummary:SetHitRectInsets(-(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2))
+		spaceSummary.bagshuiData = {
+			text = spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
+			subtext = spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
+		}
+		spaceSummary.bagshuiData.text:SetTextColor(1, 1, 1, 0.75)
+		spaceSummary.bagshuiData.text:SetShadowColor(0, 0, 0, 0.75)
+		spaceSummary.bagshuiData.text:SetShadowOffset(1, -1)
+		spaceSummary.bagshuiData.text:SetJustifyH(justifyH or "CENTER")
+		spaceSummary.bagshuiData.text:SetJustifyV("MIDDLE")
+		spaceSummary.bagshuiData.subtext:SetTextColor(1, 1, 1, 0.65)
+		spaceSummary.bagshuiData.subtext:SetShadowColor(0, 0, 0, 0.75)
+		spaceSummary.bagshuiData.subtext:SetShadowOffset(1, -1)
+		spaceSummary.bagshuiData.subtext:SetJustifyH(justifyH or "CENTER")
+		spaceSummary.bagshuiData.subtext:SetJustifyV("MIDDLE")
+		spaceSummary.bagshuiData.subtext:SetFont(spaceSummary.bagshuiData.subtext:GetFont(), 9)
+
+		-- Show individual bag type information on mouseover.
+		spaceSummary:EnableMouse(true)
+		spaceSummary:RegisterForDrag("LeftButton")
+		ui:PassMouseEventsThrough(spaceSummary, uiFrame, true)
+		spaceSummary:SetScript("OnEnter", usageSummary_OnEnter)
+		spaceSummary:SetScript("OnLeave", usageSummary_OnLeave)
+
+		return spaceSummary
+	end
+
+	-- This is the main utilization display that goes to the right of the bag bar.
+	frames.spaceSummary = CreateSpaceSummary(frames.bagBar, "CENTER")
 	frames.spaceSummary:SetPoint("LEFT", buttons.bagSlots[table.getn(buttons.bagSlots)], "RIGHT", BsSkin.bagBarSpacing - 2, 0)
 	frames.spaceSummary:SetPoint("TOP", frames.bagBar)
 	frames.spaceSummary:SetPoint("BOTTOM", frames.bagBar)
 	frames.spaceSummary:SetWidth(50)
-	frames.spaceSummary:SetHitRectInsets(-(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2))
-	frames.spaceSummary.bagshuiData = {
-		text = frames.spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
-		subtext = frames.spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
-	}
-	frames.spaceSummary.bagshuiData.text:SetTextColor(1, 1, 1, 0.75)
-	frames.spaceSummary.bagshuiData.text:SetShadowColor(0, 0, 0, 0.75)
-	frames.spaceSummary.bagshuiData.text:SetShadowOffset(1, -1)
 	frames.spaceSummary.bagshuiData.text:SetPoint("BOTTOM", frames.spaceSummary, "CENTER", 0, -2)
-	frames.spaceSummary.bagshuiData.text:SetJustifyH("CENTER")
-	frames.spaceSummary.bagshuiData.text:SetJustifyV("MIDDLE")
 	frames.spaceSummary.bagshuiData.subtext:SetPoint("TOP", frames.spaceSummary, "CENTER", 0, -3)
-	frames.spaceSummary.bagshuiData.subtext:SetJustifyH("CENTER")
-	frames.spaceSummary.bagshuiData.subtext:SetJustifyV("MIDDLE")
-	frames.spaceSummary.bagshuiData.subtext:SetFont(frames.spaceSummary.bagshuiData.subtext:GetFont(), 9)
-	frames.spaceSummary.bagshuiData.subtext:SetTextColor(1, 1, 1, 0.65)
-	frames.spaceSummary.bagshuiData.subtext:SetShadowColor(0, 0, 0, 0.75)
-	frames.spaceSummary.bagshuiData.subtext:SetShadowOffset(1, -1)
 
-	-- Show individual bag type information on mouseover.
-	frames.spaceSummary:EnableMouse(true)
-	frames.spaceSummary:RegisterForDrag("LeftButton")
-	ui:PassMouseEventsThrough(frames.spaceSummary, uiFrame, true)
-
-	frames.spaceSummary:SetScript("OnEnter", function()
-		if self.editMode then
-			return
-		end
-
-		_G.this.bagshuiData.mouseIsOver = true
-
-		-- Trigger bag bar OnEnter to avoid flickering.
-		frames.bagBar:GetScript("OnEnter")()
-
-		-- Add overall info.
-		_G.GameTooltip:SetOwner(
-			_G.this,
-			"ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint),
-			-BsSkin.tooltipExtraOffset,
-			BsSkin.tooltipExtraOffset
-		)
-		_G.GameTooltip:AddDoubleLine(
-			-- Available: 10     Used: 8/18
-			string.format(L.Symbol_Colon, L.Available) .. " " .. tostring(self.availableSlots),
-			string.format(L.Symbol_Colon, L.Used) .. " " .. string.format("%s/%s", tostring(self.usedSlots), tostring(self.totalSlots))
-		)
-
-		-- Only show per-bag-type info if there are profession bags.
-		local hasProfessionBags = false
-		for containerType, spaceInfo in pairs(self.containerSpace) do
-			if (spaceInfo.total or 0) > 0 and containerType ~= L.Bag then
-				hasProfessionBags = true
-			end
-		end
-
-		-- Add per-bag-type info, excluding any bag types where total is 0 (necessary
-		-- because we don't bother cleaning up the containerSpace table when all bags
-		-- of a given type are unequipped).
-		if hasProfessionBags then
-			for _, containerType in ipairs(BS_INVENTORY_CONTAINER_TYPE_ORDER) do
-				local spaceInfo = self.containerSpace[containerType]
-				if spaceInfo and (spaceInfo.total or 0) > 0 then
-					-- Bag: 2             6/8
-					_G.GameTooltip:AddDoubleLine(
-						string.format(L.Symbol_Colon, containerType) .. " " .. tostring(spaceInfo.available),
-						string.format("%s/%s", tostring(spaceInfo.used), tostring(spaceInfo.total)),
-						HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b,
-						HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b
-					)
-				end
-			end
-		end
-
-		_G.GameTooltip:Show()
-	end)
-
-	frames.spaceSummary:SetScript("OnLeave", function()
-		_G.this.bagshuiData.mouseIsOver = false
-
-		-- Hide tooltip.
-		if _G.GameTooltip:IsOwned(_G.this) then
-			_G.GameTooltip:Hide()
-		end
-
-		-- Decide whether to keep displaying slot available/used counts.
-		frames.bagBar:GetScript("OnLeave")()
-	end)
+	-- Create two "mini" utilization displays to use when the bag bar is hidden.
+	-- One is for the bottom left and the other for the top left when the bottom toolbar is hidden.
+	-- Reusing just one would be nice but this is more expedient.
+	for _, position in ipairs({"Bottom", "Top"}) do
+		local name = "miniSpaceSummary" .. position
+		frames[name] = CreateSpaceSummary(footer, "LEFT")
+		frames[name]:SetPoint("LEFT", footer, "LEFT", BsSkin.toolbarSpacing, 0)
+		frames[name]:SetWidth(100)
+		frames[name]:SetHeight(18)
+		frames[name].bagshuiData.text:SetPoint("LEFT", frames[name], "LEFT", 0, 0)
+		frames[name].bagshuiData.subtext:SetPoint("LEFT", frames[name].bagshuiData.text, "RIGHT", 1, 0.5)
+	end
+	-- Make the top one conditionally part of the top left toolbar.
+	frames.miniSpaceSummaryTop:SetParent(header)
+	frames.miniSpaceSummaryTop:ClearAllPoints()
+	frames.miniSpaceSummaryTop.bagshuiData.text:SetPoint("LEFT", frames.miniSpaceSummaryTop, "LEFT", 0, -1)
+	table.insert(self.ui.ordering.topLeftToolbar, 2, frames.miniSpaceSummaryTop)
 
 
+	-- Bottom right toolbar anchor.
+	frames.bottomRightToolbarAnchor = _G.CreateFrame("Frame", nil, footer)
+	frames.bottomRightToolbarAnchor:SetHeight(25)
+	frames.bottomRightToolbarAnchor:SetWidth(1)
+	frames.bottomRightToolbarAnchor:SetPoint("RIGHT", footer, "RIGHT", 5, 0)
 
 	-- Money frame.
 
@@ -660,10 +736,10 @@ function Inventory:InitUi()
 			silver = _G[moneyFrameName .. "SilverButtonText"],
 			copper = _G[moneyFrameName .. "CopperButtonText"],
 		},
+		autoLayoutXOffset = 12
 	}
 	frames.money:SetWidth(22)
 	frames.money:SetHeight(25)
-	-- Anchor point will be updated during UpdateWindow() if Hearthstone button is visible.
 	frames.money:SetPoint("RIGHT", 8, 0)
 
 	-- Need custom OnEnter/OnLeave to show tooltip with all characters' money.
@@ -709,7 +785,6 @@ function Inventory:InitUi()
 		anchorPoint = "RIGHT",
 		anchorToFrame = frames.money,
 		anchorToPoint = "LEFT",
-		xOffset = -8,
 		disable = false,
 		onClick = function()
 			if Bagshui:GetCursorItem() == self.hearthstoneItemRef then
@@ -740,13 +815,6 @@ function Inventory:InitUi()
 	-- Make the Hearthstone toolbar button compatible with our `ContainerFrameItemButton_` hackery.
 	ui:AddItemSlotButtonGetIdProxy(buttons.toolbar.hearthstone)
 
-	-- Store default positioning for later use in UpdateWindow().
-	_,
-		buttons.toolbar.hearthstone.bagshuiData.defaultAnchorToFrame,
-		buttons.toolbar.hearthstone.bagshuiData.defaultAnchorToPoint,
-		buttons.toolbar.hearthstone.bagshuiData.defaultXOffset
-			= buttons.toolbar.hearthstone:GetPoint(1)
-
 	-- Allow picking up the Hearthstone from the button.
 	buttons.toolbar.hearthstone:RegisterForDrag("LeftButton")
 	buttons.toolbar.hearthstone:SetScript("OnDragStart", function()
@@ -763,6 +831,105 @@ function Inventory:InitUi()
 		buttons.toolbar.hearthstone:Hide()
 	end
 
+
+	-- Clam (open container) button.
+	buttons.toolbar.clam = ui:CreateIconButton({
+		name = "Clam",
+		parentFrame = footer,
+		anchorPoint = "RIGHT",
+		anchorToFrame = buttons.toolbar.hearthstone,
+		anchorToPoint = "LEFT",
+		disable = false,
+		texture = "Clam",
+		tooltipTitle = L.OpenContainer,
+		onClick = function()
+			if
+				self.nextOpenableItemBagNum
+				and self.nextOpenableItemSlotNum
+			then
+				_G.UseContainerItem(self.nextOpenableItemBagNum, self.nextOpenableItemSlotNum)
+			end
+		end,
+		onEnter = function()
+			-- Actual work will be handled in OnUpdate.
+			_G.this.bagshuiData.mouseIsOver = true
+		end,
+		onLeave = function()
+			_G.this.bagshuiData.mouseIsOver = false
+			self.highlightItemsInContainerId = nil
+			self.highlightItemsContainerSlot = nil
+			self:UpdateItemSlotColors()
+			if self.nextOpenableItemSlotButton then
+				self:ItemButton_OnLeave(self.nextOpenableItemSlotButton)
+			elseif self.lastHighlightedOpenableButton then
+				self:ItemButton_OnLeave(self.lastHighlightedOpenableButton)
+			end
+			self.lastHighlightedOpenableButton = nil
+		end,
+		onUpdate = function()
+			if not _G.this.bagshuiData.mouseIsOver then
+				-- We need to essentially fake an OnLeave event when the
+				-- last container is opened because the normal OnLeave
+				-- won't fire, which leads to the light highlighted item
+				-- slot button thinking it's still moused over.
+				if _G.this.bagshuiData.wasUpdated then
+					_G.this.bagshuiData.wasUpdated = false
+				end
+				return
+			end
+			self:HighlightNextOpenable()
+			_G.this.bagshuiData.wasUpdated = true
+		end,
+	})
+
+
+	-- Disenchant button.
+	buttons.toolbar.disenchant = ui:CreateIconButton({
+		name = "Disenchant",
+		parentFrame = footer,
+		anchorPoint = "RIGHT",
+		anchorToFrame = buttons.toolbar.clam,
+		anchorToPoint = "LEFT",
+		disable = false,
+		texture = "Disenchant",
+		onClick = inventory_SpellButton_OnClick,
+		onEnter = inventory_SpellButton_OnEnter,
+		onLeave = inventory_SpellButton_OnLeave,
+		onUpdate = inventory_SpellButton_OnUpdate,
+	})
+	buttons.toolbar.disenchant.bagshuiData.spellName = L.Spell_Disenchant
+
+
+	-- Pick Lock button.
+	buttons.toolbar.pickLock = ui:CreateIconButton({
+		name = "PickLock",
+		parentFrame = footer,
+		anchorPoint = "RIGHT",
+		anchorToFrame = buttons.toolbar.disenchant,
+		anchorToPoint = "LEFT",
+		disable = false,
+		texture = "PickLock",
+		onClick = inventory_SpellButton_OnClick,
+		onEnter = inventory_SpellButton_OnEnter,
+		onLeave = inventory_SpellButton_OnLeave,
+		onUpdate = inventory_SpellButton_OnUpdate,
+	})
+	buttons.toolbar.pickLock.bagshuiData.spellName = L.Spell_PickLock
+
+
+
+	-- Bottom right toolbar order, consumed by `Inventory:UpdateToolbarAnchoring()`
+	-- to manage anchoring based on what is visible.
+	self.ui.ordering.bottomRightToolbar = {
+		frames.bottomRightToolbarAnchor,
+		frames.money,
+		-BsSkin.toolbarGroupSpacing,
+		buttons.toolbar.hearthstone,
+		-BsSkin.toolbarGroupSpacing,
+		buttons.toolbar.clam,
+		buttons.toolbar.pickLock,
+		buttons.toolbar.disenchant,
+	}
 
 
 	-- Tooltips.
@@ -987,7 +1154,12 @@ function Inventory:UiFrame_OnShow()
 	self.expandEmptySlotStacks = false
 	self.temporarilyShowWindowHeader = false
 	self.highlightChanges = false
-	self.queuedTradeItem = nil  -- Used by self:TradeFrame_OnShow().
+	self.queuedTradeItem = nil  -- Used by Inventory:TradeFrame_OnShow().
+	self.itemPendingSale = nil  -- Used by Inventory:ItemButton_OnClick() to confirm sale of protected items.
+
+	-- Reset any item highlighting.
+	self.highlightItemsInContainerId = nil
+	self.highlightItemsContainerSlot = nil
 
 	-- Because Update() is called from the UI frame's OnShow function, self:Visible() becomes true
 	-- before CategorizeAndSort() executes. Normally, CategorizeAndSort() bails if self:Visible() is true,
@@ -1055,6 +1227,137 @@ function Inventory:UiFrame_OnDragStop()
 		self:FixSettingsMenuPosition()
 		self:SaveWindowPosition()
 		self:NotifySkinOfPositionChange()
+	end
+end
+
+
+
+--- Display the inventory utilization summary tooltip.
+---@param owner table Frame to which the tooltip should bet attached.
+---@param attachedToBagBar boolean? When `true`, call the bag bar's OnEnter.
+---@param extraText string? Text to append to the tooltip.
+---@param delay boolean|number? Time to wait before showing the tooltip.
+---@param tooltip table? Tooltip to use instead of GameTooltip.
+function Inventory:ShowUsageSummary(owner, attachedToBagBar, tooltip, extraText, delay)
+	if self.editMode then
+		return
+	end
+
+	owner = owner or _G.this
+	tooltip = tooltip or _G.GameTooltip
+
+	_G.this.bagshuiData.mouseIsOver = true
+
+	-- Trigger bag bar OnEnter to avoid flickering.
+	if attachedToBagBar then
+		if self.ui.frames.bagBar:IsVisible() then
+			self.ui.frames.bagBar:GetScript("OnEnter")()
+		end
+	end
+
+	-- Add overall info.
+	tooltip:SetOwner(
+		owner,
+		"ANCHOR_" .. BsUtil.FlipAnchorPoint(self.settings.windowAnchorXPoint),
+		-BsSkin.tooltipExtraOffset,
+		BsSkin.tooltipExtraOffset
+	)
+	tooltip:AddDoubleLine(
+		-- Available: 10     Used: 8/18
+		string.format(L.Symbol_Colon, L.Available) .. " " .. tostring(self.availableSlots),
+		string.format(L.Symbol_Colon, L.Used) .. " " .. string.format("%s/%s", tostring(self.usedSlots), tostring(self.totalSlots))
+	)
+
+	-- Only show per-bag-type info if there are profession bags.
+	local hasProfessionBags = false
+	for containerType, spaceInfo in pairs(self.containerSpace) do
+		if (spaceInfo.total or 0) > 0 and containerType ~= L.Bag then
+			hasProfessionBags = true
+		end
+	end
+
+	-- Add per-bag-type info, excluding any bag types where total is 0 (necessary
+	-- because we don't bother cleaning up the containerSpace table when all bags
+	-- of a given type are unequipped).
+	if hasProfessionBags then
+		for _, containerType in ipairs(BS_INVENTORY_CONTAINER_TYPE_ORDER) do
+			local spaceInfo = self.containerSpace[containerType]
+			if spaceInfo and (spaceInfo.total or 0) > 0 then
+				-- Bag: 2             6/8
+				tooltip:AddDoubleLine(
+					string.format(L.Symbol_Colon, containerType) .. " " .. tostring(spaceInfo.available),
+					string.format("%s/%s", tostring(spaceInfo.used), tostring(spaceInfo.total)),
+					HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b,
+					HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b
+				)
+			end
+		end
+	end
+
+
+	if delay then
+		Bagshui:ShowTooltipAfterDelay(
+			tooltip,
+			owner,
+			nil,
+			type(delay) == "number" and delay or BS_TOOLTIP_DELAY_SECONDS.DEFAULT,
+			nil,
+			function()
+				if extraText then
+					Bagshui:QueueEvent(function()
+						if tooltip:IsOwned(owner) and tooltip:IsVisible() then
+							tooltip:AddLine(extraText)
+							tooltip:Show()
+						end
+					end, BS_TOOLTIP_DELAY_SECONDS.TOOLBAR_DEFAULT)
+				end
+			end
+		)
+	else
+		if extraText then
+			tooltip:AddLine(extraText)
+			tooltip:Show()
+		end
+		tooltip:Show()
+	end
+end
+
+
+
+--- Companion to `ShowUsageSummary()`.
+---@param owner table Tooltip will only be hidden if still owned by this frame.
+---@param attachedToBagBar boolean? When `true`, call the bag bar's OnLeave.
+---@param tooltip table? Tooltip to use instead of GameTooltip.
+function Inventory:HideUsageSummary(owner, attachedToBagBar, tooltip)
+	owner = owner or _G.this
+	tooltip = tooltip or _G.GameTooltip
+
+	owner.bagshuiData.mouseIsOver = false
+
+	-- Hide tooltip.
+	if tooltip:IsOwned(owner) then
+		tooltip:Hide()
+	end
+
+	-- Decide whether to keep displaying slot available/used counts.
+	if attachedToBagBar and self.ui.frames.bagBar:IsVisible() then
+		self.ui.frames.bagBar:GetScript("OnLeave")()
+	end
+end
+
+
+
+--- Spotlights the item that will be targeted by clicking the Open Container button.
+function Inventory:HighlightNextOpenable()
+	-- Avoid firing OnEnter constantly.
+	if self.lastHighlightedOpenableButton ~= self.nextOpenableItemSlotButton then
+		self.highlightItemsInContainerId = self.nextOpenableItemBagNum
+		self.highlightItemsContainerSlot = self.nextOpenableItemSlotNum
+		if self.nextOpenableItemSlotButton then
+			self:ItemButton_OnEnter(self.nextOpenableItemSlotButton)
+		end
+		self:UpdateItemSlotColors()
+		self.lastHighlightedOpenableButton = self.nextOpenableItemSlotButton
 	end
 end
 
