@@ -69,6 +69,9 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 
 ## Compatibility
 
+
+### Functionality
+
 <table>
 
 <tr>
@@ -155,6 +158,16 @@ Use [GitAddonsManager](https://woblight.gitlab.io/overview/gitaddonsmanager/).
 <sup>If installed, [SuperWoW](https://github.com/balakethelock/SuperWoW) provides charge counts (the `×#` overlay for multi-use items) slightly more efficiently. This is pretty minor since you'll have the functionality regardless.</sup>
 
 
+### Languages
+
+If Bagshui has not been localized for your client, many items will not be correctly identified by the built-in categorization[^1]. Please consider [contributing a translation](Localization/Readme.md) if you'd like to have full functionality!
+
+* English (enUS)
+* Chinese (zhCN)
+
+[^1]: In Vanilla, a *lot* of item identification must be done either by parsing tooltips or hardcoding item IDs. Bagshui leans toward the former, and therefore is highly dependent on localization.
+
+
 ## Donations
 Developing Bagshui is fun, but also a lot of work! Your support is hugely appreciated.  
 <a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
@@ -164,7 +177,3 @@ Developing Bagshui is fun, but also a lot of work! Your support is hugely apprec
 
 Bagshui owes [so much to so many people](Credits.md).
 
-
-## Localization
-
-Translations welcome! [Instructions here](Localization/Readme.md).
