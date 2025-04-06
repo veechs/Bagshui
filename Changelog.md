@@ -1,6 +1,10 @@
 # Bagshui Changelog
 
-## 1.5.0 - 2025-03-29
+## 1.5.1 - 2025-04-06
+### Fixed
+* Prevent [error when unequipping a tabard](https://github.com/veechs/Bagshui/issues/130). <sup><small>🪲 bonho</small></sup>
+
+## 1.5.0 - 2025-04-05
 ### Changes
 * **Automated bag swapping**<br>One of the most-requested features! Just equip a new bag and Bagshui [takes care of the rest](https://github.com/veechs/Bagshui/wiki/FAQ#how-do-i-swap-bags-when-i-get-bigger-ones).<br><sup><small>Sufficient free space is required, but you can visit the Bank to supplement without cleaning your Bags.</small></sup><br><sup><small>🫶&nbsp;[@Nikki1993](https://github.com/Nikki1993), Kralomax, and everyone on the TW Discord who has asked</small></sup>
 * **Shiny new toolbar buttons**<br>**Clam** (Open Container), **Disenchant**, and **Pick Lock**. <sup><small>🫶&nbsp;[@melbaa](https://github.com/melbaa), [@Azzc0](https://github.com/Azzc0)</small>

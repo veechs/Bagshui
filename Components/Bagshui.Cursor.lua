@@ -118,7 +118,7 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 			self:PrintDebug(self.cursorBagSlotNum)
 			self:PrintDebug(inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum])
 			local bagNum = inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
-			if inventoryClass.containers[bagNum].slotsFilled > 0 then
+			if bagNum and inventoryClass.containers[bagNum].slotsFilled > 0 then
 				-- Bag needs to be emptied before it can be unequipped.
 				if inventoryClass:GetAdjustedEmptySlotCount(bagNum) > inventoryClass.containers[bagNum].slotsFilled then
 					-- Empty the bag.
@@ -281,6 +281,7 @@ end
 ---@param invSlotId number Inventory slot ID to pick up the item from.
 ---@return any wowApiFunctionReturnValue Return value from hooked WoW API function.
 function Bagshui:PickupInventoryItem(wowApiFunctionName, invSlotId)
+	--self:PrintDebug("Bagshui:PickupInventoryItem() called from " .. tostring(wowApiFunctionName) .. " with invSlotId " .. tostring(invSlotId))
 
 	-- Only store bag slot information if there's currently a bag on the cursor
 	-- and the destination is different from the source.
@@ -326,12 +327,15 @@ function Bagshui:PickupInventoryItem(wowApiFunctionName, invSlotId)
 					and self.components[inventoryType].inventoryIdsToContainerIds
 					and self.components[inventoryType].inventoryIdsToContainerIds[invSlotId]
 				then
+					--self:PrintDebug("> " .. inventoryType .. " has matching invSlotId for bag slot")
 					self.cursorBagSlotNum = invSlotId
 					break
 				end
 			end
 		end
 	end
+
+	--self:PrintDebug("> cursorBagSlotNum is now " .. tostring(self.cursorBagSlotNum))
 
 	-- PutItemInBag() doesn't trigger any of our normal cursor clearing methods,
 	-- so a manual check on the next frame is needed to ensure accuracy.
