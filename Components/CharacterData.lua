@@ -168,12 +168,12 @@ function CharacterData:InitUi()
 				},
 			},
 
-			-- Add error indicator to category name.
+			-- Show correctly formatted data.
 			managerColumnTextFunc = function(fieldName, id, obj, preliminaryDisplayValue)
 				if fieldName == "name" then
 					return BsCharacter:FormatCharacterName(id) or preliminaryDisplayValue
 				elseif fieldName == "lastLogout" then
-					return _G.date("%Y-%b-%d", preliminaryDisplayValue)
+					return _G.date("%Y-%b-%d", type(preliminaryDisplayValue) == "number" and preliminaryDisplayValue or _G.time())
 				end
 				return preliminaryDisplayValue
 			end,

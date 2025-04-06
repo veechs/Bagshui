@@ -1,8 +1,12 @@
 # Bagshui Changelog
 
+## 1.5.2 - 2025-04-06
+### Fixed
+* Avoid [error from Manage Character Data window](https://github.com/veechs/Bagshui/issues/132) when a character has never logged out. <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
+
 ## 1.5.1 - 2025-04-06
 ### Fixed
-* Prevent [error when unequipping a tabard](https://github.com/veechs/Bagshui/issues/130). <sup><small>🪲 bonho</small></sup>
+* Prevent [error when unequipping a tabard](https://github.com/veechs/Bagshui/issues/130). <sup><small>🪲&nbsp;bonho</small></sup>
 
 ## 1.5.0 - 2025-04-05
 ### Changes
@@ -30,11 +34,11 @@
 ## 1.4.11 - 2025-03-29
 ### Fixed
 * Mounts, companions, and toys should all be [correctly categorized now](https://github.com/veechs/Bagshui/issues/116) on both Turtle WoW and true Vanilla. Thanks as always to [@Sunelegy](https://github.com/Sunelegy) for zhCN guidance.<sup><small>🗃️ [@jilinge2](https://github.com/jilinge2)</small></sup>
-* Attempt to protect against [rare errors during sorting](https://github.com/veechs/Bagshui/issues/127). <sup><small>🪲 bonho</small></sup>
+* Attempt to protect against [rare errors during sorting](https://github.com/veechs/Bagshui/issues/127). <sup><small>🪲&nbsp;bonho</small></sup>
 
 ## 1.4.10 - 2025-03-28
 ### Fixed
-* Locking a bag's highlight via Alt+Click now [temporarily unhides all items in that bag](https://github.com/veechs/Bagshui/issues/125). <sup><small>🪲 [@RetroCro](https://github.com/RetroCro)</small></sup>
+* Locking a bag's highlight via Alt+Click now [temporarily unhides all items in that bag](https://github.com/veechs/Bagshui/issues/125). <sup><small>🪲&nbsp;[@RetroCro](https://github.com/RetroCro)</small></sup>
 
 ## 1.4.9 - 2025-03-27
 ### Changed
