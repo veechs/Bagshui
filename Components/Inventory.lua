@@ -487,8 +487,11 @@ function Inventory:New(newPropsOrInventoryType)
 	classObj.inventoryTypeLocalized = L[classObj.inventoryType]
 
 	-- Build the list of containerIds belonging to this class along with the reverse inventory ID (slot) mapping.
-	for index, containerId in ipairs(classObj.containerIds) do
+	-- Starting at index 2 because primary containers are never inventory slots into which bags can be equipped.
+	for index = 2, table.getn(classObj.containerIds) do
+		local containerId = classObj.containerIds[index]
 		classObj.myContainerIds[containerId] = index
+		--Bagshui:PrintDebug(classObj.inventoryType .. " container " .. containerId .. " is inventoryId " .. _G.ContainerIDToInventoryID(containerId))
 		classObj.inventoryIdsToContainerIds[_G.ContainerIDToInventoryID(containerId)] = containerId
 	end
 
