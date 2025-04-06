@@ -118,7 +118,7 @@ function Bagshui:PickupItem(item, inventoryClass, itemSlotButton, callPickupCont
 			self:PrintDebug(self.cursorBagSlotNum)
 			self:PrintDebug(inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum])
 			local bagNum = inventoryClass.inventoryIdsToContainerIds[self.cursorBagSlotNum]
-			if inventoryClass.containers[bagNum].slotsFilled > 0 then
+			if bagNum and inventoryClass.containers[bagNum].slotsFilled > 0 then
 				-- Bag needs to be emptied before it can be unequipped.
 				if inventoryClass:GetAdjustedEmptySlotCount(bagNum) > inventoryClass.containers[bagNum].slotsFilled then
 					-- Empty the bag.
