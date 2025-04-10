@@ -687,6 +687,12 @@ function Inventory:OnEvent(event, arg1, arg2)
 		return
 	end
 
+	-- Longer update delay for cooldowns.
+	-- Putting this early because it fires a lot.
+	if event == "BAG_UPDATE_COOLDOWN" then
+		self:QueueUpdate(0.9)
+	end
+
 	-- BAG_UPDATE: Don't do anything if arg1 is for a bag not handled by this class.
 	if event == "BAG_UPDATE" and not self.myContainerIds[arg1] then
 		return
