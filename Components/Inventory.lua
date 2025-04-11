@@ -384,6 +384,7 @@ function Inventory:New(newPropsOrInventoryType)
 		hasChanges = false,
 		highlightChangesEnabled = false,
 		hasOpenables = false,
+		lockedItemCount = 0,  -- Used during cache updates to try and ensure we catch all lock changes.
 		nextOpenableItemBagNum = nil,
 		nextOpenableItemSlotNum = nil,
 		nextOpenableItemSlotButton = nil,
@@ -647,12 +648,26 @@ end
 
 
 
+-- Reusable variables for Inventory:OnEvent() to reduce GC load during event storms.
+
+local onEvent_action, onEvent_updateDelay
+
+
 --- Event handling.
 ---@param event string Event identifier.
 ---@param arg1 any? Argument 1 from the event.
 ---@param arg2 any? Argument 2 from the event.
 function Inventory:OnEvent(event, arg1, arg2)
-	-- self:PrintDebug("OnEvent(): " ..  event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
+	self:PrintDebug("OnEvent(): " ..  event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
+
+	-- Let the default delay for a queued update apply most of the time.
+	onEvent_updateDelay = nil
+
+	-- We need a small delay when there's a locked item because sometimes BAG_UPDATE comes so soon
+	-- after an item is locked that we don't have time to find out it's unlocked.
+	if self.lastEvent == "ITEM_LOCK_CHANGED" and event == "BAG_UPDATE" then
+		onEvent_updateDelay = 0.15
+	end
 
 	-- Store the name of this event so it can be checked when updating the inventory
 	-- cache to see if the cache update should be delayed (see self.lastEvent check
@@ -764,17 +779,17 @@ function Inventory:OnEvent(event, arg1, arg2)
 
 
 	-- Special action handling - see description of the Events table in Inventory:New() for details.
-	local eventAction = self.events[event]
+	onEvent_action = self.events[event]
 
 	-- Re-queue the event with a delay if configured.
-	if type(eventAction) == "number" then
-		Bagshui:QueueEvent("BAGSHUI_"..event, eventAction, false, arg1, arg2)
+	if type(onEvent_action) == "number" then
+		Bagshui:QueueEvent("BAGSHUI_"..event, onEvent_action, false, arg1, arg2)
 		return
 	end
 
 	-- Call the event function if it exists.
 	-- If the function returns false, don't continue processing.
-	local eventFunction = self[eventAction]
+	local eventFunction = self[onEvent_action]
 	if type(eventFunction) == "function" then
 		if eventFunction(self) == false then
 			return
@@ -869,7 +884,6 @@ function Inventory:OnEvent(event, arg1, arg2)
 		return
 	end
 
-
 	-- Lock/unlock events need a cache update, but not when a container has
 	-- been picked up.
 	if
@@ -877,15 +891,15 @@ function Inventory:OnEvent(event, arg1, arg2)
 		and not Bagshui.pickedUpBagSlotNum
 		and not Bagshui.putDownBagSlotNum
 	then
+		self:PrintDebug("will force cache update")
 		self.forceCacheUpdate = true
 	end
-
 
 	-- Assume any other event that gets this far may require a cache update.
 	self.cacheUpdateNeeded = true
 
 	-- If we get this far, it's a normal event that should just trigger inventory and window updates.
-	self:QueueUpdate()
+	self:QueueUpdate(onEvent_updateDelay)
 end
 
 
