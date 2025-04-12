@@ -56,14 +56,16 @@ end
 ---@param itemButton table? If provided, call OnEnter for this item button to update the tooltip.
 ---@param noUpdate boolean? Don't call `Inventory:UpdateItemSlotColors()`.
 function Inventory:ClearItemPendingSale(itemButton, noUpdate)
-	self.itemPendingSale = nil
-	self.highlightItemsInContainerId = nil
-	self.highlightItemsContainerSlot = nil
-	if itemButton then
-		self:ItemButton_OnEnter(itemButton)
-	end
-	if not noUpdate then
-		self:UpdateItemSlotColors()
+	if self.itemPendingSale then
+		self.itemPendingSale = nil
+		self.highlightItemsInContainerId = nil
+		self.highlightItemsContainerSlot = nil
+		if itemButton then
+			self:ItemButton_OnEnter(itemButton)
+		end
+		if not noUpdate then
+			self:UpdateItemSlotColors()
+		end
 	end
 end
 
