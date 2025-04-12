@@ -687,10 +687,11 @@ function Inventory:OnEvent(event, arg1, arg2)
 		return
 	end
 
-	-- Longer update delay for cooldowns.
+	-- Longer update delay for cooldowns when not shown.
 	-- Putting this early because it fires a lot.
-	if event == "BAG_UPDATE_COOLDOWN" then
+	if event == "BAG_UPDATE_COOLDOWN" and not self.uiFrame:IsVisible() then
 		self:QueueUpdate(0.9)
+		return
 	end
 
 	-- BAG_UPDATE: Don't do anything if arg1 is for a bag not handled by this class.
