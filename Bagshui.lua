@@ -788,6 +788,10 @@ local Bagshui = {
 	---@type table
 	currentCharacterData = {},
 
+	-- Track combat status. Used for deferring updates while player is in combat.
+	---@type boolean
+	playerInCombat = false,
+
 
 	-- Relationship between docked inventory class instances.
 	-- For example, if Keyring is docked to Bags, `{ "Bags" = "Keyring" }`.
@@ -873,6 +877,25 @@ local Bagshui = {
 	-- Track how many events are queued so we don't have to constantly initiate a loop in `Bagshui:ProcessEventQueue()`.
 	queuedEventCount = 0,
 
+	-- Reusable tables for combat-deferred updates.
+	-- Keys for each sub-table will be the unique update identifier.
+	-- See `Bagshui:DeferUpdateInCombat()`, and `Bagshui:ProcessCombatDeferredUpdates()`.
+	---@type table<string, table>
+	combatDeferredUpdates = {
+		-- Function to call (actual function, not function name).
+		---@type table<string, function>
+		classFunction = {},
+		-- Class that owns the function (self parameter).
+		---@type table<string, table>
+		class = {},
+		-- First parameter for the callback function.
+		---@type table<string, any>
+		arg1 = {},
+		-- Second parameter for the callback function.
+		---@type table<string, any>
+		arg2 = {},
+	},
+
 
 	-- Window Management.
 
@@ -941,6 +964,8 @@ function Bagshui:Init()
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("BAGSHUI_UTIL_LOADED")
 	self:RegisterEvent("BAGSHUI_LOCALIZATION_LOADED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 
 
@@ -1162,6 +1187,20 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 		-- Used by `Inventory:UpdateCache()` to move `item.bagshuiDate` forward
 		-- so that only in-game time counts for stock states.
 		self.currentCharacterData.lastLogout = _G.time()
+	end
+
+
+	-- Entering combat.
+	if event == "PLAYER_REGEN_DISABLED" then
+		if _G.UnitAffectingCombat("player") then
+			self.playerInCombat = true
+		end
+	end
+
+	-- Leaving combat.
+	if event == "PLAYER_REGEN_ENABLED" then
+		self.playerInCombat = false
+		self:QueueClassCallback(self, self.ProcessCombatDeferredUpdates, 0.25)
 	end
 
 

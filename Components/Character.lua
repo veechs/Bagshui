@@ -196,7 +196,6 @@ function Character:OnEvent(event, arg1)
 		or event == "BAGSHUI_INITIAL_CHARACTER_UPDATE"
 	then
 		self:UpdateSkillsAndSpells()
-		self:PruneProfessionItems()
 		-- Need to set this true before calling UpdateInfo() so that it will
 		-- correctly raise BAGSHUI_CHARACTER_UPDATE.
 		self.initialized = true
@@ -220,7 +219,6 @@ function Character:OnEvent(event, arg1)
 	-- Player level changed.
 	if event == "PLAYER_LEVEL_UP" then
 		self:UpdateInfo(arg1)
-		BsItemInfo:InvalidateUsableCache()
 		return
 	end
 
@@ -258,6 +256,11 @@ local _updateInfo_oldValues = {}
 --- Refresh basic character information.
 ---@param newLevel number? `arg1` from the `PLAYER_LEVEL_UP` event, needed because `UnitLevel()` can be wrong just after gaining a level.
 function Character:UpdateInfo(newLevel)
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateSkillsAndSpells, newLevel) then
+		return
+	end
+
 	-- Record old values.
 	for key, value in pairs(self.info) do
 		_updateInfo_oldValues[key] = value
@@ -294,6 +297,7 @@ function Character:UpdateInfo(newLevel)
 		for key, value in pairs(self.info) do
 			if self.info[key] ~= _updateInfo_oldValues[key] then
 				Bagshui:RaiseEvent("BAGSHUI_CHARACTER_UPDATE")
+				BsItemInfo:InvalidateUsableCache()
 				break
 			end
 		end
@@ -304,6 +308,11 @@ end
 
 --- Keep money current.
 function Character:UpdateMoney()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateMoney) then
+		return
+	end
+
 	local newMoney = _G.GetMoney()
 	if not newMoney then
 		return
@@ -324,6 +333,10 @@ local update_tempSkills = {}
 
 --- Refresh the list of known skills and spells.
 function Character:UpdateSkillsAndSpells()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateSkillsAndSpells) then
+		return
+	end
 
 	-- Backup copy to compare against so we know whether changes actually happened.
 	BsUtil.TableCopy(self.spells, update_tempSpells)
@@ -367,6 +380,9 @@ function Character:UpdateSkillsAndSpells()
 		end
 	end
 
+	-- Cleanup.
+	self:PruneProfessionItems()
+
 	-- Is anything different?
 	if
 		self.initialized
@@ -376,6 +392,7 @@ function Character:UpdateSkillsAndSpells()
 		)
 	then
 		Bagshui:RaiseEvent("BAGSHUI_CHARACTER_UPDATE")
+		BsItemInfo:InvalidateUsableCache()
 	end
 
 	-- Don't need to keep contents (but do keep the tables).
@@ -387,6 +404,11 @@ end
 
 --- Refresh the list of equipped armor and weapons.
 function Character:UpdateGear()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateGear) then
+		return
+	end
+
 	-- Bs:PrintDebug("Character:UpdateGear()")
 	local historyChanged = false
 	local equippedChanged = false
@@ -461,6 +483,7 @@ function Character:PruneProfessionItems()
 		self:PruneItemList(self.professionReagents)
 	then
 		Bagshui:RaiseEvent("BAGSHUI_PROFESSION_ITEM_UPDATE")
+		BsItemInfo:InvalidateUsableCache()
 	end
 end
 
@@ -492,6 +515,9 @@ end
 
 -- Perform a profession update.
 function Character:UpdateProfessionItems(event)
+	-- No protection against in-combat updates is needed here because this is only
+	-- called when the player opens a tradeskill window.
+
 	local changesMade = false
 
 	-- Functions for professions other than Enchanting.

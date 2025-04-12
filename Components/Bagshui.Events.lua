@@ -201,6 +201,59 @@ function Bagshui:RaiseEvent(event, returnStatus, arg1, arg2, arg3, arg4)
 end
 
 
+
+--- Reusable variable for DeferUpdateInCombat() to marginally reduce GC.
+
+local deferredUpdateKey
+
+--- Check whether the player is in combat, and if so, queue a callback to the given function and return `true`.
+--- Callback will be triggered once the player leaves combat.
+---@param class table Class owning `classFunction` (`self` parameter).
+---@param classFunction function Function to call.
+---@param arg1 any Callback arguments.
+---@param arg2 any Callback arguments.
+---@return boolean isInCombat # True when callback was queued.
+function Bagshui:DeferUpdateInCombat(class, classFunction, arg1, arg2)
+	if self.playerInCombat then
+		deferredUpdateKey = tostring(class) .. tostring(classFunction) .. tostring(arg1) .. tostring(arg2)
+		if not self.combatDeferredUpdates.classFunction[deferredUpdateKey] then
+			self.combatDeferredUpdates.classFunction[deferredUpdateKey] = classFunction
+			self.combatDeferredUpdates.class[deferredUpdateKey] = class
+			self.combatDeferredUpdates.arg1[deferredUpdateKey] = arg1
+			self.combatDeferredUpdates.arg2[deferredUpdateKey] = arg2
+		end
+		return true
+	end
+	return false
+end
+
+
+
+--- Reusable variables for ProcessCombatDeferredUpdates() to marginally reduce GC.
+
+local processDeferred_success, processDeferred_errorMessage
+
+--- Trigger any callbacks queued by `Bagshui:DeferUpdateInCombat()`.
+function Bagshui:ProcessCombatDeferredUpdates()
+	for key in pairs(self.combatDeferredUpdates.classFunction) do
+		processDeferred_success, processDeferred_errorMessage = pcall(
+			self.combatDeferredUpdates.classFunction[key],
+			self.combatDeferredUpdates.class[key],
+			self.combatDeferredUpdates.arg1[key],
+			self.combatDeferredUpdates.arg2[key]
+		)
+		self.combatDeferredUpdates.classFunction[key] = nil
+		self.combatDeferredUpdates.class[key] = nil
+		self.combatDeferredUpdates.arg1[key] = nil
+		self.combatDeferredUpdates.arg2[key] = nil
+
+		if not processDeferred_success then
+			Bagshui:PrintError(processDeferred_errorMessage)
+		end
+	end
+end
+
+
 end,
 -- Event to raise. This will trigger Bagshui:Init().
 "BAGSHUI_CORE_EVENT_FUNCTIONS_LOADED"
