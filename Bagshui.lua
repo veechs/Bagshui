@@ -870,6 +870,9 @@ local Bagshui = {
 		classFunction = {}
 	},
 
+	-- Track how many events are queued so we don't have to constantly initiate a loop in `Bagshui:ProcessEventQueue()`.
+	queuedEventCount = 0,
+
 
 	-- Window Management.
 

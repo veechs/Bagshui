@@ -78,6 +78,7 @@ function Bagshui:QueueEvent(event, delaySeconds, noReset, arg1, arg2, arg3, arg4
 		self.queuedEvents.arg2[event] = arg2
 		self.queuedEvents.arg3[event] = arg3
 		self.queuedEvents.arg4[event] = arg4
+		self.queuedEventCount = self.queuedEventCount + 1
 		return true
 	end
 	return false
@@ -113,6 +114,10 @@ end
 --- variables in the for loop though.
 local processEventQueue_success, processEventQueue_errorMessage
 function Bagshui:ProcessEventQueue()
+	if self.queuedEventCount <= 0 then
+		return
+	end
+
 	-- Loop through queued events and fire them if enough time has passed.
 	for event, raiseAfter in pairs(self.queuedEvents.events) do
 		if raiseAfter <= _G.GetTime() then
@@ -138,6 +143,8 @@ function Bagshui:ProcessEventQueue()
 				self.queuedEvents.class[event] = nil
 				self.queuedEvents.classFunction[event] = nil
 			end
+
+			self.queuedEventCount = self.queuedEventCount - 1
 
 			assert(processEventQueue_success, processEventQueue_errorMessage)
 		end
