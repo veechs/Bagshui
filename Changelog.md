@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.5.4 - 2025-04-12
+### Fixed
+* Ensure Alt+click bag highlights [persist correctly](https://github.com/veechs/Bagshui/issues/141).
+
 ## 1.5.3 - 2025-04-12
 ### Fixed
 * Prevent [items from getting stuck in locked (grayed-out) state](https://github.com/veechs/Bagshui/issues/138). <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
