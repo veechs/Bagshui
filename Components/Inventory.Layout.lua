@@ -159,9 +159,9 @@ function Inventory:ManageDryRun(phase1)
 			and not self.forceResort
 		then
 			self.dryRun = true
-			self:PrintDebug("++++DRY RUN ON++++")
-		else
-			self:PrintDebug("----dry run off----")
+		-- 	self:PrintDebug("++++DRY RUN ON++++")
+		-- else
+		-- 	self:PrintDebug("----dry run off----")
 		end
 
 		-- Reset force resort flag.
