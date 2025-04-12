@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.5.3 - 2025-04-12
+### Fixed
+* Prevent [items from getting stuck in locked (grayed-out) state](https://github.com/veechs/Bagshui/issues/138). <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
+
 ## 1.5.2 - 2025-04-06
 ### Fixed
 * Avoid [error from Manage Character Data window](https://github.com/veechs/Bagshui/issues/132) when a character has never logged out. <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
