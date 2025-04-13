@@ -15,7 +15,15 @@ function Bagshui:RegisterEvent(event, classObject, classEventFunctionName)
 	-- The Bagshui class internally uses RegisterEvent, so bypass consumer registration when there isn't a classObject.
 	if classObject then
 		self:RegisterClassForEvents(classObject, classEventFunctionName)
-		self.eventConsumers[classObject][event] = true
+
+		-- We create a table for each event so the consumer loop in Bagshui:OnEvent()
+		-- doesn't have to run for events that don't have any consumers, and the loop is as short as possible.
+		if not self.eventConsumers[event] then
+			self.eventConsumers[event] = {}
+		end
+
+		-- This is the event consumer registration.
+		self.eventConsumers[event][classObject] = true
 	end
 
 	-- Don't try to register internal events with the game (doesn't seem to cause a problem but is also pointless).
@@ -37,17 +45,15 @@ end
 ---@param eventFunctionName string? Class function to use instead of `OnEvent`.
 function Bagshui:RegisterClassForEvents(classObject, eventFunctionName)
 	-- Already registered.
-	if self.eventConsumers[classObject] then
+	if self.eventConsumerFunctions[classObject] then
 		return
 	end
 
 	eventFunctionName = eventFunctionName or "OnEvent"
-
 	assert(classObject[eventFunctionName], "Bagshui:RegisterClassForEvents(): " .. tostring(eventFunctionName) .. " not found on classObject " .. tostring(classObject))
 
-	self.eventConsumers[classObject] = {
-		_eventFunctionName = eventFunctionName
-	}
+	-- Store function so the consumer loop in Bagshui:OnEvent() knows what to call.
+	self.eventConsumerFunctions[classObject] = classObject[eventFunctionName]
 end
 
 

@@ -828,19 +828,26 @@ local Bagshui = {
 	---@type table
 	eventFrame = nil,
 
-	-- List of components and events for which to call the OnEvent function.  
+	-- List of events and classes that are registered for them, processed by `Bagshui:OnEvent()`.  
 	-- After calling `Bagshui:RegisterEvent()`, the table will start looking something like this:
 	-- ```
 	-- {
-	-- 	[classObject Pointer] = {
-	-- 		_eventFunctionName = function,
-	-- 		event1 = true,
-	-- 		event2 = true
+	-- 	"EVENT_NAME" = {
+	-- 		[classObject1 Pointer] = true,
+	-- 		[classObject2 Pointer] = true,
 	-- 	}
 	-- }
 	-- ```
-	---@type table<string, table>
+	---@type table<string, table<table, true>>
 	eventConsumers = {},
+
+	-- Functions to call for classes that have asked via `Bagshui:RegisterEvent()` to receive events.
+	-- ```
+	-- { [classObject Pointer] = function }
+	-- ```
+	---@type table<table, function>
+	eventConsumerFunctions = {},
+
 
 	-- Reusable tables for the Bagshui event queue.
 	-- Keys for each sub-table will be the unique event identifier.
@@ -1203,9 +1210,10 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 
 
 	-- Pass events on to consumers.
-	for consumer, events in pairs(self.eventConsumers) do
-		if events[event] then
-			consumer[self.eventConsumers[consumer]._eventFunctionName](consumer, event, arg1, arg2, arg3, arg4)
+	-- Don't do anything unless at least one consumer has called Bagshui:RegisterEvent() for this event.
+	if self.eventConsumers[event] then
+		for consumer in pairs(self.eventConsumers[event]) do
+			self.eventConsumerFunctions[consumer](consumer, event, arg1, arg2, arg3, arg4)
 		end
 	end
 
