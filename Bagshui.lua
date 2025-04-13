@@ -1153,8 +1153,6 @@ end
 function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 	-- Bagshui:PrintDebug("Bagshui event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
 
-	local downstreamEvent = event  --[[@as string|nil]]
-
 	if event == "ADDON_LOADED" then
 		-- Need to check arg1 to avoid responding to this event for other addons.
 		if arg1 == "Bagshui" then
@@ -1205,17 +1203,15 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 
 
 	-- Pass events on to consumers.
-	if downstreamEvent then
-		for consumer, events in pairs(self.eventConsumers) do
-			if events[event] then
-				consumer[self.eventConsumers[consumer]._eventFunctionName](consumer, downstreamEvent, arg1, arg2, arg3, arg4)
-			end
+	for consumer, events in pairs(self.eventConsumers) do
+		if events[event] then
+			consumer[self.eventConsumers[consumer]._eventFunctionName](consumer, event, arg1, arg2, arg3, arg4)
 		end
 	end
 
 	-- Provide an event that happens just after ADDON_LOADED but before anything else
 	-- so that components split across multiple files can complete initialization.
-	if downstreamEvent == "ADDON_LOADED" then
+	if event == "ADDON_LOADED" then
 		self:RaiseEvent("BAGSHUI_ADDON_LOADED")
 	end
 end
