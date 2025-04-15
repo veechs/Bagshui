@@ -1,5 +1,10 @@
 # Bagshui Changelog
 
+## 1.5.5 - 2025-04-15
+### Fixed
+* Prevent [doubled cooldown text](https://github.com/veechs/Bagshui/issues/143) when ShaguPlates, ShaguTweaks, and pfQuest are enabled. Thanks to [@shagu](https://github.com/shagu) for identifying the cause and suggesting how to fix it. <sup><small>🪲&nbsp;[@Vymya](https://github.com/Vymya)</small></sup>
+* Capture custom Turtle WoW recipes that are [wrongly categorized on the server side](https://github.com/veechs/Bagshui/issues/144). <sup><small>🗃️&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
+
 ## 1.5.4 - 2025-04-12
 ### Fixed
 * Ensure Alt+click bag highlights [persist correctly](https://github.com/veechs/Bagshui/issues/141).
