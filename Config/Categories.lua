@@ -287,8 +287,9 @@ Bagshui.config.Categories = {
 			-- 3. The "Top/Bottom Half of Advanced..." pieces need to be captured.
 			sequence = 66,
 			rule = string.format(
-				'Type("%s")\nor\n(\n  Name("/^%s/", "/^%s/")\n  and Subtype("%s", "%s")\n)',
+				'Type("%s")\nor Tooltip("%s")\nor\n(\n  Name("/^%s/", "/^%s/")\n  and Subtype("%s", "%s")\n)',
 				L.Recipe,
+				L.TooltipIdentifier_Recipe,
 				L.NameIdentifier_Recipe_TopHalf,
 				L.NameIdentifier_Recipe_BottomHalf,
 				L.Junk,
