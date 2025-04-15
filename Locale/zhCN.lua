@@ -501,6 +501,7 @@ BsLocalization:AddLocale("zhCN", {
 ["TooltipIdentifier_PotionHealth"] = [[/恢复%d+到%d+点生命值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_PotionMana"] = [[/恢复%d+到%d+点法力值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_QuestItem"] = [[任务物品]],
+["TooltipIdentifier_Recipe"] = [[使用: 教你学会制]],
 ["TooltipIdentifier_ToyTurtleWoW"] = [[使用..-将玩具添加到玩家的玩具收藏中]],
 
 -- Tooltip parsing -- extracting data from tooltips.

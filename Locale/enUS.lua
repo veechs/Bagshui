@@ -516,6 +516,7 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
+["TooltipIdentifier_Recipe"] = [[Use: Teaches you how to]],  -- Needed because Turtle WoW has some of their custom recipes categorized as Consumables.
 ["TooltipIdentifier_ToyTurtleWoW"] = [[Use: Add a toy to the player's toy collection]],
 
 -- Tooltip parsing -- extracting data from tooltips.
