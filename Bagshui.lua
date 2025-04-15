@@ -735,7 +735,14 @@ local bagshuiEnvironment = {
 	type = _G.type,
 
 	-- Other addons.
-	pfUI = _G.IsAddOnLoaded("pfUI") and _G.pfUI or nil,
+	-- Intensive check for pfUI to ensure it's the real thing and not an addon that
+	-- provides pfUI API compatibility. (And false is used since nil will just
+	-- end up with an empty table entry and it will metatable its way up into _G).
+	pfUI = (
+		_G.IsAddOnLoaded("pfUI")
+		and _G.pfUI and _G.pfUI.uf 
+		and _G.pfUI.env and _G.pfUI.env.C
+	) and _G.pfUI or false,
 
 
 	-- Contain the _ dummy variable within the Bagshui environment.
