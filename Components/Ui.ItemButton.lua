@@ -199,10 +199,9 @@ end
 function Ui:CreateItemButtonCooldown(button, disableText)
 	local cooldown = _G.CreateFrame("Model", button:GetName() .. "Cooldown", button, "CooldownFrameTemplate")
 	cooldown:SetFrameLevel(cooldown:GetFrameLevel() + 1)  -- Move above NormalTexture.
-	-- Enable pfUI cooldown display. The pfUI check is needed because
-	-- Turtle Dragonflight will double the text when pfCooldownType is present.
-	-- (`pfUI` is added to the Bagshui environment in Bagshui.lua).
-	if pfUI then
+	-- Pretend we're a pfUI frame so we can get pfUI cooldown text without the 
+	-- "Foreign Frames" option (so long as the pfUI cooldown module is enabled).
+	if pfUI and pfUI.env.C.disabled and pfUI.env.C.disabled.cooldown ~= "1" then
 		cooldown.pfCooldownType = "ALL"
 	end
 	return cooldown
