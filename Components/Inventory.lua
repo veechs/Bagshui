@@ -703,7 +703,7 @@ function Inventory:OnEvent(event, arg1, arg2)
 	end
 
 	-- BAG_UPDATE: Don't do anything if arg1 is for a bag not handled by this class.
-	if event == "BAG_UPDATE" and not self.myContainerIds[arg1] then
+	if event == "BAG_UPDATE" and arg1 and not self.myContainerIds[arg1] then
 		return
 	end
 
