@@ -1,8 +1,8 @@
 # Bagshui Changelog
 
-## 1.5.8 - 2025-04-26
+## 1.5.9 - 2025-04-26
 ### Fixed
-* Avoid localization errors. Whoops.
+* Avoid localization errors. Whoops (x2).
 
 ## 1.5.7 - 2025-04-26
 ### Changes
