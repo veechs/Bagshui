@@ -242,7 +242,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Slash_Help"] = "%s 命令：",
 ["Slash_Help_Postscript"] = "要查看子命令列表，请在命令后附加 Help。",
 
-["Slash_Help_ItemInfo"] = "/Bagshui !!信息!! 示例:" .. BS_NEWLINE .. "   /Bagshui !!信息!! 13444".. BS_NEWLINE .. "   /Bagshui !!信息!! item:13446:0:0:0",
+["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! 示例:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444" .. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
 
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 -- 按键绑定（除了背包类名称；这些在 `Inventory:New()` 中处理）。
@@ -849,7 +849,7 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Location_ExampleDescriptionExtra1"] = "检查物品是否存储在任何指定位置。",
 
 ["RuleFunction_LootMethod_GenericDescription"] = "检查当前的拾取方式。",
-["RuleFunction_LootMethod_Note"] = "查看方式: /Bagshui !!信息!! 团队",
+["RuleFunction_LootMethod_Note"] = "查看方式: /Bagshui !!Info!! 团队",
 ["RuleFunction_LootMethod_Example1"] = 'LootMethod("自由拾取")',  -- DO NOT LOCALIZE THE PARAMETER.
 ["RuleFunction_LootMethod_ExampleDescription1"] = "检查拾取方式是否为自由拾取（这是默认的拾取方式）。",
 ["RuleFunction_LootMethod_Example2"] = 'LootMethod("轮流拾取")',  -- DO NOT LOCALIZE THE PARAMETER.
@@ -916,7 +916,7 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_PeriodicTable_ExampleDescriptionExtra1"] = "检查物品是否属于任何指定的规则表集合。!!RuleFunction_PT_CaseSensitiveParameters!!",
 
 ["RuleFunction_PlayerInGroup_GenericDescription"] = "检查您是否在团队中。",
-["RuleFunction_PlayerInGroup_Note"] = "查看方式: /Bagshui !!信息!! 团队",
+["RuleFunction_PlayerInGroup_Note"] = "查看方式: /Bagshui !!Info!! 团队",
 ["RuleFunction_PlayerInGroup_Example1"] = 'PlayerInGroup()',
 ["RuleFunction_PlayerInGroup_ExampleDescription1"] = "检查您是否在任何团队（小队或团队）中。",
 ["RuleFunction_PlayerInGroup_Example2"] = 'PlayerInGroup(小队)',  -- DO NOT LOCALIZE THE PARAMETER.
@@ -974,7 +974,7 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Subtype_ExampleDescriptionExtra1"] = "检查物品是否具有任何指定子类型。",
 
 ["RuleFunction_Subzone_GenericDescription"] = "检查当前子区域（特定区域）。",
-["RuleFunction_Subzone_Note"] = "查看方式: /Bagshui !!信息!! 位置",
+["RuleFunction_Subzone_Note"] = "查看方式: /Bagshui !!Info!! 位置",
 ["RuleFunction_Subzone_Example1"] = 'Subzone("灵魂高地")',  -- DO localize the parameter.
 ["RuleFunction_Subzone_ExampleDescription1"] = "检查您是否在灵魂高地。",
 ["RuleFunction_Subzone_Example2"] = 'Subzone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
@@ -1006,7 +1006,7 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Wishlist_ExampleDescription1"] = "检查物品是否在 %s 愿望清单上。",
 
 ["RuleFunction_Zone_GenericDescription"] = "检查当前区域（特定区域）。",
-["RuleFunction_Zone_Note"] = "查看方式: /Bagshui !!信息!! 位置",
+["RuleFunction_Zone_Note"] = "查看方式: /Bagshui !!Info!! 位置",
 ["RuleFunction_Zone_Example1"] = 'Zone("雷霆崖")',  -- DO localize the parameter.
 ["RuleFunction_Zone_ExampleDescription1"] = "检查您是否在雷霆崖。",
 ["RuleFunction_Zone_Example2"] = 'Zone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
@@ -1273,25 +1273,25 @@ BsLocalization:AddLocale("zhCN", {
 ["resetStockState"] = "标记物品为未更改",
 ["resetStockState_TooltipText"] = "将此背包中的所有物品标记为不再新增、增加或减少。",
 
-["sellProtectionActiveQuest"] = "!!物品属性友好_当前任务物品!!",
-["sellProtectionActiveQuest_TooltipTitle"] = "保护!!物品属性友好_当前任务物品!!物品",
+["sellProtectionActiveQuest"] = "!!ItemPropFriendly_activeQuest!!",
+["sellProtectionActiveQuest_TooltipTitle"] = "保护!!ItemPropFriendly_activeQuest!!物品",
 ["sellProtectionActiveQuest_TooltipText"] = "出售前需要确认。",
 
 ["sellProtectionEnabled"] = "已启用",
 ["sellProtectionEnabled_TooltipTitle"] = "出售保护",
 ["sellProtectionEnabled_TooltipText"] = "出售某些物品前需要确认。",
 
-["sellProtectionEquipped"] = "!!已装备物品!!",
+["sellProtectionEquipped"] = "!!EquippedGear!!",
 ["sellProtectionEquipped_TooltipTitle"] = "保护所有!!已装备物品!!",
 ["sellProtectionEquipped_TooltipText"] = "出售前需要确认。",
 
-["sellProtectionQualityThreshold"] = "!!物品属性友好_品质!! 阈值",
+["sellProtectionQualityThreshold"] = "!!ItemPropFriendly_quality!! 阈值",
 ["sellProtectionQualityThreshold_TooltipText"] = "出售前需要确认。",
 ["sellProtectionQualityThreshold_Choice_TooltipTitle"] = "保护 %s 物品",  -- %s = Quality (ex. Rare, Epic).
 ["sellProtectionQualityThreshold_Choice_TooltipText"] = "出售 %s 物品或更高品质物品前需要确认。",  -- %s = Quality (ex. Rare, Epic).
 
-["sellProtectionSoulbound"] = "!!物品属性友好_灵魂绑定!!",
-["sellProtectionSoulbound_TooltipTitle"] = "保护!!物品属性友好_灵魂绑定!!物品",
+["sellProtectionSoulbound"] = "!!ItemPropFriendly_soulbound!!",
+["sellProtectionSoulbound_TooltipTitle"] = "保护!!ItemPropFriendly_soulbound!!物品",
 ["sellProtectionSoulbound_TooltipText"] = "出售前需要确认。",
 
 ["showBagBar"] = "背包栏",
