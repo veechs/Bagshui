@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.5.6 - 2025-04-26
+### Fixed
+* Matching item properties that contain Lua pattern characters (most notably `-` but could be any of `^$()%.[]*+-?`) [now works as it should](https://github.com/veechs/Bagshui/issues/149). <sup><small>🪲&nbsp;[@AsunaSalata](https://github.com/AsunaSalata)</small></sup>
+
 ## 1.5.5 - 2025-04-15
 ### Fixed
 * Prevent [doubled cooldown text](https://github.com/veechs/Bagshui/issues/143) when ShaguPlates, ShaguTweaks, and pfQuest are enabled. Thanks to [@shagu](https://github.com/shagu) for identifying the cause and suggesting how to fix it. <sup><small>🪲&nbsp;[@Vymya](https://github.com/Vymya)</small></sup>

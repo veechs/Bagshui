@@ -490,7 +490,7 @@ function Rules:TestValue(
 		matchType = BS_RULE_MATCH_TYPE.EQUALS
 	end
 
-	-- Validate validArgumentTypes by removing any spaces and uppercasing everything
+	-- Validate validArgumentTypes by removing any spaces and uppercasing everything.
 	validArgumentTypes = validArgumentTypes and string.gsub(string.upper(tostring(validArgumentTypes)), "%s", "")
 
 	-- Only permit numbers for "between" comparisons.
@@ -607,7 +607,11 @@ function Rules:TestValue(
 					)
 				else
 					-- String literal -- just lowercase it.
-					argument = string.lower(BsUtil.EscapeMagicCharacters(argument))
+					argument = string.lower(argument)
+					-- Also need to escape pattern characters if this will be run through `string.find()`.
+					if matchType == BS_RULE_MATCH_TYPE.CONTAINS then
+						argument = BsUtil.EscapeMagicCharacters(argument)
+					end
 				end
 			end
 
