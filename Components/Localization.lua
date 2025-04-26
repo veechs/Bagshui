@@ -225,7 +225,9 @@ function Localization:ReplacePlaceholders(str, locale)
 			if self.locales[locale][placeholderToReplace] then
 				return Localization:ReplacePlaceholders(self.locales[locale][placeholderToReplace], locale)
 			else
-				Bagshui:PrintWarning("Localization placeholder " .. tostring(match) .. " not found!")
+				Bagshui:PrintDebug("Localization placeholder " .. tostring(match) .. " not found! (from " .. tostring(str) .. ")")
+				-- Logging system isn't fully initialized yet, so this is being disabled for now.
+				--Bagshui:PrintWarning("Localization placeholder " .. tostring(match) .. " not found!")
 				return match
 			end
 		end
