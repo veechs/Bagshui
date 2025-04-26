@@ -965,8 +965,8 @@ Bagshui.config.RuleFunctions = {
 		},
 		ruleFunction = function(rules, ruleArguments)
 			return (
-				rules:TestValue(BsGameInfo.currentSubZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
-				or rules:TestValue(BsGameInfo.currentMinimapZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
+				rules:TestValue(BsGameInfo.currentSubZone, ruleArguments, nil, "contains", nil, nil, true)
+				or rules:TestValue(BsGameInfo.currentMinimapZone, ruleArguments, nil, "contains", nil, nil, true)
 			)
 		end,
 		-- Template come from localization.
@@ -1146,8 +1146,8 @@ Bagshui.config.RuleFunctions = {
 		},
 		ruleFunction = function(rules, ruleArguments)
 			return (
-				rules:TestValue(BsGameInfo.currentZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
-				or rules:TestValue(BsGameInfo.currentRealZone, ruleArguments, nil, BS_RULE_MATCH_TYPE.CONTAINS, nil, nil, true)
+				rules:TestValue(BsGameInfo.currentZone, ruleArguments, nil, "contains", nil, nil, true)
+				or rules:TestValue(BsGameInfo.currentRealZone, ruleArguments, nil, "contains", nil, nil, true)
 			)
 		end,
 		-- Template come from localization.
