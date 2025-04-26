@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.5.7 - 2025-04-26
+### Changes
+* zhCN localization now includes everything added/changed in 1.5. Many thanks to [@Sunelegy](https://github.com/Sunelegy) for keeping up with this!
+
 ## 1.5.6 - 2025-04-26
 ### Fixed
 * Matching item properties that contain Lua pattern characters (most notably `-` but could be any of `^$()%.[]*+-?`) [now works as it should](https://github.com/veechs/Bagshui/issues/149). <sup><small>🪲&nbsp;[@AsunaSalata](https://github.com/AsunaSalata)</small></sup>
