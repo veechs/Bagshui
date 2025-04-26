@@ -1282,7 +1282,7 @@ BsLocalization:AddLocale("zhCN", {
 ["sellProtectionEnabled_TooltipText"] = "出售某些物品前需要确认。",
 
 ["sellProtectionEquipped"] = "!!EquippedGear!!",
-["sellProtectionEquipped_TooltipTitle"] = "保护所有!!已装备物品!!",
+["sellProtectionEquipped_TooltipTitle"] = "保护所有!!EquippedGear!!",
 ["sellProtectionEquipped_TooltipText"] = "出售前需要确认。",
 
 ["sellProtectionQualityThreshold"] = "!!ItemPropFriendly_quality!! 阈值",
