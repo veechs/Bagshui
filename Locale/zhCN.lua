@@ -86,6 +86,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Catalog"] = "目录",
 ["Categories"] = "分类",
 ["Category"] = "类别",
+["Character"] = "角色",
 ["CharacterData"] = "角色数据",
 ["CategorySlashItem"] = "类别/物品",
 ["ClassCategory"] = "职业类别",
@@ -118,13 +119,16 @@ BsLocalization:AddLocale("zhCN", {
 ["HoldAlt"] = "按住 Alt",
 ["HoldControlAlt"] = "按住 Control+Alt",
 ["Horizontal"] = "水平",
+["ID"] = "ID",  -- Short way of saying "Identifier"
 ["Ignore"] = "忽略",
 ["Import"] = "导入",
 ["ImportSlashExport"] = "导入/导出",
 ["Info"] = "信息",
 ["Information"] = "信息",
+["Instance"] = "副本",  -- Referring to a game instance, like a dungeon or raid.
 ["Inventory"] = "背包",
 ["Item"] = "物品",
+["ItemId"] = "物品ID",
 ["ItemProperties"] = "物品属性",
 ["KeepEditing"] = "继续编辑",
 ["Label"] = "标签",
@@ -148,6 +152,8 @@ BsLocalization:AddLocale("zhCN", {
 ["NoRuleFunction"] = "（无规则函数）",
 ["NoValue"] = "（无值）",
 ["Open"] = "打开",
+["OpenContainer"] = "打开容器",
+["Openable"] = "可打开",
 ["PleaseWait"] = "请稍候...",
 ["Profile"] = "配置文件",
 ["Prefix_Add"] = "添加 %s",
@@ -182,11 +188,13 @@ BsLocalization:AddLocale("zhCN", {
 ["Search"] = "搜索",
 ["Settings"] = "设置",
 ["Share"] = "分享",
+["ShiftClick"] = "按住Shift并点击",
 ["Show"] = "显示",
 ["SortOrder"] = "排序顺序",
 ["SortOrders"] = "排序顺序",
 ["Sorting"] = "排序",
 ["Stack"] = "堆叠",  -- 动词 (Verb)
+["Subzone"] = "子区域",
 ["Suffix_Default"] = "%s " .. LIGHTYELLOW_FONT_COLOR_CODE .. " [默认]" .. FONT_COLOR_CODE_CLOSE,
 ["Suffix_EmptySlot"] = "%s 空槽",
 ["Suffix_Menu"] = "%s 菜单",
@@ -196,6 +204,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Symbol_Brackets"] = "[%s]",
 ["Symbol_Colon"] = "%s：",
 ["Symbol_Ellipsis"] = "%s…",  -- 用于菜单中，表示点击它将打开另一个对话框或菜单
+["Symbol_Parentheses"] = "(%s)",
 ["Templates"] = "模板",
 ["Text"] = "文本",
 ["Toggle"] = "切换",  -- 动词 (Verb)
@@ -212,6 +221,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Vertical"] = "垂直",
 ["VersionNumber"] = "版本 %s",
 ["Yes"] = "是",
+["Zone"] = "区域",
 
 -- Inventory types.
 -- 背包类型。
@@ -232,6 +242,8 @@ BsLocalization:AddLocale("zhCN", {
 ["Slash_Help"] = "%s 命令：",
 ["Slash_Help_Postscript"] = "要查看子命令列表，请在命令后附加 Help。",
 
+["Slash_Help_ItemInfo"] = "/Bagshui !!信息!! 示例:" .. BS_NEWLINE .. "   /Bagshui !!信息!! 13444".. BS_NEWLINE .. "   /Bagshui !!信息!! item:13446:0:0:0",
+
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 -- 按键绑定（除了背包类名称；这些在 `Inventory:New()` 中处理）。
 ["Binding_Resort"] = "整理所有",
@@ -250,6 +262,7 @@ BsLocalization:AddLocale("zhCN", {
 ["ItemPropFriendly_count"] = "数量",
 ["ItemPropFriendly_equipLocation"] = "装备位置",
 ["ItemPropFriendly_equipLocationLocalized"] = "装备位置（本地化）",
+["ItemPropFriendly_equipLocationSort"] = "装备位置",
 ["ItemPropFriendly_emptySlot"] = "空槽",
 ["ItemPropFriendly_id"] = "物品 ID",
 ["ItemPropFriendly_itemLink"] = "物品链接",
@@ -279,6 +292,21 @@ BsLocalization:AddLocale("zhCN", {
 
 ["Inventory_NoData"] = "离线背包数据不可用。",
 
+
+-- Spell names that enable special features.
+["Spell_Disenchant"] = "分解",
+["Spell_PickLock"] = "开锁",
+
+-- Special item tooltips.
+["Inventory_Item_SellProtection_ConfirmSale"] = "按住Ctrl并右键单击以确认出售。",
+["Inventory_Item_SellProtection_Reason"] = "受保护: %s。",
+["Inventory_Item_SellProtection_OverrideHint"] = "跳过确认: 按住Ctrl+Alt+Shift并右键单击。",
+
+-- Bag tooltips.
+["Bag_SlotsNeededToSwap"] = "交换需要额外 %d 个空闲槽位。",
+["Bag_SupplementalSpaceAvailable"] = "您或许可以在 %s 交换，而无需清理您的 %s。",  -- "You may be able to swap at the Bank without cleaning your Bags."
+
+
 -- Toolbar.
 -- 工具栏。
 ["Toolbar_Menu_TooltipTitle"] = "菜单",
@@ -302,6 +330,7 @@ BsLocalization:AddLocale("zhCN", {
 
 -- Action Tooltips.
 -- 操作提示框。
+["Tooltip_Inventory_PlaceBagInBagHint"] = "按住%s将物品移入背包，而非交换。",  -- "Shift-Click to lock/unlock slot highlighting"
 ["Tooltip_Inventory_ToggleBagSlotHighlightLockHint"] = "%s 以 %s 槽位高亮。",  -- "Alt+点击以锁定/解锁槽位高亮显示"
 ["Tooltip_Inventory_ToggleEmptySlotStacking"] = "%s 以 %s 空槽。",  -- "点击以堆叠/取消堆叠空槽"
 ["Tooltip_Inventory_TradeShortcut"] = "%s 与 %s 交易。",  -- "Alt+点击与 <玩家名称> 交易"
@@ -330,33 +359,53 @@ BsLocalization:AddLocale("zhCN", {
 ["Menu_Settings"] = "%s 设置",  -- "背包设置"
 ["Menu_Settings_About"] = "关于 Bagshui",
 ["Menu_Settings_Accessibility"] = "可访问性",
+["Menu_Settings_ActiveDesignProfileHint"] = "应用到当前使用的配置文件。",
 ["Menu_Settings_Advanced"] = "高级",
 ["Menu_Settings_Anchoring"] = "锚点",
+["Menu_Settings_BagUsage"] = "利用率",
+["Menu_Settings_BagUsage_TooltipText"] = "显示可用槽位和总容量。",
 ["Menu_Settings_Behaviors"] = "行为",
 ["Menu_Settings_Badges"] = "物品徽章",
+["Menu_Settings_DefaultProfiles_TooltipText"] = "管理为新角色创建配置文件的方式。",
 ["Menu_Settings_ChangeTiming"] = "库存更改计时器",
 ["Menu_Settings_Colors"] = "颜色",
 ["Menu_Settings_ColorHistory_TooltipTitle"] = "颜色选择器历史",
 ["Menu_Settings_Commands"] = "命令",
 ["Menu_Settings_DefaultProfiles"] = "默认配置文件",
 ["Menu_Settings_Defaults"] = "默认值",
+["Menu_Settings_DesignColors_TooltipTitle"] = "设计颜色",
+["Menu_Settings_DesignColors_TooltipText"] = "更改物品栏颜色。",
+["Menu_Settings_DesignSize_TooltipTitle"] = "设计尺寸",
+["Menu_Settings_DesignSize_TooltipText"] = "更改物品栏尺寸。",
+["Menu_Settings_DesignView_TooltipTitle"] = "设计视图",
+["Menu_Settings_DesignView_TooltipText"] = "更改物品栏界面元素的可见性。",
 ["Menu_Settings_Etcetera"] = "其他",
+["Menu_Settings_Format"] = "格式",
 ["Menu_Settings_General"] = "常规",
 ["Menu_Settings_GroupDefaults"] = "组默认值",
+["Menu_Settings_General_TooltipText"] = "常规设置",
 ["Menu_Settings_Groups"] = "组",
 ["Menu_Settings_Hooks_Suffix"] = "%s 钩子",  -- %s = 背包类型。
 ["Menu_Settings_InfoTooltip"] = "信息提示",
 ["Menu_Settings_Integration"] = "集成",
+["Menu_Settings_Integration_TooltipText"] = "控制Bagshui与游戏的集成方式。",
 ["Menu_Settings_Interface"] = "界面",
+["Menu_Settings_ItemProperties"] = "物品属性",
 ["Menu_Settings_ItemSlots"] = "物品槽",
 ["Menu_Settings_More"] = "更多",
 ["Menu_Settings_More_TooltipTitle"] = "附加设置",
+["Menu_Settings_NitpickyDetails"] = "细节设置",
 ["Menu_Settings_Overrides"] = "覆盖",
 ["Menu_Settings_Open"] = "!!Open!!",
 ["Menu_Settings_Options"] = "选项",
+["Menu_Settings_PerBag"] = "每个背包",
 ["Menu_Settings_Profile"] = "配置文件",
+["Menu_Settings_SellProtection"] = "出售保护",
 ["Menu_Settings_Size"] = "大小",
 ["Menu_Settings_SizeAndLayering"] = "尺寸和分层",
+["Menu_Settings_StructureOptions_TooltipTitle"] = "结构选项",
+["Menu_Settings_StructureOptions_TooltipText"] = "当前使用的配置文件设置。",
+["Menu_Settings_Summary"] = "汇总",
 ["Menu_Settings_Tinting"] = "物品着色",
 ["Menu_Settings_Toggles"] = "切换",
 ["Menu_Settings_Toolbar"] = "工具栏",
@@ -364,6 +413,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Menu_Settings_ToggleBagsWith"] = "切换背包与",
 ["Menu_Settings_StockBadgeColors"] = "库存颜色",
 ["Menu_Settings_View"] = "视图",
+["Menu_Settings_Visibility"] = "可见性",
 ["Menu_Settings_Window"] = "窗口",
 
 -- Category Menu.
@@ -405,13 +455,15 @@ BsLocalization:AddLocale("zhCN", {
 
 -- Item Menu.
 -- 物品菜单。
-["Menu_Item_AssignToCategory"] = "直接分配",
+["Menu_Item_AssignToCategory"] = "类别分配",
 ["Menu_Item_AssignToCategory_TooltipTitle"] = "直接类别分配",
 ["Menu_Item_AssignToCategory_TooltipText"] = "将此物品的ID分配给一个或多个自定义类别（而不是使用规则函数）。",
 ["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "将物品分配给新的自定义类别。",
 ["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "内置类别是只读的 - 请参阅Bagshui Wiki上的FAQ了解原因。",
-["Menu_Item_AssignToClassCategory"] = "直接分配到",
+["Menu_Item_AssignToClassCategory"] = "分配到职业类别",
 ["Menu_Item_Information_TooltipTitle"] = "物品信息",
+["Menu_Item_EquipBag"] = "装备背包",
+["Menu_Item_EquipBag_TooltipText"] = "替换当前已装备的背包之一。",
 ["Menu_Item_Information_TooltipText"] = "查看有关此物品属性的详细信息并访问物品信息窗口。",
 ["Menu_Item_Information_Submenu_TooltipText"] = "点击打开物品信息窗口。",
 ["Menu_Item_Manage_TooltipTitle"] = "管理物品",
@@ -495,9 +547,11 @@ BsLocalization:AddLocale("zhCN", {
 ["TooltipIdentifier_CompanionTurtleWoW"] = [[右键点击以召唤和解散你的]],
 ["TooltipIdentifier_Drink"] = [[必须在坐下时饮用]],
 ["TooltipIdentifier_Food"] = [[必须在坐下时进食]],
+["TooltipIdentifier_Locked"] = [[已锁]],
 ["TooltipIdentifier_Mount"] = [[使用..-召唤或解散一只可供骑乘的]],
 ["TooltipIdentifier_MountAQ40"] = [[使用..-发出高频声波]],
 ["TooltipIdentifier_MountTurtleWoW"] = [[使用..-在玩家的坐骑收藏中增加一个新坐骑]],
+["TooltipIdentifier_Openable"] = [[<右键单击打开>]],
 ["TooltipIdentifier_PotionHealth"] = [[/恢复%d+到%d+点生命值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_PotionMana"] = [[/恢复%d+到%d+点法力值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_QuestItem"] = [[任务物品]],
@@ -647,8 +701,10 @@ BsLocalization:AddLocale("zhCN", {
 ["CategoryEditor_Field_class"] = "职业",
 ["CategoryEditor_Field_rule"] = "规则",
 ["CategoryEditor_Field_rule_TooltipText"] = "一个或多个 Bagshui 规则函数，使用 and/or/not 关键字组合，可选地使用括号分组。请参阅文档以获取帮助。",
-["CategoryEditor_Field_list"] = "直接分配",
+["CategoryEditor_Field_list"] = "已分配物品",
 ["CategoryEditor_Field_list_TooltipText"] = "直接分配到此类别而不是使用规则函数的物品列表。",
+["CategoryEditor_ID_TooltipTitle"] = "类别ID",
+["CategoryEditor_ID_TooltipText"] = "传递给MatchCategory()规则函数，以检查物品是否与此类别匹配。",
 -- Button tooltips.
 -- 按钮提示框。
 ["CategoryEditor_AddRuleFunction"] = "添加规则函数",
@@ -792,6 +848,34 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Location_ExampleExtra1"] = 'Location("loc1", "loc2", "locN")',
 ["RuleFunction_Location_ExampleDescriptionExtra1"] = "检查物品是否存储在任何指定位置。",
 
+["RuleFunction_LootMethod_GenericDescription"] = "检查当前的拾取方式。",
+["RuleFunction_LootMethod_Note"] = "查看方式: /Bagshui !!信息!! 团队",
+["RuleFunction_LootMethod_Example1"] = 'LootMethod("自由拾取")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription1"] = "检查拾取方式是否为自由拾取（这是默认的拾取方式）。",
+["RuleFunction_LootMethod_Example2"] = 'LootMethod("轮流拾取")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription2"] = "检查拾取方式是否为轮流拾取。",
+["RuleFunction_LootMethod_Example3"] = 'LootMethod("队长分配")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription3"] = "检查拾取方式是否为队长分配。",
+["RuleFunction_LootMethod_Example4"] = 'LootMethod("需求优先")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription4"] = "检查拾取方式是否为需求优先。",
+["RuleFunction_LootMethod_Example5"] = 'LootMethod("个人拾取")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription5"] = "检查拾取方式是否为个人拾取。",
+["RuleFunction_LootMethod_Example6"] = 'LootMethod("method1", "method2", "methodN")',
+["RuleFunction_LootMethod_ExampleDescription6"] = "检查当前拾取方式是否为提供的任何值。",
+["RuleFunction_LootMethod_Example7"] = 'LootMaster()',
+["RuleFunction_LootMethod_ExampleDescription7"] = "检查您是否为拾取队长。",
+
+["RuleFunction_MatchCategory_GenericDescription"] = "检查物品是否与一个或多个其他类别匹配。",
+["RuleFunction_MatchCategory_Note"] = "参数是类别ID（不是名称），可以在类别编辑器的底部找到。",
+["RuleFunction_MatchCategory_Example1"] = 'MatchCategory("钥匙及类似物品")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription1"] = "检查物品是否与内置的钥匙类别匹配。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "内置类别的ID是字符串，可能与其名称不匹配。" .. FONT_COLOR_CODE_CLOSE,
+["RuleFunction_MatchCategory_Example2"] = 'MatchCategory(5)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription2"] = "检查物品是否与自定义类别5匹配。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "自定义类别有数字ID。",
+["RuleFunction_MatchCategory_Example3"] = 'not MatchCategory(5)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription3"] = "检查物品是否不与自定义类别5匹配。",
+["RuleFunction_MatchCategory_Example4"] = 'MatchCategory(ID1, ID2, IDN)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription4"] = "检查物品是否与任何指定的类别匹配。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. '请记住，内置类别使用必须加引号的字符串，自定义类别使用数字。',
+
 ["RuleFunction_MinLevel_GenericDescription"] = "检查物品是否基于指定等级可用。",
 ["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
 ["RuleFunction_MinLevel_ExampleDescription1"] = "检查物品是否在 <level> 或以上可用。",
@@ -810,6 +894,14 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_NameExact_ExampleExtra1"] = 'NameExact("string1", "string2", "stringN")',
 ["RuleFunction_NameExact_ExampleDescriptionExtra1"] = "检查物品名称是否完全匹配任何指定字符串。",
 
+["RuleFunction_Openable_GenericDescription"] = "检查物品是否可打开。",
+["RuleFunction_Openable_Example1"] = 'Openable()',
+["RuleFunction_Openable_ExampleDescription1"] = "检查物品是否可打开。",
+["RuleFunction_Openable_Example2"] = 'Openable(Locked)',
+["RuleFunction_Openable_ExampleDescription2"] = "检查物品是否可打开，但已锁定。",
+["RuleFunction_Openable_Example3"] = 'Openable(Unlocked)',
+["RuleFunction_Openable_ExampleDescription3"] = "检查物品是否可打开且未锁定。",
+
 ["RuleFunction_Outfit_GenericDescription"] = "检查物品是否是 %s 中的套装的一部分。",
 ["RuleFunction_Outfit_Example1"] = 'Outfit()',
 ["RuleFunction_Outfit_ExampleDescription1"] = "检查物品是否是 %s 中的套装的一部分。",
@@ -822,6 +914,15 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_PeriodicTable_ExampleDescription"] = "检查物品是否属于 '%s' 规则表集合。!!RuleFunction_PT_CaseSensitiveParameters!!",
 ["RuleFunction_PeriodicTable_ExampleExtra1"] = 'PeriodicTable("set1", "set2", "setN")',
 ["RuleFunction_PeriodicTable_ExampleDescriptionExtra1"] = "检查物品是否属于任何指定的规则表集合。!!RuleFunction_PT_CaseSensitiveParameters!!",
+
+["RuleFunction_PlayerInGroup_GenericDescription"] = "检查您是否在团队中。",
+["RuleFunction_PlayerInGroup_Note"] = "查看方式: /Bagshui !!信息!! 团队",
+["RuleFunction_PlayerInGroup_Example1"] = 'PlayerInGroup()',
+["RuleFunction_PlayerInGroup_ExampleDescription1"] = "检查您是否在任何团队（小队或团队）中。",
+["RuleFunction_PlayerInGroup_Example2"] = 'PlayerInGroup(小队)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription2"] = "检查您是否在小队中。",
+["RuleFunction_PlayerInGroup_Example3"] = 'PlayerInGroup(团队)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription3"] = "检查您是否在团队中。",
 
 ["RuleFunction_ProfessionCraft_GenericDescription"] = "检查物品是否由当前角色的专业制作（仅限已学习配方）。",
 ["RuleFunction_ProfessionCraft_Example1"] = 'ProfessionCraft()',
@@ -844,6 +945,18 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Quality_ExampleExtra1"] = 'Quality(qual1, qual2, qualN)',
 ["RuleFunction_Quality_ExampleDescriptionExtra1"] = "检查物品是否具有任何指定品质。",
 
+["RuleFunction_RecentlyChanged_GenericDescription"] = "检查物品的库存状态是否已更改。",
+["RuleFunction_RecentlyChanged_Example1"] = 'RecentlyChanged()',
+["RuleFunction_RecentlyChanged_ExampleDescription1"] = '检查库存状态是否以任何方式发生了变化。',
+["RuleFunction_RecentlyChanged_Example2"] = 'RecentlyChanged(新增)',
+["RuleFunction_RecentlyChanged_ExampleDescription2"] = '检查物品是否被视为新增。',
+["RuleFunction_RecentlyChanged_Example3"] = 'RecentlyChanged(增加)',
+["RuleFunction_RecentlyChanged_ExampleDescription3"] = '检查库存是否增加。',
+["RuleFunction_RecentlyChanged_Example4"] = 'RecentlyChanged(减少)',
+["RuleFunction_RecentlyChanged_ExampleDescription4"] = '检查库存是否减少。',
+["RuleFunction_RecentlyChanged_Example5"] = 'RecentlyChanged(新增, 增加)',
+["RuleFunction_RecentlyChanged_ExampleDescription5"] = '检查物品是否为新增或库存是否增加，但忽略库存减少。',
+
 ["RuleFunction_RequiresClass_GenericDescription"] = "检查物品是否可由指定职业使用。",
 ["RuleFunction_RequiresClass_ExampleDescription"] = "检查物品是否可由 %s 职业使用。",
 ["RuleFunction_RequiresClass_ExampleExtra1"] = 'RequiresClass("class1", "class2", "classN")',
@@ -859,6 +972,13 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Subtype_ExampleDescription"] = "检查物品的子类型是否为 '%s'。",
 ["RuleFunction_Subtype_ExampleExtra1"] = 'Subtype("type1", "type2", "typeN")',
 ["RuleFunction_Subtype_ExampleDescriptionExtra1"] = "检查物品是否具有任何指定子类型。",
+
+["RuleFunction_Subzone_GenericDescription"] = "检查当前子区域（特定区域）。",
+["RuleFunction_Subzone_Note"] = "查看方式: /Bagshui !!信息!! 位置",
+["RuleFunction_Subzone_Example1"] = 'Subzone("灵魂高地")',  -- DO localize the parameter.
+["RuleFunction_Subzone_ExampleDescription1"] = "检查您是否在灵魂高地。",
+["RuleFunction_Subzone_Example2"] = 'Subzone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Subzone_ExampleDescription2"] = "检查您是否在任何指定的子区域中。",
 
 ["RuleFunction_Tooltip_GenericDescription"] = "检查提示是否包含指定字符串。!!RuleFunction_LuaStringPatternsSupported!!",
 ["RuleFunction_Tooltip_Example1"] = 'Tooltip("string")',
@@ -885,6 +1005,13 @@ BsLocalization:AddLocale("zhCN", {
 ["RuleFunction_Wishlist_Example1"] = 'Wishlist()',
 ["RuleFunction_Wishlist_ExampleDescription1"] = "检查物品是否在 %s 愿望清单上。",
 
+["RuleFunction_Zone_GenericDescription"] = "检查当前区域（特定区域）。",
+["RuleFunction_Zone_Note"] = "查看方式: /Bagshui !!信息!! 位置",
+["RuleFunction_Zone_Example1"] = 'Zone("雷霆崖")',  -- DO localize the parameter.
+["RuleFunction_Zone_ExampleDescription1"] = "检查您是否在雷霆崖。",
+["RuleFunction_Zone_Example2"] = 'Zone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Zone_ExampleDescription2"] = "检查您是否在任何指定的区域中。",
+
 
 -- ### Tips/Help ###
 -- ### 提示/帮助 ###
@@ -898,6 +1025,9 @@ BsLocalization:AddLocale("zhCN", {
 ["Error_AddonDependency_Generic"] = "需要额外的插件来启用此规则函数（请参阅 Bagshui wiki 上的规则页面）。",
 ["Error_AddonDependency_Generic_FunctionName"] = "需要额外的插件来启用 %s 的使用（请参阅 Bagshui wiki 上的规则页面）。",
 ["Error_AddonDependency"] = "%s 未安装或未启用。",
+["Error_BagSwap_EmptyOldFailed"] = "清空旧背包失败。",
+["Error_BagSwap_EmptyOldInsufficientSpace"] = "没有足够的空闲槽位来清空旧背包。",
+["Error_BagSwap_EquipNewFailed"] = "装备新背包失败。",
 ["Error_CategoryEvaluation"] = "%s：%s",  -- "<类别名称>: <错误消息>"
 ["Error_DuplicateName"] = "已经存在名为 %s 的 %s。",  -- "已经存在一个名为<名称>的<对象类型>。"
 ["Error_GroupNotFound"] = "未找到组ID %s。",
@@ -905,6 +1035,7 @@ BsLocalization:AddLocale("zhCN", {
 ["Error_ImportInvalidFormat"] = "导入失败：数据格式意外。",
 ["Error_ImportVersionTooNew"] = "导入失败：请升级到最新版本的Bagshui。",
 ["Error_ItemCategoryUnknown"] = "！未知！（这不应该发生）。",  -- 如果物品没有类别，则显示在提示中。
+["Error_ItemNotFound"] = "未找到物品 %s。",
 ["Error_RestackFailed"] = "重新堆叠 %s 失败",
 ["Error_SaveFailed"] = "%s 无法保存：%s",
 ["Error_Suffix_Retrying"] = "%s；正在重试…",  -- 当操作失败但正在再次尝试时，附加到错误消息的末尾。
@@ -918,6 +1049,8 @@ BsLocalization:AddLocale("zhCN", {
 ["Compat_ReloadUIPrompt"] = "需要重新加载UI。",
 ["Compat_pfUIBags"] = "强烈建议禁用pfUI背包模块以避免多个银行窗口。",
 ["Compat_pfUIBagsInfo"] = "如果你改变主意，可以在pfUI配置 > 组件 > 模块中管理pfUI背包模块。",
+["Compat_Swapper"] = "Swapper会干扰Bagshui的背包交换功能，必须禁用。",
+["Compat_SwapperInfo"] = "Swapper已被禁用。",
 ["Compat_tDFAllInOneBags"] = "如果你希望使用Bagshui作为默认背包，建议禁用tDF全能背包模块。",
 ["Compat_tDFAllInOneBagsInfo"] = "如果你改变主意，可以在tDF选项中管理tDF全能背包模块。",
 
@@ -934,6 +1067,9 @@ BsLocalization:AddLocale("zhCN", {
 
 ["Error_Rule_ItemLevelStat"] = "经典旧世没有物品等级（ilvl），因此 ItemLevelStat() 不可用。",
 ["Error_Rule_ItemStat"] = "ItemStat() 和 ItemStatActive() 当前不受支持。尝试使用Tooltip() 来检查属性。",
+
+["Error_Rule_MatchCategory_Loop"] = "检测到MatchCategory()循环:",
+["Error_Rule_MatchCategory_DownstreamError"] = "由于引用类别 %s 中存在错误，MatchCategory()无法继续。",
 
 -- ### Logging ###
 -- ### 日志记录 ###
@@ -983,12 +1119,39 @@ BsLocalization:AddLocale("zhCN", {
 ["Setting_Profile_Use"] = "将此设为活动的 %s %s 配置文件。",  -- 设为活动的背包设计配置文件。
 
 
+["Setting_BagUsageDisplay_Always"] = "始终显示",
+["Setting_BagUsageDisplay_Always_TooltipTitle"] = "汇总始终可见",
+["Setting_BagUsageDisplay_Always_TooltipText"] = "无论其他设置如何，都显示利用率汇总。",
+["Setting_BagUsageDisplay_Smart"] = "自动",
+["Setting_BagUsageDisplay_Smart_TooltipTitle"] = "自动显示汇总",
+["Setting_BagUsageDisplay_Smart_TooltipText"] = "当空槽堆叠关闭时（或鼠标悬停在背包槽位上时）显示利用率汇总。",
+["Setting_BagUsageDisplay_Never"] = "从不显示",
+["Setting_BagUsageDisplay_Never_TooltipTitle"] = "汇总从不显示",
+["Setting_BagUsageDisplay_Never_TooltipText"] = "利用率汇总将永远不会显示（鼠标悬停在背包槽位上时除外）。",
+
+["Setting_BagUsageFormat_Empty"] = "空闲",
+["Setting_BagUsageFormat_Empty_Total"] = "空闲/总计",
+["Setting_BagUsageFormat_Empty_Used_Total"] = "空闲 (已用/总计)",
+["Setting_BagUsageFormat_Used"] = "已用",
+["Setting_BagUsageFormat_Used_Total"] = "已用/总计",
+["Setting_BagUsageFormat_Used_Empty_Total"] = "已用 (空闲/总计)",
+
 -- ### Settings ###
 -- ### 设置 ###
 -- 键为settingName、settingName_TooltipTitle或settingName_TooltipText。
 -- 有关更多信息，请参阅 `Settings:InitSettingsInfo()` 声明中的本地化说明。
 
 ["aboutBagshui_TooltipTitle"] = "关于Bagshui",
+
+["bagUsageAlwaysShow"] = "始终显示",
+["bagUsageAlwaysShow_TooltipTitle"] = "每个背包的利用率始终可见",
+["bagUsageAlwaysShow_TooltipText"] = "始终在每个背包上显示利用率（仅在背包槽位可见时适用）。",
+
+["bagUsageDisplay"] = "显示",
+["bagUsageDisplay_TooltipText"] = "控制物品栏消耗显示的可见时间。",
+
+["bagUsageFormat"] = "利用率汇总格式",
+["bagUsageFormat_TooltipText"] = "控制物品栏消耗显示中显示哪些数字。",
 
 ["colorblindMode"] = "色盲模式",
 ["colorblindMode_TooltipText"] = "无论设计设置如何，始终显示物品品质和不可用徽章。",
@@ -1019,6 +1182,13 @@ BsLocalization:AddLocale("zhCN", {
 ["windowDoubleClickActions"] = "双击",
 ["windowDoubleClickActions_TooltipText"] = "双击背包窗口的空白部分以显示/隐藏所有工具栏。" .. BS_NEWLINE .. "Alt+双击以切换位置锁定。",
 
+["emptySlotBackgroundImage"] = "背景",
+["emptySlotBackgroundImage_TooltipTitle"] = "空槽背景",
+["emptySlotBackgroundImage_TooltipText"] = "禁用此选项可使用纯色背景表示空槽位。",
+
+["emptySlotBackgroundColor"] = "颜色",
+["emptySlotBackgroundColor_TooltipTitle"] = "空槽背景颜色",
+["emptySlotBackgroundColor_TooltipText"] = "空槽位背景显示的颜色。",
 ["globalInfoTooltips"] = "无处不在",
 ["globalInfoTooltips_TooltipTitle"] = "挂钩所有物品提示",
 ["globalInfoTooltips_TooltipText"] = "当按住Alt时，在任何地方（即角色窗口、聊天链接等）显示Bagshui信息提示与目录计数。",
@@ -1103,8 +1273,37 @@ BsLocalization:AddLocale("zhCN", {
 ["resetStockState"] = "标记物品为未更改",
 ["resetStockState_TooltipText"] = "将此背包中的所有物品标记为不再新增、增加或减少。",
 
+["sellProtectionActiveQuest"] = "!!物品属性友好_当前任务物品!!",
+["sellProtectionActiveQuest_TooltipTitle"] = "保护!!物品属性友好_当前任务物品!!物品",
+["sellProtectionActiveQuest_TooltipText"] = "出售前需要确认。",
+
+["sellProtectionEnabled"] = "已启用",
+["sellProtectionEnabled_TooltipTitle"] = "出售保护",
+["sellProtectionEnabled_TooltipText"] = "出售某些物品前需要确认。",
+
+["sellProtectionEquipped"] = "!!已装备物品!!",
+["sellProtectionEquipped_TooltipTitle"] = "保护所有!!已装备物品!!",
+["sellProtectionEquipped_TooltipText"] = "出售前需要确认。",
+
+["sellProtectionQualityThreshold"] = "!!物品属性友好_品质!! 阈值",
+["sellProtectionQualityThreshold_TooltipText"] = "出售前需要确认。",
+["sellProtectionQualityThreshold_Choice_TooltipTitle"] = "保护 %s 物品",  -- %s = Quality (ex. Rare, Epic).
+["sellProtectionQualityThreshold_Choice_TooltipText"] = "出售 %s 物品或更高品质物品前需要确认。",  -- %s = Quality (ex. Rare, Epic).
+
+["sellProtectionSoulbound"] = "!!物品属性友好_灵魂绑定!!",
+["sellProtectionSoulbound_TooltipTitle"] = "保护!!物品属性友好_灵魂绑定!!物品",
+["sellProtectionSoulbound_TooltipText"] = "出售前需要确认。",
+
 ["showBagBar"] = "背包栏",
 ["showBagBar_TooltipText"] = "在左下角显示背包栏。",
+
+["showClam"] = "贝壳按钮",
+["showClam_TooltipTitle"] = "打开贝壳按钮",
+["showClam_TooltipText"] = "显示贝壳按钮以快速打开贝壳。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "仅适用于背包。" .. FONT_COLOR_CODE_CLOSE,
+
+["showDisenchant"] = "分解按钮",
+["showDisenchant_TooltipTitle"] = "分解按钮",
+["showDisenchant_TooltipText"] = "显示分解按钮。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "仅适用于拥有附魔专业的角色和背包。" .. FONT_COLOR_CODE_CLOSE,
 
 ["showFooter"] = "底部工具栏",
 ["showFooter_TooltipTitle"] = "底部工具栏",
@@ -1120,6 +1319,7 @@ BsLocalization:AddLocale("zhCN", {
 
 ["showHearthstone"] = "炉石按钮",
 ["showHearthstone_TooltipText"] = "显示炉石按钮。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "仅适用于背包。" .. FONT_COLOR_CODE_CLOSE,
+["showHearthstone_TooltipTitle"] = "炉石按钮",
 
 ["showInfoTooltipsWithoutAlt"] = "无需 Alt 显示",
 ["showInfoTooltipsWithoutAlt_TooltipText"] = "始终显示 Bagshui 信息提示（按住 Shift 以暂时隐藏）。",
@@ -1128,6 +1328,10 @@ BsLocalization:AddLocale("zhCN", {
 
 ["showMoney"] = "金钱",
 ["showMoney_TooltipText"] = "在右下角显示金钱。",
+
+["showPickLock"] = "开锁",
+["showPickLock_TooltipTitle"] = "开锁按钮",
+["showPickLock_TooltipText"] = "显示开锁按钮。" .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "仅适用于盗贼和背包。" .. FONT_COLOR_CODE_CLOSE,
 
 ["stackEmptySlots"] = "堆叠空槽",
 ["stackEmptySlots_TooltipTitle"] = "堆叠空槽",
@@ -1178,6 +1382,14 @@ BsLocalization:AddLocale("zhCN", {
 ["windowScale"] = "缩放",
 ["windowScale_TooltipTitle"] = "窗口缩放",
 ["windowScale_TooltipText"] = "整个窗口的相对大小。",
+
+["windowStrata"] = "层级",
+["windowStrata_TooltipTitle"] = "窗口层级",
+["windowStrata_TooltipText"] = "控制Bagshui窗口与其他框架的重叠方式（z轴索引）。",
+["windowStrata_Choice_LOW"] = "低",
+["windowStrata_Choice_MEDIUM"] = "中",
+["windowStrata_Choice_HIGH"] = "高",
+["windowStrata_Choice_DIALOG"] = "非常高",
 
 ["windowUseSkinColors"] = "使用 %s 颜色",
 ["windowUseSkinColors_TooltipTitle"] = "%s 颜色用于窗口",
