@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.5.8 - 2025-04-26
+### Fixed
+* Avoid localization errors. Whoops.
+
 ## 1.5.7 - 2025-04-26
 ### Changes
 * zhCN localization now includes everything added/changed in 1.5. Many thanks to [@Sunelegy](https://github.com/Sunelegy) for keeping up with this!
