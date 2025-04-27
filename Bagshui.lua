@@ -891,6 +891,31 @@ local Bagshui = {
 	-- Track how many events are queued so we don't have to constantly initiate a loop in `Bagshui:ProcessEventQueue()`.
 	queuedEventCount = 0,
 
+	-- Reusable tables for combat-deferred events.
+	-- Keys for each sub-table will be the unique update identifier.
+	-- See `Bagshui:DeferEventInCombat()`, and `Bagshui:ProcessCombatDeferredEvents()`.
+	---@type table<string, table>
+	combatDeferredEvents = {
+		-- Track which events have already been queued.
+		---@type table<string,true>
+		queued = {},
+		-- List of events, in the order they should be raised (event:<arg1><arg2><arg3><arg4>).
+		---@type string[]
+		events = {},
+		-- First parameter for the callback function.
+		---@type table<string, any>
+		arg1 = {},
+		-- Second parameter for the callback function.
+		---@type table<string, any>
+		arg2 = {},
+		-- Third parameter for the callback function.
+		---@type table<string, any>
+		arg3 = {},
+		-- Fourth parameter for the callback function.
+		---@type table<string, any>
+		arg4 = {},
+	},
+
 	-- Reusable tables for combat-deferred updates.
 	-- Keys for each sub-table will be the unique update identifier.
 	-- See `Bagshui:DeferUpdateInCombat()`, and `Bagshui:ProcessCombatDeferredUpdates()`.
@@ -1165,13 +1190,14 @@ end
 ---@param arg3 any? Third argument, if any.
 ---@param arg4 any? Fourth argument, if any.
 function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
-	-- Bagshui:PrintDebug("Bagshui event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
+	--Bagshui:PrintDebug("Bagshui event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
 
 	if event == "ADDON_LOADED" then
 		-- Need to check arg1 to avoid responding to this event for other addons.
 		if arg1 == "Bagshui" then
 			self:AddonLoaded()
 			self:LoadComponents()
+			self:InitInventoryWindowVisibilityCheck()
 		else
 			return
 		end
@@ -1212,7 +1238,13 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 	-- Leaving combat.
 	if event == "PLAYER_REGEN_ENABLED" then
 		self.playerInCombat = false
-		self:QueueClassCallback(self, self.ProcessCombatDeferredUpdates, 0.25)
+		self:QueueClassCallback(self, self.ProcessCombatDeferrals, 0.25)
+	end
+
+
+	-- Aggressive event squashing in combat.
+	if self:DeferEventInCombat(event, arg1, arg2, arg3, arg4) then
+		return
 	end
 
 

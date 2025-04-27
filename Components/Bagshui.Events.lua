@@ -208,6 +208,55 @@ end
 
 
 
+function Bagshui:ProcessCombatDeferrals()
+	self:ProcessCombatDeferredEvents()
+	self:ProcessCombatDeferredUpdates()
+end
+
+
+
+local deferredEventKey, deferredEventIndex
+
+function Bagshui:DeferEventInCombat(event, arg1, arg2, arg3, arg4)
+	if self.playerInCombat and not self:IsAnyInventoryWindowVisible() then
+		deferredEventKey = tostring(event) .. ":" .. tostring(arg1) .. tostring(arg2) .. tostring(arg3) .. tostring(arg4)
+		-- self:PrintDebug("Deferring " .. deferredEventKey)
+		if not self.combatDeferredEvents.queued[deferredEventKey] then
+			self.combatDeferredEvents.queued[deferredEventKey] = true
+			table.insert(self.combatDeferredEvents.events, deferredEventKey)
+			self.combatDeferredEvents.arg1[deferredEventKey] = arg1
+			self.combatDeferredEvents.arg2[deferredEventKey] = arg2
+			self.combatDeferredEvents.arg3[deferredEventKey] = arg3
+			self.combatDeferredEvents.arg4[deferredEventKey] = arg4
+		end
+	end
+end
+
+
+
+function Bagshui:ProcessCombatDeferredEvents()
+	for _, eventKey in ipairs(self.combatDeferredEvents.events) do
+		-- self:PrintDebug("Raising " .. eventKey)
+		local event = (BsUtil.Split(eventKey, ":"))
+		self:RaiseEvent(
+			event,
+			false,
+			self.combatDeferredEvents.arg1[eventKey],
+			self.combatDeferredEvents.arg2[eventKey],
+			self.combatDeferredEvents.arg3[eventKey],
+			self.combatDeferredEvents.arg4[eventKey]
+		)
+
+		self.combatDeferredEvents.arg1[eventKey] = nil
+		self.combatDeferredEvents.arg2[eventKey] = nil
+		self.combatDeferredEvents.arg3[eventKey] = nil
+		self.combatDeferredEvents.arg4[eventKey] = nil
+	end
+	BsUtil.TableClear(self.combatDeferredEvents.events)
+	BsUtil.TableClear(self.combatDeferredEvents.queued)
+end
+
+
 --- Reusable variable for DeferUpdateInCombat() to marginally reduce GC.
 
 local deferredUpdateKey
@@ -220,7 +269,7 @@ local deferredUpdateKey
 ---@param arg2 any Callback arguments.
 ---@return boolean isInCombat # True when callback was queued.
 function Bagshui:DeferUpdateInCombat(class, classFunction, arg1, arg2)
-	if self.playerInCombat then
+	if self.playerInCombat and not self:IsAnyInventoryWindowVisible() then
 		deferredUpdateKey = tostring(class) .. tostring(classFunction) .. tostring(arg1) .. tostring(arg2)
 		if not self.combatDeferredUpdates.classFunction[deferredUpdateKey] then
 			self.combatDeferredUpdates.classFunction[deferredUpdateKey] = classFunction

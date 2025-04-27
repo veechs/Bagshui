@@ -1140,6 +1140,8 @@ end
 --- - Top toolbar hidden if it was temporarily visible.
 --- - Pending trade-with-another player item cleared.
 function Inventory:UiFrame_OnShow()
+	-- Make sure everything is up to date.
+	Bagshui:ProcessCombatDeferredEvents()
 
 	if self.dockTo then
 		-- Used by SetDockedToFrameVisibility() to decide whether the  frame to which this
