@@ -157,7 +157,7 @@ Bagshui.components.Character = Character
 ---@param event string WoW API event
 ---@param arg1 any First event argument.
 function Character:OnEvent(event, arg1)
-	-- Bagshui:PrintDebug("Character event " .. event .. " // " .. tostring(arg1))
+	Bagshui:PrintDebug("Character event " .. event .. " // " .. tostring(arg1))
 
 	-- Initial processing at startup. The delayed event is necessary to ensure
 	-- we can actually get the data we need, which isn't available instantly.
