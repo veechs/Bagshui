@@ -963,6 +963,7 @@ local Bagshui = {
 
 	-- Debugging.
 	debug = BS_DEBUG,
+	debugLog = false,
 	debugWipeConfigOnLoad = false and BS_DEBUG,
 }
 
@@ -1179,6 +1180,44 @@ function Bagshui:PostLocalizationInit()
 		BsSlash:PrintHandlers(self._settingsHandler_LocalizedInventoryTypes, "Settings")
 	end)
 
+	-- Add "Debug" slash command.
+	BsSlash:AddHandler(
+		"Debug",
+		function(tokens)
+			if not tokens[2] then
+				Bagshui:PrintBare(
+					"Bagshui Debug Status:" .. BS_NEWLINE ..
+					"> Print to chat: " .. tostring(self.debug) .. BS_NEWLINE ..
+					"> Save to log*: " .. tostring(self.debugLog) .. BS_NEWLINE ..
+					"  * debugLog property in Bagshui.lua SavedVariables"
+				)
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "on") then
+				self.debug = true
+				self:PrintBare("Bagshui debug chat output ON")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "off") then
+				self.debug = false
+				self:PrintBare("Bagshui debug chat output OFF")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "log") then
+				self.debugLog = true
+				self:PrintBare("Bagshui debug logging to SavedVariables ON")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "nolog") then
+				self.debugLog = false
+				self:PrintBare("Bagshui debug logging to SavedVariables OFF")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "alloff") then
+				self.debug = false
+				self.debugLog = false
+				self:PrintBare("Bagshui debug chat output OFF")
+				self:PrintBare("Bagshui debug logging to SavedVariables OFF")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "clearlog") then
+				_G.BagshuiData.debugLog = nil
+				self:PrintBare("Bagshui debug log cleared")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "help") then
+				BsSlash:PrintHandlers({"On", "Off", "Log", "NoLog", "AllOff", "ClearLog"}, "Debug")
+			end
+		end,
+		true
+	)
+
 end
 
 
@@ -1228,13 +1267,6 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 	end
 
 
-	-- Entering combat.
-	if event == "PLAYER_REGEN_DISABLED" then
-		if _G.UnitAffectingCombat("player") then
-			self.playerInCombat = true
-		end
-	end
-
 	-- Leaving combat.
 	if event == "PLAYER_REGEN_ENABLED" then
 		self.playerInCombat = false
@@ -1245,6 +1277,14 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 	-- Aggressive event squashing in combat.
 	if self:DeferEventInCombat(event, arg1, arg2, arg3, arg4) then
 		return
+	end
+
+
+	-- Entering combat.
+	if event == "PLAYER_REGEN_DISABLED" then
+		if _G.UnitAffectingCombat("player") then
+			self.playerInCombat = true
+		end
 	end
 
 

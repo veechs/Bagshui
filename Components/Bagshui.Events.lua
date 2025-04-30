@@ -229,18 +229,19 @@ function Bagshui:DeferEventInCombat(event, arg1, arg2, arg3, arg4)
 			self.combatDeferredEvents.arg3[deferredEventKey] = arg3
 			self.combatDeferredEvents.arg4[deferredEventKey] = arg4
 		end
+		return true
 	end
 end
 
 
 
+local deferredEvent
+
 function Bagshui:ProcessCombatDeferredEvents()
 	for _, eventKey in ipairs(self.combatDeferredEvents.events) do
-		-- self:PrintDebug("Raising " .. eventKey)
-		local event = (BsUtil.Split(eventKey, ":"))
-		self:RaiseEvent(
-			event,
-			false,
+		deferredEvent = BsUtil.Split(eventKey, ":")[1]
+		self:OnEvent(
+			deferredEvent,
 			self.combatDeferredEvents.arg1[eventKey],
 			self.combatDeferredEvents.arg2[eventKey],
 			self.combatDeferredEvents.arg3[eventKey],
