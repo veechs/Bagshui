@@ -1,1 +1,1 @@
-BAGSHUI_DEBUG = true
+BAGSHUI_DEBUG_ON = true

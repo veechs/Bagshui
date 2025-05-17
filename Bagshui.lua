@@ -703,10 +703,10 @@ local bagshuiEnvironment = {
 	---@type string
 	BS_LOG_DATE_STRING = "%Y-%m-%d %H:%M:%S",
 
-	-- Ensure debug is never turned on in production by requiring another addon to set BAGSHUI_DEBUG to true prior to Bagshui loading.
-	-- (I'm doing this via a one-line addon named !BagshuiDebug whose only code is BAGSHUI_DEBUG = true).
+	-- Ensure debug is never turned on in production by requiring another addon to set BAGSHUI_DEBUG_ON to true prior to Bagshui loading.
+	-- The !BagshuiDebug addon (in the Debug folder) is an easy way to enable this.
 	---@type boolean
-	BS_DEBUG = _G.BAGSHUI_DEBUG or false,
+	BS_DEBUG = _G.BAGSHUI_DEBUG_ON or false,
 
 	-- Is SuperWoW loaded? Since it's a DLL injection, not an addon, IsAddOnLoaded() won't help here.
 	---@type boolean
