@@ -1,5 +1,9 @@
 # Bagshui Changelog
 
+## 1.5.10 - 2025-04-26
+### Fixed
+* Prevent lag while in a raid group. Additional protections for in-combat performance are being tested, but this should resolve the worst of the [issues](https://github.com/veechs/Bagshui/issues/153). Thanks to jj for their patient testing that helped me locate the root cause.
+
 ## 1.5.9 - 2025-04-26
 ### Fixed
 * Avoid localization errors. Whoops (x2).

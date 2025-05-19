@@ -31,6 +31,7 @@ local CHARACTER_EVENTS = {
 	SPELLS_CHANGED = true,  -- Need to update spells.
 	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting).
 	UNIT_INVENTORY_CHANGED = true,  -- Equipped gear has changed -- requires arg1 == "player" check.
+	UNIT_INVENTORY_CHANGED = true,  -- Equipped gear has changed -- requires arg1 == "player" check.
 }
 
 -- Events that should trigger a money update.
