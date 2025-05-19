@@ -1,6 +1,6 @@
 <h1>
 <img src="Images/Logo.svg" width="204" align="left" alt="Bagshui">
-<div width="100%">&nbsp;</div>
+<div width="100%">&nbsp;<br></div>
 </h1>
 
 **Feng shui for your bags:** A Vanilla WoW 1.12 (and Turtle WoW) inventory addon.<br><sup>Not for Classic or Retail; you have [so](https://www.curseforge.com/wow/addons/better-bags) [many](https://www.curseforge.com/wow/addons/ark-inventory) [options](https://www.curseforge.com/wow/search?class=addons&categories=bags-inventory&sortBy=popularity).</sup>
