@@ -1,13 +1,15 @@
 <h1>
 <img src="Images/Logo.svg" width="204" align="left" alt="Bagshui">
-<div width="100%">&nbsp;</div>
+<div width="100%">&nbsp;<br></div>
 </h1>
 
 **Feng shui for your bags:** A Vanilla WoW 1.12 (and Turtle WoW) inventory addon.<br><sup>Not for Classic or Retail; you have [so](https://www.curseforge.com/wow/addons/better-bags) [many](https://www.curseforge.com/wow/addons/ark-inventory) [options](https://www.curseforge.com/wow/search?class=addons&categories=bags-inventory&sortBy=popularity).</sup>
 
-[![Bagshui](https://github.com/veechs/Bagshui/wiki/images/BagshuiScreenshots.png)](https://github.com/veechs/Bagshui/wiki/Screenshots)  
-<sup>[More screenshots](https://github.com/veechs/Bagshui/wiki/Screenshots)</sup>
-
+<h4><picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/veechs/Bagshui/wiki/images/BagshuiScreenshots.png">
+  <img alt="Bagshui Screenshots" src="https://github.com/veechs/Bagshui/wiki/images/BagshuiScreenshots.png">
+</picture><br>
+<a href="https://github.com/veechs/Bagshui/wiki/Screenshots">More Screenshots</a></h4>
 
 <a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
 
@@ -27,7 +29,7 @@
 * Selling protection to safeguard valuable items.
 * Clam (Open Container), Disenchant, Pick Lock, and Hearthstone buttons.
 * [Colorblind mode](https://github.com/veechs/Bagshui/wiki/Accessibility#colorblind-mode) to help identify item quality and unusability.
-* Lots of other little niceties like item restacking, pfUI skinning, and more.
+* Plenty of other little niceties like item restacking, pfUI skinning, and more.
 
 <details>
 
