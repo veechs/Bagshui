@@ -84,7 +84,7 @@ end
 --- their menu entries when the default skin is active.
 ---@return boolean
 local function useSkinColorsHide()
-	return Bagshui.config.Skins.activeSkin == "Bagshui"
+	return BsSkinMgr:GetActiveSkinName() == "Bagshui"
 end
 
 
@@ -93,7 +93,7 @@ end
 ---@param nameString string
 ---@return string updatedNameString
 local function useSkinColorsName(nameString)
-	return string.format(nameString, Bagshui.config.Skins.activeSkin)
+	return string.format(nameString, BsSkinMgr:GetActiveSkinName())
 end
 
 
@@ -126,7 +126,7 @@ end
 ---@return boolean
 local function disableWhenUsingSkinColors(settingName, settings)
 	return
-		Bagshui.config.Skins.activeSkin ~= "Bagshui"
+		BsSkinMgr:GetActiveSkinName() ~= "Bagshui"
 		and settings[(string.find(settingName, "^group") and "group" or "window") .. "UseSkinColors"]
 end
 

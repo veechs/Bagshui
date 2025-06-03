@@ -487,14 +487,14 @@ function Inventory:UpdateWindow()
 	self.windowColor = self.settings.windowBackground
 	self.borderColor = self.settings.windowBorder
 
-	if self.settings.windowUseSkinColors and BsSkin.skinBackgroundColor then
-		self.windowColor = BsSkin.skinBackgroundColor
+	if self.settings.windowUseSkinColors and BsSkin.inventoryBackgroundColorFromSkin then
+		self.windowColor = BsSkin.inventoryBackgroundColorFromSkin
 	end
 
 	if not self.online then
 		self.borderColor = BS_COLOR.RED
-	elseif self.settings.windowUseSkinColors and BsSkin.skinBorderColor then
-		self.borderColor = BsSkin.skinBorderColor
+	elseif self.settings.windowUseSkinColors and BsSkin.inventoryBorderColorFromSkin then
+		self.borderColor = BsSkin.inventoryBorderColorFromSkin
 	end
 
 	self.uiFrame:SetBackdropColor(
