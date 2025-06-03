@@ -140,7 +140,7 @@ end
 --- 	-- Bagshui starts building the interface during PLAYER_LOGIN/PLAYER_ENTERING_WORLD.
 --- 	if _G.event == "ADDON_LOADED" then
 --- 		-- Only respond to the event for this addon.
---- 		if _G.arg1 == "Bagshui-InterfaceSkin-Demo" then
+--- 		if _G.arg1 == "YourAddonName" then
 --- 			-- Make sure Bagshui is loaded and a new enough version to have the interface skin API.
 --- 			if _G.IsAddOnLoaded("Bagshui") and _G.Bagshui and _G.Bagshui.AddInterfaceSkin then
 --- 				Bagshui:AddInterfaceSkin(
