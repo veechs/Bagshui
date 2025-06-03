@@ -102,6 +102,16 @@ end
 --- to help Bagshui blend in. It *cannot* be used to provide additional optional
 --- appearances for Bagshui's item slots.
 --- 
+--- ### 🧩 `skinConfig` values
+--- When calling `Bagshui:AddInterfaceSkin()`, the second parameter is a table containing
+--- all the information needed to apply your skin. Refer to **Config\Skins.lua** for documentation
+--- of available properties and expected values, along with an example implementation in the
+--- pfUI skin.
+--- 
+--- Note that any values you omit from your `skinConfig` will automatically be picked up from
+--- the default "Bagshui" skin. In other words, you *don't* need to provide properties unless
+--- they're different from the default.
+--- 
 --- ### ⚠️ Limitations
 --- 
 ---   - Bagshui does *not* currently provide the user a way to switch skins or
