@@ -234,7 +234,7 @@ end
 
 --- Apply all our visual customizations to an item slot (or bag slot) button.
 ---@param button table Button to skin.
-function Ui:SkinItemButton(button, buttonType)
+function Ui:SkinItemButton(button)
 	if not button.bagshuiData then
 		button.bagshuiData = {}
 	end
@@ -245,7 +245,7 @@ function Ui:SkinItemButton(button, buttonType)
 	buttonInfo.originalSizeAdjusted = button.bagshuiData.originalSize + (BsSkin.itemSlotSizeFudge or 0)
 
 	-- Treat as an item slot button unless the button has been configured as something else.
-	buttonType = buttonInfo.type or BS_UI_ITEM_BUTTON_TYPE.ITEM
+	local buttonType = buttonInfo.type or BS_UI_ITEM_BUTTON_TYPE.ITEM
 
 	local buttonName = button:GetName()
 
