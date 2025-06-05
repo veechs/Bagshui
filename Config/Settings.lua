@@ -1019,7 +1019,7 @@ Bagshui.config.Settings = {
 
 
 				{
-					menuTitle = L.Menu_Settings_Buttons
+					menuTitle = L.Menu_Settings_ToolbarButtons
 				},
 
 				{
