@@ -342,10 +342,10 @@ function Ui:SkinItemButton(button)
 	if BsSkin.itemSlotBoldBorderSupported then
 		buttonComponents.borderBold:SetTexture(BsUtil.GetFullTexturePath(BsSkin.itemSlotBoldBorderTexture))
 		buttonComponents.borderBold:SetTexCoord(
-			BsSkin.itemSlotBorderTexCoord[1],
-			BsSkin.itemSlotBorderTexCoord[2],
-			BsSkin.itemSlotBorderTexCoord[3],
-			BsSkin.itemSlotBorderTexCoord[4]
+			BsSkin.itemSlotBoldBorderTexCoord[1],
+			BsSkin.itemSlotBoldBorderTexCoord[2],
+			BsSkin.itemSlotBoldBorderTexCoord[3],
+			BsSkin.itemSlotBoldBorderTexCoord[4]
 		)
 	end
 	buttonComponents.borderBold:SetVertexColor(1, 1, 1, 0)

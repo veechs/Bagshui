@@ -163,7 +163,7 @@ Bagshui.config.Skins = {
 		-- in Vanilla to avoid shipping extra textures.
 		itemSlotBoldBorderTexture = "Interface\\Buttons\\UI-ActionButton-Border",
 		---@type table { left, right, top, bottom }: Item slot border SetTexCoord parameters.
-		itemSlotBorderTexCoord = { 12/64, 51/64, 13/64, 52/64 },
+		itemSlotBoldBorderTexCoord = { 12/64, 51/64, 13/64, 52/64 },
 
 		---@type string Replacement texture for item slot HighlightTexture.
 		itemSlotHighlightTexture = nil,
