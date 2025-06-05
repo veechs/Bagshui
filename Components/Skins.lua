@@ -66,6 +66,9 @@ end
 --- Change the active skin.
 --- ⚠️ As of now, this should **only** be called at startup, since it will *not*
 ---    apply changes to UI elements that have already been created. ⚠️
+--- 
+--- 🛑 3rd party addons should not call this directly -- use the Bagshui:AddInterfaceSkin() API instead. 🛑
+--- 
 ---@param skinName any
 function SkinMgr:ActivateInterfaceSkin(skinName)
 	assert(type(skinName) == "string", "SkinMgr:ActivateInterfaceSkin(): skinName must be a string")
