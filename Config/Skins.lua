@@ -152,6 +152,19 @@ Bagshui.config.Skins = {
 		---@type number Item slot inner opacity for container mouseover highlight.
 		itemSlotBorderContainerHighlightOpacity = 1,
 
+		---@type boolean Enable bold item borders.
+		itemSlotBoldBorderSupported = true,
+		---@type string Texture to use for bold item borders.
+		-- Some extra explanation is probably needed here, because standard and bold borders
+		-- are handled differently.
+		-- - Standard borders are "true" borders added via SetBackdrop() using an edgeFile texture.
+		-- - Bold borders are a square texture positioned using SetTexCoord().
+		-- Why? Because it was easiest to do things this way with the resources available
+		-- in Vanilla to avoid shipping extra textures.
+		itemSlotBoldBorderTexture = "Interface\\Buttons\\UI-ActionButton-Border",
+		---@type table { left, right, top, bottom }: Item slot border SetTexCoord parameters.
+		itemSlotBorderTexCoord = { 12/64, 51/64, 13/64, 52/64 },
+
 		---@type string Replacement texture for item slot HighlightTexture.
 		itemSlotHighlightTexture = nil,
 		---@type number Item slot HighlightTexture anchor (positive = outset / negative = inset).
@@ -443,6 +456,9 @@ if (pfUI and pfUI.api and pfUI.env and pfUI.env.C) then
 				itemSlotBorderInverseScale = true,
 				itemSlotBorderAlwaysShow = true,
 				itemSlotBorderDefaultColor = { r = 0.4, g = 0.4, b = 0.4, a = 0.5 },
+
+				-- The concept of bold borders doesn't make sense in the flat style.
+				itemSlotBoldBorderSupported = false,
 
 				itemSlotHighlightTexture = "ItemSlot\\Flat-Highlight",
 				itemSlotHighlightAnchor = 2,

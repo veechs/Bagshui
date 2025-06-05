@@ -383,6 +383,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Tinting"] = "Item Tinting",
 ["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
+["Menu_Settings_ToolbarButtons"] = "Toolbar Buttons",
 ["Menu_Settings_Tooltips"] = "Tooltips",
 ["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
 ["Menu_Settings_StockBadgeColors"] = "Stock Colors",
@@ -1040,6 +1041,7 @@ BsLocalization:AddLocale("enUS", {
 ["SettingScope_Account"] = "Applies to all characters on this account.",
 ["SettingScope_Character"] = "Applies to all of this character's inventory windows.",
 ["Setting_DisabledBy_HideGroupLabels"] = "× Disabled because the active Structure has Hide Group Labels enabled.",
+["Setting_DisabledBy_Skin"] = "× Disabled because the current interface skin does not support this feature.",
 ["Setting_EnabledBy_ColorblindMode"] = "√ Enabled because Colorblind Mode is on.",
 ["Setting_Profile_SetAllHint"] = "Shift+Click to use for all profile types.",
 ["Setting_Reset_TooltipText"] = "Reset to default: Ctrl+Alt+Shift+Click.",
@@ -1153,6 +1155,10 @@ BsLocalization:AddLocale("enUS", {
 ["itemActiveQuestBadges"] = "Active Quest",
 ["itemActiveQuestBadges_TooltipTitle"] = "Item Slot Active Quest Badges",
 ["itemActiveQuestBadges_TooltipText"] = "Show a ? in the top when the item is an objective of an active quest.",
+
+["itemBordersBold"] = "Bold Borders",
+["itemBordersBold_TooltipTitle"] = "Bold Item Quality Borders",
+["itemBordersBold_TooltipText"] = "Add an extra glow to items of Uncommon quality and higher.",
 
 ["itemQualityBadges"] = "!!Quality!!",
 ["itemQualityBadges_TooltipTitle"] = "Item Quality Badges",

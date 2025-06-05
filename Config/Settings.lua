@@ -1086,6 +1086,32 @@ Bagshui.config.Settings = {
 				},
 
 				{
+					menuTitle = L.Menu_Settings_ItemSlots,
+				},
+				{
+					name = "itemBordersBold",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOLEAN,
+					textDisplayFunc = function(name, settingName, settings)
+						return name .. ((not BsSkin.itemSlotBoldBorderSupported) and (LIGHTYELLOW_FONT_COLOR_CODE .. " ×" .. FONT_COLOR_CODE_CLOSE) or "")
+					end,
+					tooltipTextDisplayFunc = function(tooltipText, settingName, settings)
+						return string.gsub(
+							tooltipText,
+							"~1~",
+							(
+								(not BsSkin.itemSlotBoldBorderSupported)
+								and (LIGHTYELLOW_FONT_COLOR_CODE .. L.Setting_DisabledBy_Skin .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE)
+								or ""
+							)
+						)
+					end,
+					defaultValue = false,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+				{
 					menuTitle = L.Menu_Settings_Tinting,
 				},
 				{
