@@ -1229,7 +1229,7 @@ end
 ---@param arg3 any? Third argument, if any.
 ---@param arg4 any? Fourth argument, if any.
 function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
-	Bagshui:PrintDebug("Bagshui event " .. tostring(event) .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
+	--Bagshui:PrintDebug("Bagshui event " .. tostring(event) .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
 
 	if event == "ADDON_LOADED" then
 		-- Need to check arg1 to avoid responding to this event for other addons.

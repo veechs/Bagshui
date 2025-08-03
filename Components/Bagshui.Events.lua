@@ -220,7 +220,7 @@ local deferredEventKey, deferredEventIndex
 function Bagshui:DeferEventInCombat(event, arg1, arg2, arg3, arg4)
 	if self.playerInCombat and not self:IsAnyInventoryWindowVisible() then
 		deferredEventKey = tostring(event) .. ":" .. tostring(arg1) .. tostring(arg2) .. tostring(arg3) .. tostring(arg4)
-		self:PrintDebug("Deferring event " .. deferredEventKey)
+		--self:PrintDebug("Deferring event " .. deferredEventKey)
 		if not self.combatDeferredEvents.queued[deferredEventKey] then
 			self.combatDeferredEvents.queued[deferredEventKey] = true
 			table.insert(self.combatDeferredEvents.events, deferredEventKey)
@@ -239,7 +239,7 @@ local deferredEvent
 
 function Bagshui:ProcessCombatDeferredEvents()
 	for _, eventKey in ipairs(self.combatDeferredEvents.events) do
-		self:PrintDebug("Raising deferred event " .. eventKey)
+		--self:PrintDebug("Raising deferred event " .. eventKey)
 		deferredEvent = BsUtil.Split(eventKey, ":")[1]
 		self:OnEvent(
 			deferredEvent,
@@ -274,7 +274,7 @@ function Bagshui:DeferUpdateInCombat(class, classFunction, arg1, arg2)
 	if self.playerInCombat and not self:IsAnyInventoryWindowVisible() then
 		deferredUpdateKey = tostring(class) .. tostring(classFunction) .. tostring(arg1) .. tostring(arg2)
 		if not self.combatDeferredUpdates.classFunction[deferredUpdateKey] then
-			self:PrintDebug("Deferring update " .. deferredUpdateKey)
+			--self:PrintDebug("Deferring update " .. deferredUpdateKey)
 			self.combatDeferredUpdates.classFunction[deferredUpdateKey] = classFunction
 			self.combatDeferredUpdates.class[deferredUpdateKey] = class
 			self.combatDeferredUpdates.arg1[deferredUpdateKey] = arg1
@@ -294,7 +294,7 @@ local processDeferred_success, processDeferred_errorMessage
 --- Trigger any callbacks queued by `Bagshui:DeferUpdateInCombat()`.
 function Bagshui:ProcessCombatDeferredUpdates()
 	for key in pairs(self.combatDeferredUpdates.classFunction) do
-		self:PrintDebug("Raising deferred update " .. key)
+		--self:PrintDebug("Raising deferred update " .. key)
 		processDeferred_success, processDeferred_errorMessage = pcall(
 			self.combatDeferredUpdates.classFunction[key],
 			self.combatDeferredUpdates.class[key],
