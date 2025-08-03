@@ -7,45 +7,79 @@ Bagshui:LoadComponent(function()
 --- When component is not present, the message will be `[<Localized Type> <Timestamp>] <Message>`.
 ---@param msg string
 ---@param component string? Prefix for the log message.
----@param type BS_LOG_MESSAGE_TYPE Log message type (severity).
-function Bagshui:Log(msg, component, type)
+---@param msgType BS_LOG_MESSAGE_TYPE? Log message type (severity).
+---@param log table? Array to add log messages to (default: `Bagshui.log`).
+---@param prune boolean? `false` to disable pruning.
+---@param pruneLimit number? Override `BS_LOG_LIMIT` when pruning.
+function Bagshui:Log(msg, component, msgType, log, prune, pruneLimit)
 	if not msg or (msg and string.len(tostring(msg)) == 0) then
 		return
 	end
 
-	self:PruneLog()
+	log = log or self.log
+	if type(log) ~= "table" then
+		return
+	end
+
+	if type(prune) ~= "boolean" then
+		prune = true
+	end
+	if prune then
+		self:PruneLog(log, pruneLimit)
+	end
 
 	-- Ensure type can be localized.
-	if not BS_LOG_TYPE_LOCALIZATION_KEY[type] then
-		type = BS_LOG_MESSAGE_TYPE.INFORMATION
+	if not msgType or not BS_LOG_TYPE_LOCALIZATION_KEY[msgType] then
+		msgType = BS_LOG_MESSAGE_TYPE.INFORMATION
 	end
 
 	-- Save log string.
-	table.insert(
-		self.log,
-		string.format(
-			"%s[%s %s]%s%s%s %s%s",
-			BS_LOG_MESSAGE_COLOR[type],  -- Color opener.
-			L[BS_LOG_TYPE_LOCALIZATION_KEY[type]],  -- Localized log type.
-			_G.date(BS_LOG_DATE_STRING),  -- Timestamp.
-			FONT_COLOR_CODE_CLOSE,
-			HIGHLIGHT_FONT_COLOR_CODE,
-			(component and string.format(" %s:", tostring(component)) or ""),  -- Component.
-			tostring(msg),  -- Message.
-			FONT_COLOR_CODE_CLOSE
+	if log == self.log then
+		table.insert(
+			log,
+			string.format(
+				"%s[%s %s]%s%s%s %s%s",
+				BS_LOG_MESSAGE_COLOR[msgType],  -- Color opener.
+				L[BS_LOG_TYPE_LOCALIZATION_KEY[msgType]],  -- Localized log type.
+				_G.date(BS_LOG_DATE_STRING),  -- Timestamp.
+				FONT_COLOR_CODE_CLOSE,
+				HIGHLIGHT_FONT_COLOR_CODE,
+				(component and string.format(" %s:", tostring(component)) or ""),  -- Component.
+				tostring(msg),  -- Message.
+				FONT_COLOR_CODE_CLOSE
+			)
 		)
-	)
+		self:RaiseEvent("BAGSHUI_LOG_UPDATE")
 
-	self:RaiseEvent("BAGSHUI_LOG_UPDATE")
+	else
+		-- Nonstandard log table gets plain text version.
+		table.insert(
+			log,
+			string.format(
+				"[%s] %s%s",
+				_G.date(BS_LOG_DATE_STRING),  -- Timestamp.
+				(component and string.format(" %s:", tostring(component)) or ""),  -- Component.
+				tostring(msg)  -- Message.
+			)
+		)
+
+	end
 end
 
 
 
 --- Remove any log messages over the configured limit.
-function Bagshui:PruneLog()
-	if table.getn(self.log) > BS_LOG_LIMIT then
-		for i = 1, (table.getn(self.log) - BS_LOG_LIMIT) do
-			table.remove(self.log, i)
+---@param log table? Array to prune (default: `Bagshui.log`).
+---@param limit number? Override `BS_LOG_LIMIT` when pruning.
+function Bagshui:PruneLog(log, limit)
+	log = log or self.log
+	if type(log) ~= "table" then
+		return
+	end
+	limit = type(limit) == "number" and limit or BS_LOG_LIMIT
+	if table.getn(log) > limit then
+		for i = 1, (table.getn(log) - limit) do
+			table.remove(log, i)
 		end
 	end
 end
@@ -54,6 +88,9 @@ end
 
 --- Reset the log.
 function Bagshui:ClearLog()
+	if type(self.log) ~= "table" then
+		return
+	end
 	BsUtil.TableClear(self.log)
 	self:RaiseEvent("BAGSHUI_LOG_UPDATE")
 end
@@ -63,6 +100,9 @@ end
 --- Obtain the log as a single newline-concatenated string.
 ---@return string
 function Bagshui:GetLogText()
+	if type(self.log) ~= "table" then
+		return ""
+	end
 	return table.concat(self.log, BS_NEWLINE)
 end
 
@@ -175,7 +215,7 @@ end
 ---@param noPrefix boolean? Parameter for `Bagshui:Print()`.
 function Bagshui:ShowErrorMessage(msg, component, r, g, b, a, duration, log, noPrefix)
 	if log then
-		Bagshui:Log(msg, component, BS_LOG_MESSAGE_TYPE.ERROR)
+		self:Log(msg, component, BS_LOG_MESSAGE_TYPE.ERROR)
 	end
 	self:Print(
 		msg,
@@ -226,6 +266,12 @@ function Bagshui:PrintDebug(msg, component, r, g, b)
 		-- Enable for timestamps
 		--msg = _G.GetTime() .. ":" .. msg
 		self:Print(tostring(msg), component, r, g, b)
+	end
+	if self.debugLog then
+		if not _G.BagshuiData.debugLog then
+			_G.BagshuiData.debugLog = {}
+		end
+		self:Log(msg, component, nil, _G.BagshuiData.debugLog, true, 500)
 	end
 end
 

@@ -649,12 +649,25 @@ end
 
 
 
+-- Reusable variables for OnEvent to slightly lighten garbage collector load.
+
+local onEvent_updateDelay, onEvent_action, onEvent_function, onEvent_uiFrameHidden
+
 --- Event handling.
 ---@param event string Event identifier.
 ---@param arg1 any? Argument 1 from the event.
 ---@param arg2 any? Argument 2 from the event.
 function Inventory:OnEvent(event, arg1, arg2)
 	-- self:PrintDebug("OnEvent(): " ..  event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
+
+	-- We use this multiple times so saving a function call seems worth it? Maybe?
+	onEvent_uiFrameHidden = self.uiFrame and (not self.uiFrame:IsVisible()) or true
+
+	-- Don't need to update cooldowns when not shown.
+	-- Putting this first because it can fire a lot in combat.
+	if event == "BAG_UPDATE_COOLDOWN" and onEvent_uiFrameHidden then
+		return
+	end
 
 	-- Store the name of this event so it can be checked when updating the inventory
 	-- cache to see if the cache update should be delayed (see self.lastEvent check
@@ -690,7 +703,7 @@ function Inventory:OnEvent(event, arg1, arg2)
 	end
 
 	-- BAG_UPDATE: Don't do anything if arg1 is for a bag not handled by this class.
-	if event == "BAG_UPDATE" and not self.myContainerIds[arg1] then
+	if event == "BAG_UPDATE" and arg1 and not self.myContainerIds[arg1] then
 		return
 	end
 
@@ -766,22 +779,23 @@ function Inventory:OnEvent(event, arg1, arg2)
 
 
 	-- Special action handling - see description of the Events table in Inventory:New() for details.
-	local eventAction = self.events[event]
+	onEvent_action = self.events[event]
 
 	-- Re-queue the event with a delay if configured.
-	if type(eventAction) == "number" then
-		Bagshui:QueueEvent("BAGSHUI_"..event, eventAction, false, arg1, arg2)
+	if type(onEvent_action) == "number" then
+		Bagshui:QueueEvent("BAGSHUI_"..event, onEvent_action, false, arg1, arg2)
 		return
 	end
 
 	-- Call the event function if it exists.
 	-- If the function returns false, don't continue processing.
-	local eventFunction = self[eventAction]
-	if type(eventFunction) == "function" then
-		if eventFunction(self) == false then
-			return
-		end
-	end
+	-- NOT CURRENTLY USED. Vestigial from early development and might never be used again.
+	-- onEvent_function = self[onEvent_action]
+	-- if type(onEvent_function) == "function" then
+	-- 	if onEvent_function(self) == false then
+	-- 		return
+	-- 	end
+	-- end
 
 	-- Actually perform initial inventory cache update.
 	if event == "BAGSHUI_INITIAL_INVENTORY_UPDATE" then
@@ -882,12 +896,19 @@ function Inventory:OnEvent(event, arg1, arg2)
 		self.forceCacheUpdate = true
 	end
 
+	-- Use QueueUpdate's default delay most of the time.
+	onEvent_updateDelay = nil
+
+	-- Slower updates while in combat and not visible.
+	if Bagshui.playerInCombat and onEvent_uiFrameHidden then
+		onEvent_updateDelay = 1
+	end
 
 	-- Assume any other event that gets this far may require a cache update.
 	self.cacheUpdateNeeded = true
 
 	-- If we get this far, it's a normal event that should just trigger inventory and window updates.
-	self:QueueUpdate()
+	self:QueueUpdate(onEvent_updateDelay)
 end
 
 

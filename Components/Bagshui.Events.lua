@@ -15,7 +15,15 @@ function Bagshui:RegisterEvent(event, classObject, classEventFunctionName)
 	-- The Bagshui class internally uses RegisterEvent, so bypass consumer registration when there isn't a classObject.
 	if classObject then
 		self:RegisterClassForEvents(classObject, classEventFunctionName)
-		self.eventConsumers[classObject][event] = true
+
+		-- We create a table for each event so the consumer loop in Bagshui:OnEvent()
+		-- doesn't have to run for events that don't have any consumers, and the loop is as short as possible.
+		if not self.eventConsumers[event] then
+			self.eventConsumers[event] = {}
+		end
+
+		-- This is the event consumer registration.
+		self.eventConsumers[event][classObject] = true
 	end
 
 	-- Don't try to register internal events with the game (doesn't seem to cause a problem but is also pointless).
@@ -37,17 +45,15 @@ end
 ---@param eventFunctionName string? Class function to use instead of `OnEvent`.
 function Bagshui:RegisterClassForEvents(classObject, eventFunctionName)
 	-- Already registered.
-	if self.eventConsumers[classObject] then
+	if self.eventConsumerFunctions[classObject] then
 		return
 	end
 
 	eventFunctionName = eventFunctionName or "OnEvent"
-
 	assert(classObject[eventFunctionName], "Bagshui:RegisterClassForEvents(): " .. tostring(eventFunctionName) .. " not found on classObject " .. tostring(classObject))
 
-	self.eventConsumers[classObject] = {
-		_eventFunctionName = eventFunctionName
-	}
+	-- Store function so the consumer loop in Bagshui:OnEvent() knows what to call.
+	self.eventConsumerFunctions[classObject] = classObject[eventFunctionName]
 end
 
 
@@ -78,6 +84,7 @@ function Bagshui:QueueEvent(event, delaySeconds, noReset, arg1, arg2, arg3, arg4
 		self.queuedEvents.arg2[event] = arg2
 		self.queuedEvents.arg3[event] = arg3
 		self.queuedEvents.arg4[event] = arg4
+		self.queuedEventCount = self.queuedEventCount + 1
 		return true
 	end
 	return false
@@ -113,6 +120,10 @@ end
 --- variables in the for loop though.
 local processEventQueue_success, processEventQueue_errorMessage
 function Bagshui:ProcessEventQueue()
+	if self.queuedEventCount <= 0 then
+		return
+	end
+
 	-- Loop through queued events and fire them if enough time has passed.
 	for event, raiseAfter in pairs(self.queuedEvents.events) do
 		if raiseAfter <= _G.GetTime() then
@@ -138,6 +149,8 @@ function Bagshui:ProcessEventQueue()
 				self.queuedEvents.class[event] = nil
 				self.queuedEvents.classFunction[event] = nil
 			end
+
+			self.queuedEventCount = self.queuedEventCount - 1
 
 			assert(processEventQueue_success, processEventQueue_errorMessage)
 		end
@@ -190,6 +203,112 @@ function Bagshui:RaiseEvent(event, returnStatus, arg1, arg2, arg3, arg4)
 		return raiseEvent_success, raiseEvent_errorMessage
 	elseif not raiseEvent_success then
 		assert(false, raiseEvent_errorMessage)
+	end
+end
+
+
+
+function Bagshui:ProcessCombatDeferrals()
+	self:ProcessCombatDeferredEvents()
+	self:ProcessCombatDeferredUpdates()
+end
+
+
+
+local deferredEventKey, deferredEventIndex
+
+function Bagshui:DeferEventInCombat(event, arg1, arg2, arg3, arg4)
+	if self.playerInCombat and not self:IsAnyInventoryWindowVisible() then
+		deferredEventKey = tostring(event) .. ":" .. tostring(arg1) .. tostring(arg2) .. tostring(arg3) .. tostring(arg4)
+		self:PrintDebug("Deferring event " .. deferredEventKey)
+		if not self.combatDeferredEvents.queued[deferredEventKey] then
+			self.combatDeferredEvents.queued[deferredEventKey] = true
+			table.insert(self.combatDeferredEvents.events, deferredEventKey)
+			self.combatDeferredEvents.arg1[deferredEventKey] = arg1
+			self.combatDeferredEvents.arg2[deferredEventKey] = arg2
+			self.combatDeferredEvents.arg3[deferredEventKey] = arg3
+			self.combatDeferredEvents.arg4[deferredEventKey] = arg4
+		end
+		return true
+	end
+end
+
+
+
+local deferredEvent
+
+function Bagshui:ProcessCombatDeferredEvents()
+	for _, eventKey in ipairs(self.combatDeferredEvents.events) do
+		self:PrintDebug("Raising deferred event " .. eventKey)
+		deferredEvent = BsUtil.Split(eventKey, ":")[1]
+		self:OnEvent(
+			deferredEvent,
+			self.combatDeferredEvents.arg1[eventKey],
+			self.combatDeferredEvents.arg2[eventKey],
+			self.combatDeferredEvents.arg3[eventKey],
+			self.combatDeferredEvents.arg4[eventKey]
+		)
+
+		self.combatDeferredEvents.arg1[eventKey] = nil
+		self.combatDeferredEvents.arg2[eventKey] = nil
+		self.combatDeferredEvents.arg3[eventKey] = nil
+		self.combatDeferredEvents.arg4[eventKey] = nil
+	end
+	BsUtil.TableClear(self.combatDeferredEvents.events)
+	BsUtil.TableClear(self.combatDeferredEvents.queued)
+end
+
+
+--- Reusable variable for DeferUpdateInCombat() to marginally reduce GC.
+
+local deferredUpdateKey
+
+--- Check whether the player is in combat, and if so, queue a callback to the given function and return `true`.
+--- Callback will be triggered once the player leaves combat.
+---@param class table Class owning `classFunction` (`self` parameter).
+---@param classFunction function Function to call.
+---@param arg1 any Callback arguments.
+---@param arg2 any Callback arguments.
+---@return boolean isInCombat # True when callback was queued.
+function Bagshui:DeferUpdateInCombat(class, classFunction, arg1, arg2)
+	if self.playerInCombat and not self:IsAnyInventoryWindowVisible() then
+		deferredUpdateKey = tostring(class) .. tostring(classFunction) .. tostring(arg1) .. tostring(arg2)
+		if not self.combatDeferredUpdates.classFunction[deferredUpdateKey] then
+			self:PrintDebug("Deferring update " .. deferredUpdateKey)
+			self.combatDeferredUpdates.classFunction[deferredUpdateKey] = classFunction
+			self.combatDeferredUpdates.class[deferredUpdateKey] = class
+			self.combatDeferredUpdates.arg1[deferredUpdateKey] = arg1
+			self.combatDeferredUpdates.arg2[deferredUpdateKey] = arg2
+		end
+		return true
+	end
+	return false
+end
+
+
+
+--- Reusable variables for ProcessCombatDeferredUpdates() to marginally reduce GC.
+
+local processDeferred_success, processDeferred_errorMessage
+
+--- Trigger any callbacks queued by `Bagshui:DeferUpdateInCombat()`.
+function Bagshui:ProcessCombatDeferredUpdates()
+	for key in pairs(self.combatDeferredUpdates.classFunction) do
+		self:PrintDebug("Raising deferred update " .. key)
+		processDeferred_success, processDeferred_errorMessage = pcall(
+			self.combatDeferredUpdates.classFunction[key],
+			self.combatDeferredUpdates.class[key],
+			self.combatDeferredUpdates.arg1[key],
+			self.combatDeferredUpdates.arg2[key]
+		)
+		self.combatDeferredUpdates.classFunction[key] = nil
+		self.combatDeferredUpdates.class[key] = nil
+		self.combatDeferredUpdates.arg1[key] = nil
+		self.combatDeferredUpdates.arg2[key] = nil
+
+		if not processDeferred_success then
+			Bagshui:PrintError(processDeferred_errorMessage)
+		end
 	end
 end
 

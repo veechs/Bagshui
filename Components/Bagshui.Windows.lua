@@ -128,4 +128,28 @@ function Bagshui:ManageBoundaryFrames()
 end
 
 
+
+function Bagshui:InitInventoryWindowVisibilityCheck()
+
+	local visibleCheck = ""
+
+	for _, inventoryType in pairs(BS_INVENTORY_TYPE) do
+		visibleCheck =
+		visibleCheck
+			.. (string.len(visibleCheck) > 0 and " or " or "")
+			.. "Bagshui.components." .. inventoryType .. ":Visible()"
+	end
+
+	self.isAnyInventoryWindowVisible = loadstring(
+		"return (" .. visibleCheck .. ")"
+	)
+
+end
+
+
+function Bagshui:IsAnyInventoryWindowVisible()
+	return not self.isAnyInventoryWindowVisible and true or self.isAnyInventoryWindowVisible()
+end
+
+
 end)

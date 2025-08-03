@@ -48,7 +48,7 @@ function Slash:AddHandler(handlerName, handlerFunction, hide)
 	if localizedHandlerName then
 		self.handlerList[string.lower(localizedHandlerName)] = handlerFunction
 	else
-		Bagshui:PrintWarning("No localized version of slash command handler '" .. handlerName .. "' has been defined!")
+		Bagshui:PrintDebug("No localized version of slash command handler '" .. handlerName .. "' has been defined!")
 	end
 	table.insert(self.handlerLocalized, localizedHandlerName or handlerName)
 	table.sort(self.handlerList)

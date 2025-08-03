@@ -795,6 +795,10 @@ local Bagshui = {
 	---@type table
 	currentCharacterData = {},
 
+	-- Track combat status. Used for deferring updates while player is in combat.
+	---@type boolean
+	playerInCombat = false,
+
 
 	-- Relationship between docked inventory class instances.
 	-- For example, if Keyring is docked to Bags, `{ "Bags" = "Keyring" }`.
@@ -831,19 +835,26 @@ local Bagshui = {
 	---@type table
 	eventFrame = nil,
 
-	-- List of components and events for which to call the OnEvent function.  
+	-- List of events and classes that are registered for them, processed by `Bagshui:OnEvent()`.  
 	-- After calling `Bagshui:RegisterEvent()`, the table will start looking something like this:
 	-- ```
 	-- {
-	-- 	[classObject Pointer] = {
-	-- 		_eventFunctionName = function,
-	-- 		event1 = true,
-	-- 		event2 = true
+	-- 	"EVENT_NAME" = {
+	-- 		[classObject1 Pointer] = true,
+	-- 		[classObject2 Pointer] = true,
 	-- 	}
 	-- }
 	-- ```
-	---@type table<string, table>
+	---@type table<string, table<table, true>>
 	eventConsumers = {},
+
+	-- Functions to call for classes that have asked via `Bagshui:RegisterEvent()` to receive events.
+	-- ```
+	-- { [classObject Pointer] = function }
+	-- ```
+	---@type table<table, function>
+	eventConsumerFunctions = {},
+
 
 	-- Reusable tables for the Bagshui event queue.
 	-- Keys for each sub-table will be the unique event identifier.
@@ -877,6 +888,53 @@ local Bagshui = {
 		classFunction = {}
 	},
 
+	-- Track how many events are queued so we don't have to constantly initiate a loop in `Bagshui:ProcessEventQueue()`.
+	queuedEventCount = 0,
+
+	-- Reusable tables for combat-deferred events.
+	-- Keys for each sub-table will be the unique update identifier.
+	-- See `Bagshui:DeferEventInCombat()`, and `Bagshui:ProcessCombatDeferredEvents()`.
+	---@type table<string, table>
+	combatDeferredEvents = {
+		-- Track which events have already been queued.
+		---@type table<string,true>
+		queued = {},
+		-- List of events, in the order they should be raised (event:<arg1><arg2><arg3><arg4>).
+		---@type string[]
+		events = {},
+		-- First parameter for the callback function.
+		---@type table<string, any>
+		arg1 = {},
+		-- Second parameter for the callback function.
+		---@type table<string, any>
+		arg2 = {},
+		-- Third parameter for the callback function.
+		---@type table<string, any>
+		arg3 = {},
+		-- Fourth parameter for the callback function.
+		---@type table<string, any>
+		arg4 = {},
+	},
+
+	-- Reusable tables for combat-deferred updates.
+	-- Keys for each sub-table will be the unique update identifier.
+	-- See `Bagshui:DeferUpdateInCombat()`, and `Bagshui:ProcessCombatDeferredUpdates()`.
+	---@type table<string, table>
+	combatDeferredUpdates = {
+		-- Function to call (actual function, not function name).
+		---@type table<string, function>
+		classFunction = {},
+		-- Class that owns the function (self parameter).
+		---@type table<string, table>
+		class = {},
+		-- First parameter for the callback function.
+		---@type table<string, any>
+		arg1 = {},
+		-- Second parameter for the callback function.
+		---@type table<string, any>
+		arg2 = {},
+	},
+
 
 	-- Window Management.
 
@@ -905,6 +963,7 @@ local Bagshui = {
 
 	-- Debugging.
 	debug = BS_DEBUG,
+	debugLog = false,
 	debugWipeConfigOnLoad = false and BS_DEBUG,
 }
 
@@ -945,6 +1004,8 @@ function Bagshui:Init()
 	self:RegisterEvent("PLAYER_LOGIN")
 	self:RegisterEvent("BAGSHUI_UTIL_LOADED")
 	self:RegisterEvent("BAGSHUI_LOCALIZATION_LOADED")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("PLAYER_LOGOUT")
 
 
@@ -1119,6 +1180,44 @@ function Bagshui:PostLocalizationInit()
 		BsSlash:PrintHandlers(self._settingsHandler_LocalizedInventoryTypes, "Settings")
 	end)
 
+	-- Add "Debug" slash command.
+	BsSlash:AddHandler(
+		"Debug",
+		function(tokens)
+			if not tokens[2] then
+				Bagshui:PrintBare(
+					"Bagshui Debug Status:" .. BS_NEWLINE ..
+					"> Print to chat: " .. tostring(self.debug) .. BS_NEWLINE ..
+					"> Save to log*: " .. tostring(self.debugLog) .. BS_NEWLINE ..
+					"  * debugLog property in Bagshui.lua SavedVariables"
+				)
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "on") then
+				self.debug = true
+				self:PrintBare("Bagshui debug chat output ON")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "off") then
+				self.debug = false
+				self:PrintBare("Bagshui debug chat output OFF")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "log") then
+				self.debugLog = true
+				self:PrintBare("Bagshui debug logging to SavedVariables ON")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "nolog") then
+				self.debugLog = false
+				self:PrintBare("Bagshui debug logging to SavedVariables OFF")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "alloff") then
+				self.debug = false
+				self.debugLog = false
+				self:PrintBare("Bagshui debug chat output OFF")
+				self:PrintBare("Bagshui debug logging to SavedVariables OFF")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "clearlog") then
+				_G.BagshuiData.debugLog = nil
+				self:PrintBare("Bagshui debug log cleared")
+			elseif BsUtil.MatchLocalizedOrNon(tokens[2], "help") then
+				BsSlash:PrintHandlers({"On", "Off", "Log", "NoLog", "AllOff", "ClearLog"}, "Debug")
+			end
+		end,
+		true
+	)
+
 end
 
 
@@ -1130,15 +1229,14 @@ end
 ---@param arg3 any? Third argument, if any.
 ---@param arg4 any? Fourth argument, if any.
 function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
-	-- Bagshui:PrintDebug("Bagshui event " .. event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
-
-	local downstreamEvent = event  --[[@as string|nil]]
+	Bagshui:PrintDebug("Bagshui event " .. tostring(event) .. " // " .. tostring(arg1) .. " // " .. tostring(arg2) .. " // " .. tostring(arg3) .. " // " .. tostring(arg4))
 
 	if event == "ADDON_LOADED" then
 		-- Need to check arg1 to avoid responding to this event for other addons.
 		if arg1 == "Bagshui" then
 			self:AddonLoaded()
 			self:LoadComponents()
+			self:InitInventoryWindowVisibilityCheck()
 		else
 			return
 		end
@@ -1169,18 +1267,38 @@ function Bagshui:OnEvent(event, arg1, arg2, arg3, arg4)
 	end
 
 
+	-- Leaving combat.
+	if event == "PLAYER_REGEN_ENABLED" then
+		self.playerInCombat = false
+		self:QueueClassCallback(self, self.ProcessCombatDeferrals, 0.25)
+	end
+
+
+	-- Aggressive event squashing in combat.
+	if self:DeferEventInCombat(event, arg1, arg2, arg3, arg4) then
+		return
+	end
+
+
+	-- Entering combat.
+	if event == "PLAYER_REGEN_DISABLED" then
+		if _G.UnitAffectingCombat("player") then
+			self.playerInCombat = true
+		end
+	end
+
+
 	-- Pass events on to consumers.
-	if downstreamEvent then
-		for consumer, events in pairs(self.eventConsumers) do
-			if events[event] then
-				consumer[self.eventConsumers[consumer]._eventFunctionName](consumer, downstreamEvent, arg1, arg2, arg3, arg4)
-			end
+	-- Don't do anything unless at least one consumer has called Bagshui:RegisterEvent() for this event.
+	if self.eventConsumers[event] then
+		for consumer in pairs(self.eventConsumers[event]) do
+			self.eventConsumerFunctions[consumer](consumer, event, arg1, arg2, arg3, arg4)
 		end
 	end
 
 	-- Provide an event that happens just after ADDON_LOADED but before anything else
 	-- so that components split across multiple files can complete initialization.
-	if downstreamEvent == "ADDON_LOADED" then
+	if event == "ADDON_LOADED" then
 		self:RaiseEvent("BAGSHUI_ADDON_LOADED")
 	end
 end
