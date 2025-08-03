@@ -84,7 +84,7 @@ end
 --- their menu entries when the default skin is active.
 ---@return boolean
 local function useSkinColorsHide()
-	return Bagshui.config.Skins.activeSkin == "Bagshui"
+	return BsSkinMgr:GetActiveSkinName() == "Bagshui"
 end
 
 
@@ -93,7 +93,7 @@ end
 ---@param nameString string
 ---@return string updatedNameString
 local function useSkinColorsName(nameString)
-	return string.format(nameString, Bagshui.config.Skins.activeSkin)
+	return string.format(nameString, BsSkinMgr:GetActiveSkinName())
 end
 
 
@@ -126,7 +126,7 @@ end
 ---@return boolean
 local function disableWhenUsingSkinColors(settingName, settings)
 	return
-		Bagshui.config.Skins.activeSkin ~= "Bagshui"
+		BsSkinMgr:GetActiveSkinName() ~= "Bagshui"
 		and settings[(string.find(settingName, "^group") and "group" or "window") .. "UseSkinColors"]
 end
 
@@ -1019,7 +1019,7 @@ Bagshui.config.Settings = {
 
 
 				{
-					menuTitle = L.Menu_Settings_Buttons
+					menuTitle = L.Menu_Settings_ToolbarButtons
 				},
 
 				{
@@ -1082,6 +1082,32 @@ Bagshui.config.Settings = {
 						)
 					end,
 					defaultValue = true,
+					inventoryWindowUpdateOnChange = true,
+				},
+
+				{
+					menuTitle = L.Menu_Settings_ItemSlots,
+				},
+				{
+					name = "itemBordersBold",
+					scope = BS_SETTING_SCOPE.INVENTORY,
+					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+					type = BS_SETTING_TYPE.BOOLEAN,
+					textDisplayFunc = function(name, settingName, settings)
+						return name .. ((not BsSkin.itemSlotBoldBorderSupported) and (LIGHTYELLOW_FONT_COLOR_CODE .. " ×" .. FONT_COLOR_CODE_CLOSE) or "")
+					end,
+					tooltipTextDisplayFunc = function(tooltipText, settingName, settings)
+						return string.gsub(
+							tooltipText,
+							"~1~",
+							(
+								(not BsSkin.itemSlotBoldBorderSupported)
+								and (LIGHTYELLOW_FONT_COLOR_CODE .. L.Setting_DisabledBy_Skin .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE)
+								or ""
+							)
+						)
+					end,
+					defaultValue = false,
 					inventoryWindowUpdateOnChange = true,
 				},
 

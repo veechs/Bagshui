@@ -1,6 +1,10 @@
 # Bagshui Changelog
 
-## 1.5.10 - 2025-04-26
+## 1.6.0 - 2025-06-05
+### Changes
+* Add 3rd party interface skin API to support UI replacements like [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded).
+
+## 1.5.10 - 2025-05-19
 ### Fixed
 * Prevent lag while in a raid group. Additional protections for in-combat performance are being tested, but this should resolve the worst of the [issues](https://github.com/veechs/Bagshui/issues/153). Thanks to jj for their patient testing that helped me locate the root cause.
 

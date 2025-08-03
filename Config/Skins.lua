@@ -6,21 +6,17 @@ Bagshui:LoadComponent(function()
 local Ui = Bagshui.prototypes.Ui
 
 Bagshui.config.Skins = {
-	activeSkin = "Bagshui",
+	-- This property will be picked up during SkinManager initialization and used to determine the active interface skin.
+	_activeSkin = "Bagshui",
 
+	-- Default skin.
 	Bagshui = {
 
+		-- Window frame colors. Used for all non-inventory Bagshui windows.
 		---@type table { number: r, number: g, number: b, number: a }: Window frame background color.
 		frameBackgroundColor = { 0.1, 0.1, 0.1, 0.99 },
 		---@type table { number: r, number: g, number: b, number: a }: Window frame border color.
 		frameBorderColor = nil,
-
-		-- When these have values, an additional item will appear in settings menus for colors
-		-- to allow the selection of the skin's default colors.
-		---@type table { number: r, number: g, number: b, number: a }
-		skinBackgroundColor = nil,
-		---@type table { number: r, number: g, number: b, number: a }
-		skinBorderColor = nil,
 
 		---@type string Frame default backdrop texture.
 		frameDefaultBackdrop = "Interface\\BUTTONS\\WHITE8X8",
@@ -97,7 +93,14 @@ Bagshui.config.Skins = {
 		---@type number Close button X coordinate shift for inventory windows only.
 		closeButtonInventoryWindowXOffsetAdjustment = 0,
 
-		---@type number Minimum inventory window width.
+		-- When these have values, an additional item will appear in inventory settings menus for colors
+		-- to allow the use of the skin's colors in lieu of any custom colors.
+		---@type table { number: r, number: g, number: b, number: a }
+		inventoryBackgroundColorFromSkin = nil,
+		---@type table { number: r, number: g, number: b, number: a }
+		inventoryBorderColorFromSkin = nil,
+
+		---@type number Minimum inventory window width. (⚠️ 3rd party skins probably shouldn't override this unless there's a *really* good reason.)
 		inventoryWindowMinWidth = 400,
 		---@type number Inventory window padding.
 		inventoryWindowPadding = 6,
@@ -148,6 +151,19 @@ Bagshui.config.Skins = {
 		itemSlotBorderOpacity = 1,
 		---@type number Item slot inner opacity for container mouseover highlight.
 		itemSlotBorderContainerHighlightOpacity = 1,
+
+		---@type boolean Enable bold item borders.
+		itemSlotBoldBorderSupported = true,
+		---@type string Texture to use for bold item borders.
+		-- Some extra explanation is probably needed here, because standard and bold borders
+		-- are handled differently.
+		-- - Standard borders are "true" borders added via SetBackdrop() using an edgeFile texture.
+		-- - Bold borders are a square texture positioned using SetTexCoord().
+		-- Why? Because it was easiest to do things this way with the resources available
+		-- in Vanilla to avoid shipping extra textures.
+		itemSlotBoldBorderTexture = "Interface\\Buttons\\UI-ActionButton-Border",
+		---@type table { left, right, top, bottom }: Item slot border SetTexCoord parameters.
+		itemSlotBoldBorderTexCoord = { 12/64, 51/64, 13/64, 52/64 },
 
 		---@type string Replacement texture for item slot HighlightTexture.
 		itemSlotHighlightTexture = nil,
@@ -272,8 +288,8 @@ if (pfUI and pfUI.api and pfUI.env and pfUI.env.C) then
 			frameBackgroundColor = { pfUI.api.GetStringColor(pfUI.env.C.appearance.border.background) },
 			frameBorderColor = { pfUI.api.GetStringColor(pfUI.env.C.appearance.border.color) },
 
-			skinBackgroundColor = { pfUI.api.GetStringColor(pfUI.env.C.appearance.border.background) },
-			skinBorderColor = { pfUI.api.GetStringColor(pfUI.env.C.appearance.border.color) },
+			inventoryBackgroundColorFromSkin = { pfUI.api.GetStringColor(pfUI.env.C.appearance.border.background) },
+			inventoryBorderColorFromSkin = { pfUI.api.GetStringColor(pfUI.env.C.appearance.border.color) },
 
 			frameDefaultBorderStyle = {
 				edgeFile = pfUI.backdrop_blizz_border.edgeFile,
@@ -441,6 +457,9 @@ if (pfUI and pfUI.api and pfUI.env and pfUI.env.C) then
 				itemSlotBorderAlwaysShow = true,
 				itemSlotBorderDefaultColor = { r = 0.4, g = 0.4, b = 0.4, a = 0.5 },
 
+				-- The concept of bold borders doesn't make sense in the flat style.
+				itemSlotBoldBorderSupported = false,
+
 				itemSlotHighlightTexture = "ItemSlot\\Flat-Highlight",
 				itemSlotHighlightAnchor = 2,
 
@@ -491,7 +510,7 @@ if (pfUI and pfUI.api and pfUI.env and pfUI.env.C) then
 		end
 
 		Bagshui.config.Skins.pfUI = pfUISkin
-		Bagshui.config.Skins.activeSkin = "pfUI"
+		Bagshui.config.Skins._activeSkin = "pfUI"
 	end
 end
 
