@@ -228,6 +228,8 @@ BsLocalization:AddLocale("enUS", {
 
 ["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! Examples:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444".. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
 
+["Slash_Debug"] = "Debug",
+
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 ["Binding_Resort"] = "Organize All",
 ["Binding_Restack"] = "Restack All",
