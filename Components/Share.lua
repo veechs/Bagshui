@@ -349,8 +349,11 @@ function Share:BuildExportObject(selectedEntries)
 	-- Build up the export table. ObjectList dependency mapping isn't needed for
 	-- export, so we don't need to pay attention to self.importOrder.
 	for shareObjectId, _ in pairs(selectedEntries) do
-		local _, objectId, objectList = self:GetObjectInfo(shareObjectId)
-		self:AddToExport(objectList, objectId)
+		-- Skip headers to avoid errors.
+		if not self.objectHeaders[shareObjectId] then
+			local _, objectId, objectList = self:GetObjectInfo(shareObjectId)
+			self:AddToExport(objectList, objectId)
+		end
 	end
 end
 

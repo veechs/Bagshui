@@ -4,6 +4,10 @@
 ### Changes
 * Add 3rd party interface skin API to support UI replacements like [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded).
 
+## 1.5.11 - 2025-08-04
+### Fixed
+* [Sharing works consistently now](https://github.com/veechs/Bagshui/issues/160) (previously there were errors if all objects of a given type were selected). <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
+
 ## 1.5.10 - 2025-05-19
 ### Fixed
 * Prevent lag while in a raid group. Additional protections for in-combat performance are being tested, but this should resolve the worst of the [issues](https://github.com/veechs/Bagshui/issues/153). Thanks to jj for their patient testing that helped me locate the root cause.
