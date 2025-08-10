@@ -98,6 +98,7 @@ Bagshui.config.Inventory = {
 		closeSound = "igBackPackClose",
 
 		debug = true,
+		debugShowBagSlotNum = false,
 	},
 
 
