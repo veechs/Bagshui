@@ -543,7 +543,7 @@ function Inventory:UpdateWindow()
 		local groupPadding = self.settings.groupPadding + (BsSkin.groupPaddingFudge or 0) + ((BsSkin.itemSlotMarginFudge / 2) * itemSlotScale)
 
 		local maxColumns = self.settings.windowMaxColumns
-		local anchorLeft = self.settings.windowContentAlignment == "LEFT"
+		local anchorLeft = self.settings.windowContentAnchorXPoint == "LEFT"
 		local showGroupLabels = (self.settings.showGroupLabels and not self.settings.hideGroupLabelsOverride) or self.editMode
 
 		local firstFrame, widestRowLastFrame, topmostFrame
@@ -787,7 +787,6 @@ function Inventory:UpdateWindow()
 			else
 				-- There are groups to display, so let's continue.
 				-- Calculate the actual group widths, which we need to know when we make the group frame visible.
-				local totalActualGroupWidths = 0  -- Will be used to determine how wide the window needs to be.
 				for columnNum = rowGroupStart, rowGroupEnd, rowGroupStep do
 					local group = self.layout[rowNum][columnNum]
 
@@ -801,7 +800,6 @@ function Inventory:UpdateWindow()
 							-- Left and right group padding.
 							+ (groupPadding * 2)
 						)
-						totalActualGroupWidths = totalActualGroupWidths + self.actualGroupWidths[group.groupId]
 					else
 						self.actualGroupWidths[group.groupId] = 0
 					end
@@ -962,15 +960,15 @@ function Inventory:UpdateWindow()
 				currentRowLastFrameOutsideX = (
 					anchorLeft
 					and self.positioningTables.UpdateWindow.anchorToFrame:GetRight()
-					or self.positioningTables.UpdateWindow.anchorToFrame:GetLeft()
+					-- Invert for right anchor since left is smaller than right in the coordinate system.
+					-- This makes the decision of whether the row is wider than the widest
+					-- we've seen so far align between left and right anchoring (next if statement).
+					or self.positioningTables.UpdateWindow.anchorToFrame:GetLeft() * -1
 				)
+
 				if
 					widestRowLastFrameOutsideX == 0
-					or (
-						anchorLeft
-						and widestRowLastFrameOutsideX < currentRowLastFrameOutsideX
-						or widestRowLastFrameOutsideX > currentRowLastFrameOutsideX
-					)
+					or currentRowLastFrameOutsideX > widestRowLastFrameOutsideX
 				then
 					widestRowLastFrameOutsideX = currentRowLastFrameOutsideX
 					widestRowLastFrame = self.positioningTables.UpdateWindow.anchorToFrame
@@ -1024,7 +1022,11 @@ function Inventory:UpdateWindow()
 			-- Inventory content.
 			(
 				(firstFrame and widestRowLastFrame)
-				and math.abs(firstFrame:GetRight() - widestRowLastFrame:GetLeft())
+				and (
+					anchorLeft
+					and math.abs(firstFrame:GetLeft() - widestRowLastFrame:GetRight())
+					or math.abs(firstFrame:GetRight() - widestRowLastFrame:GetLeft())
+				)
 				or 0
 			)
 			-- Outer group margins.
@@ -1197,6 +1199,12 @@ end
 
 
 
+-- Reusable table to hold the visible items assigned to a group.
+-- This is needed in order to accurately calculate the size of the remainder row
+-- when it's at the bottom.
+local assignItemsToSlots_groupItems = {}
+
+
 --- Fill the given UI group frame with the items assigned to the given group.
 ---@param groupId number ID of the group to which items should be assigned.
 ---@param uiGroupNum number Frame in the `self.ui.frames.groups` table to use for display.
@@ -1217,8 +1225,6 @@ function Inventory:AssignItemsToSlots(
 )
 	-- self:PrintDebug(string.format("AssignItemsToSlots() groupId=%s uiGroupNum=%s groupWidthInItems=%s", groupId, uiGroupNum, groupWidthInItems))
 
-	local itemsPlacedInCurrentRow = 0
-	local rowNum = 0
 	local genericBagType
 	local button
 	local isEmptySlotStack
@@ -1231,34 +1237,20 @@ function Inventory:AssignItemsToSlots(
 	-- Make sure there are items to assign in this group.
 	if groupItemCount > 0 then
 
-		local buttons = self.ui.buttons
-		local frames = self.ui.frames
+		-- Reset the list of items that will be visible in the group.
+		BsUtil.TableClear(assignItemsToSlots_groupItems)
 
-		local groupFrame = frames.groups[uiGroupNum]
-
-		-- Prepare for layout
-		local initialOffset = groupPadding + itemSlotMargin
-		self:InitFramePositioningTable(
-			"AssignItemsToSlots",  -- Position tracking table
-			itemSlotMargin,        -- Frame X spacing
-			itemSlotMargin,        -- Frame Y spacing
-			groupFrame,            -- Initial frame to anchor to
-			-initialOffset,        -- Initial X offset
-			initialOffset          -- Initial Y offset
-		)
+		-- Do one pass to figure out what is actually going to be visible.
 
 		-- Update empty slot stack count for this group.
 		if self.emptySlotStackingAllowed then
 			self:CountEmptySlots(groupId)
 		end
 
-		-- Need to go in reverse because we're building right to left.
-		local firstItem = groupItemCount
-		local lastItem = 1
-		local step = -1
 		local item = nil
 		local hideItem = false
-		for position = firstItem, lastItem, step do
+
+		for position = 1, table.getn(self.groupItems[groupId]) do
 
 			-- Grab the item info.
 			item = self.groupItems[groupId][position]
@@ -1296,11 +1288,77 @@ function Inventory:AssignItemsToSlots(
 				hideItem = true
 			end
 
-
 			if not hideItem then
-				-- Ensure slot button exists.
-				self.ui:CreateInventoryItemSlotButton(currentItemSlotButtonNum)
+				table.insert(assignItemsToSlots_groupItems, item)
+			end
+		end
 
+		-- Make sure there's STILL something to do.
+		groupItemCount = table.getn(assignItemsToSlots_groupItems)
+		if groupItemCount > 0 then
+
+			local buttons = self.ui.buttons
+			local frames = self.ui.frames
+
+			local groupFrame = frames.groups[uiGroupNum]
+
+			-- Prepare for layout
+			local initialOffset = groupPadding + itemSlotMargin
+			self:InitFramePositioningTable(
+				"AssignItemsToSlots",  -- Position tracking table
+				itemSlotMargin,        -- Frame X spacing
+				itemSlotMargin,        -- Frame Y spacing
+				groupFrame,            -- Initial frame to anchor to
+				-initialOffset,        -- Initial X offset
+				initialOffset          -- Initial Y offset
+			)
+
+			-- When the remainder row is on the bottom, we'll need to know
+			-- the correct point to do an early shift to the next row.
+			local remainder = mod(groupItemCount, groupWidthInItems)
+			-- When the remainder row is on the top, we need to know when that point
+			-- is reached so the left-aligned offset can be shifted by the remainder
+			-- amount instead of the normal items-per-row amount.
+			local numRows = math.ceil(groupItemCount / groupWidthInItems)
+
+
+			-- Need to go in reverse because we always build bottom to top.
+			-- local firstItem = table.getn(assignItemsToSlots_groupItems)
+			-- local lastItem = 1
+			local step = -1
+			local itemPositionOffset = 0
+
+			local itemsPlacedInCurrentRow = 0
+			local itemsPlaced = 0
+			local rowNum = 1
+
+			--for position = firstItem, lastItem, step do
+			local position = table.getn(assignItemsToSlots_groupItems)
+
+			--Bagshui:PrintDebug("N:" .. numRows .. "  R: " .. remainder .. "  W: " .. groupWidthInItems .. "  C: " .. groupItemCount)
+
+			-- Left alignment needs to work forwards through each row of items.
+			if self.settings.windowContentAnchorXPoint == "LEFT" then
+				step = 1
+				if self.settings.windowContentAnchorYPoint == "TOP" and remainder > 0 then
+					itemPositionOffset = remainder
+				else
+					itemPositionOffset = groupWidthInItems
+				end
+				-- The starting position can't be higher than the number of items in the group.
+				position = math.min(position - itemPositionOffset + 1, groupItemCount)
+			end
+
+			-- Place the items.
+			-- Note that `currentItemSlotButtonNum` (corresponding to the actual item slot button frames)
+			-- always counts up, but `position` (the items themselves) shifts around as needed based on
+			-- whether it's right- or left-aligned, since left-aligned works forward through each row of items.
+			repeat
+
+				item = assignItemsToSlots_groupItems[position]
+
+				-- Create item slot button if needed, or reuse if possible.
+				self.ui:CreateInventoryItemSlotButton(currentItemSlotButtonNum)
 				button = buttons.itemSlots[currentItemSlotButtonNum]
 
 				-- Ensure parentage of item slot button is set to current group frame.
@@ -1340,15 +1398,39 @@ function Inventory:AssignItemsToSlots(
 				end
 
 				-- Increment counters.
+				itemsPlaced = itemsPlaced + 1
 				itemsPlacedInCurrentRow = itemsPlacedInCurrentRow + 1
 				currentItemSlotButtonNum = currentItemSlotButtonNum + 1
 
+				-- Find position of next item to be placed.
+				position = position + step
+
 				-- When we reach the end of a row, move to the next one.
-				if itemsPlacedInCurrentRow == groupWidthInItems then
+				if
+					itemsPlacedInCurrentRow == groupWidthInItems
+					-- Early shift to next row for remainder on bottom.
+					or (
+						rowNum == 1
+						and self.settings.windowContentAnchorYPoint == "TOP"
+						and itemsPlacedInCurrentRow == remainder
+						and remainder > 0
+					)
+				then
 					itemsPlacedInCurrentRow = 0
 					rowNum = rowNum + 1
+
+					-- Left alignment needs to work forwards through each row of items.
+					if self.settings.windowContentAnchorXPoint == "LEFT" then
+						if rowNum == numRows and remainder > 0 then
+							itemPositionOffset = groupWidthInItems + remainder
+						else
+							itemPositionOffset = groupWidthInItems * 2
+						end
+						position = position - itemPositionOffset
+					end
 				end
-			end
+			
+			until itemsPlaced >= groupItemCount
 		end
 	end
 
@@ -1493,13 +1575,15 @@ end
 ---@param initialAnchorToFrame table Frame to which the first frame should be attached.
 ---@param initialXOffset number Horizontal space between initialAnchorToFrame and first frame.
 ---@param initialYOffset number Vertical space between initialAnchorToFrame and first frame.
+---@param anchorXPoint "LEFT"|"RIGHT"|nil Horizontal alignment (default is `settings.windowContentAnchorXPoint`).
 function Inventory:InitFramePositioningTable(
 	positioningTableName,
 	frameXSpacing,
 	frameYSpacing,
 	initialAnchorToFrame,
 	initialXOffset,
-	initialYOffset
+	initialYOffset,
+	anchorXPoint
 )
 	-- Set up positioning variable storage.
 	-- The table doesn't need to be cleared if it already exists because all its values will be reset below.
@@ -1509,10 +1593,10 @@ function Inventory:InitFramePositioningTable(
 	local positioningTable = self.positioningTables[positioningTableName]
 
 	-- Define anchor points and spacing.
-	positioningTable.anchorXPoint = self.settings.windowContentAlignment
+	positioningTable.anchorXPoint = anchorXPoint or self.settings.windowContentAnchorXPoint
 	positioningTable.anchorLeft = positioningTable.anchorXPoint == "LEFT"
-	positioningTable.anchorToPointXRowStart = "TOP" .. positioningTable.anchorXPoint
-	positioningTable.anchorToPointXSubsequent = "BOTTOM" .. BsUtil.FlipAnchorPoint(positioningTable.anchorXPoint)
+	positioningTable.anchorToPointRowStart = "TOP" .. positioningTable.anchorXPoint
+	positioningTable.anchorToPointSubsequent = "BOTTOM" .. BsUtil.FlipAnchorPoint(positioningTable.anchorXPoint)
 	positioningTable.frameXSpacing = frameXSpacing
 	positioningTable.frameYSpacing = frameYSpacing
 
@@ -1572,7 +1656,7 @@ function Inventory:ShowFrameInNextPosition(
 	if positioningTable.currentRow ~= nil and positioningTable.currentRow ~= rowNum then
 		-- Anchor to the first frame in the previous row.
 		positioningTable.anchorToFrame = positioningTable.firstVisibleFrameInPreviousRow
-		positioningTable.anchorToPoint = positioningTable.anchorToPointXRowStart
+		positioningTable.anchorToPoint = positioningTable.anchorToPointRowStart
 		positioningTable.anchorXOffset = 0
 		-- First frame in the row needs to be higher up.
 		positioningTable.anchorYOffset = positioningTable.frameYSpacing
@@ -1600,7 +1684,7 @@ function Inventory:ShowFrameInNextPosition(
 		-- Update the row number of the tracking variable so we know we've found the first visible element in this row.
 		positioningTable.currentRow = rowNum
 		-- Change the anchor point for subsequent frames.
-		positioningTable.anchorToPoint = positioningTable.anchorToPointXSubsequent
+		positioningTable.anchorToPoint = positioningTable.anchorToPointSubsequent
 		-- Subsequent frames in this row will be spaced using the frameXSpacing set by InitFramePositioningTable().
 		positioningTable.anchorXOffset = -positioningTable.frameXSpacing
 		-- Subsequent frames in this same row should be at the same vertical offset.

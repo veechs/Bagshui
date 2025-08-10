@@ -31,6 +31,25 @@ local POSITION_CHOICES = {
 		}
 	},
 
+	CORNERS = {
+		{
+			value = "TOP LEFT",
+			text = L.Top .. " " .. L.Left,
+		},
+		{
+			value = "TOP RIGHT",
+			text = L.Top .. " " .. L.Right,
+		},
+			{
+			value = "BOTTOM LEFT",
+			text = L.Bottom .. " " .. L.Left,
+		},
+		{
+			value = "BOTTOM RIGHT",
+			text = L.Bottom .. " " .. L.Right,
+		},
+	}
+
 }
 
 
@@ -137,8 +156,33 @@ end
 ---@param settingName string
 ---@param settings table
 ---@param newValue string
-local function windowAnchorChange(settings, settingName, newValue)
+local function windowAnchorPointChange(settings, settingName, newValue)
 	settings[string.gsub(settingName, "Point$", "Offset")] = settings._inventoryClassInstance:GetWindowOffset(newValue)
+end
+
+
+
+--- Assigned to the `onGet` property of the user-friendly `window[Content]Anchor` settings to
+--- return the meta-value "<window[Content]AnchorYPoint> <window[Content]AnchorXPoint>".
+---@param settingName string
+---@param settings table
+---@return true # Use as the Get value.
+---@return string value
+local function anchorCornerGet(settings, settingName)
+	return true, settings[settingName .. "YPoint"] .. " " .. settings[settingName .. "XPoint"]
+end
+
+--- Assigned to the `onSet` property of the user-friendly `window[Content]Anchor` settings to adjust
+--- pass the values on to the `window[Content]AnchorX/YPoint` settings Bagshui actually uses.
+---@param settingName string
+---@param settings table
+---@param newValue string
+---@return true # Don't proceed with normal Set operation.
+local function anchorCornerSet(settings, settingName, newValue)
+	local anchorPoints = BsUtil.Split(newValue, " ")
+	settings[settingName .. "YPoint"] = anchorPoints[1]
+	settings[settingName .. "XPoint"] = anchorPoints[2]
+	return true
 end
 
 
@@ -526,32 +570,17 @@ Bagshui.config.Settings = {
 					menuTitle = L.Menu_Settings_Window,
 				},
 
+				-- This setting is only used to provide a single user-facing
+				-- choice. The actual values used by Bagshui are windowAnchorX/YPoint,
+				-- and they're managed by `anchorCornerSet`.
 				{
-					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_Anchoring,
-				},
-
-				{
-					name = "windowAnchorXPoint",
-					scope = BS_SETTING_SCOPE.INVENTORY,
+					name = "windowAnchor",
+					virtual = true,
 					type = BS_SETTING_TYPE.CHOICES,
-					defaultValue = "RIGHT",
-					choices = POSITION_CHOICES.LEFT_RIGHT,
-					onChange = windowAnchorChange,
+					choices = POSITION_CHOICES.CORNERS,
+					onGet = anchorCornerGet,
+					onSet = anchorCornerSet,
 					inventoryWindowUpdateOnChange = true,
-				},
-				{
-					name = "windowAnchorYPoint",
-					scope = BS_SETTING_SCOPE.INVENTORY,
-					type = BS_SETTING_TYPE.CHOICES,
-					defaultValue = "BOTTOM",
-					choices = POSITION_CHOICES.TOP_BOTTOM,
-					onChange = windowAnchorChange,
-					inventoryWindowUpdateOnChange = true,
-				},
-
-
-				{
-					menuTitle = BS_MENU_SUBTITLE_INDENT .. L.Menu_Settings_SizeAndLayering,
 				},
 
 				-- Scale of the entire window.
@@ -949,6 +978,48 @@ Bagshui.config.Settings = {
 				},
 
 				{
+					submenuName = L.Menu_Settings_ToolbarButtons,
+					tooltipText = L.Menu_Settings_ToolbarButtons_TooltipText,
+					settings = {
+						{
+							name = "showPickLock",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+							inventoryWindowUpdateOnChange = true,
+						},
+
+						{
+							name = "showDisenchant",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+							inventoryWindowUpdateOnChange = true,
+						},
+
+						{
+							name = "showClam",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+							inventoryWindowUpdateOnChange = true,
+						},
+
+						{
+							name = "showHearthstone",
+							scope = BS_SETTING_SCOPE.INVENTORY,
+							profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+							type = BS_SETTING_TYPE.BOOLEAN,
+							defaultValue = true,
+							inventoryCacheUpdateOnChange = true,
+						},
+					}
+				},
+
+				{
 					name = "showBagBar",
 					scope = BS_SETTING_SCOPE.INVENTORY,
 					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
@@ -1017,45 +1088,18 @@ Bagshui.config.Settings = {
 					inventoryWindowUpdateOnChange = true,
 				},
 
-
 				{
-					menuTitle = L.Menu_Settings_ToolbarButtons
+					menuTitle =  L.Menu_Settings_Anchoring,
 				},
 
 				{
-					name = "showPickLock",
-					scope = BS_SETTING_SCOPE.INVENTORY,
-					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
-					type = BS_SETTING_TYPE.BOOLEAN,
-					defaultValue = true,
+					name = "windowContentAnchor",
+					virtual = true,
+					type = BS_SETTING_TYPE.CHOICES,
+					choices = POSITION_CHOICES.CORNERS,
+					onGet = anchorCornerGet,
+					onSet = anchorCornerSet,
 					inventoryWindowUpdateOnChange = true,
-				},
-
-				{
-					name = "showDisenchant",
-					scope = BS_SETTING_SCOPE.INVENTORY,
-					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
-					type = BS_SETTING_TYPE.BOOLEAN,
-					defaultValue = true,
-					inventoryWindowUpdateOnChange = true,
-				},
-
-				{
-					name = "showClam",
-					scope = BS_SETTING_SCOPE.INVENTORY,
-					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
-					type = BS_SETTING_TYPE.BOOLEAN,
-					defaultValue = true,
-					inventoryWindowUpdateOnChange = true,
-				},
-
-				{
-					name = "showHearthstone",
-					scope = BS_SETTING_SCOPE.INVENTORY,
-					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
-					type = BS_SETTING_TYPE.BOOLEAN,
-					defaultValue = true,
-					inventoryCacheUpdateOnChange = true,
 				},
 
 				{
@@ -1111,9 +1155,6 @@ Bagshui.config.Settings = {
 					inventoryWindowUpdateOnChange = true,
 				},
 
-				{
-					menuTitle = L.Menu_Settings_Tinting,
-				},
 				{
 					name = "itemUsableColors",
 					scope = BS_SETTING_SCOPE.INVENTORY,
@@ -1398,6 +1439,33 @@ Bagshui.config.Settings = {
 
 		-- Hidden settings.
 
+
+		-- Window will grow horizontally from this edge of the screen.
+		-- Updated on `windowAnchor` set by `anchorCornerChange`.
+		{
+			name = "windowAnchorXPoint",
+			scope = BS_SETTING_SCOPE.INVENTORY,
+			hidden = true,
+			type = BS_SETTING_TYPE.CHOICES,
+			defaultValue = "RIGHT",
+			choices = POSITION_CHOICES.LEFT_RIGHT,
+			onChange = windowAnchorPointChange,
+			inventoryWindowUpdateOnChange = true,
+		},
+
+		-- Window will grow vertically from this edge of the screen.
+		-- Updated on `windowAnchor` set by `anchorCornerChange`.
+		{
+			name = "windowAnchorYPoint",
+			scope = BS_SETTING_SCOPE.INVENTORY,
+			hidden = true,
+			type = BS_SETTING_TYPE.CHOICES,
+			defaultValue = "BOTTOM",
+			choices = POSITION_CHOICES.TOP_BOTTOM,
+			onChange = windowAnchorPointChange,
+			inventoryWindowUpdateOnChange = true,
+		},
+
 		-- Window will grow horizontally from this point on the windowAnchorXPoint side of the screen
 		-- (expressed in the WoW coordinate system where the bottom right is 0,0).
 		-- Updated automatically when the inventory frame is moved.
@@ -1420,6 +1488,32 @@ Bagshui.config.Settings = {
 			defaultValue = 90,
 		},
 
+		-- Inventory content will be laid out starting from this edge of the window.
+		-- Updated by `anchorCornerSet` when `windowContentAnchor` is changed.
+		{
+			name = "windowContentAnchorXPoint",
+			scope = BS_SETTING_SCOPE.INVENTORY,
+			profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+			hidden = true,
+			defaultValue = "RIGHT",
+			type = BS_SETTING_TYPE.CHOICES,
+			choices = POSITION_CHOICES.LEFT_RIGHT,
+			inventoryWindowUpdateOnChange = true,
+		},
+
+		-- Inventory content will be laid out starting from this edge of the window.
+		-- Updated by `anchorCornerSet` when `windowContentAnchor` is changed.
+		{
+			name = "windowContentAnchorYPoint",
+			scope = BS_SETTING_SCOPE.INVENTORY,
+			profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+			hidden = true,
+			defaultValue = "BOTTOM",
+			type = BS_SETTING_TYPE.CHOICES,
+			choices = POSITION_CHOICES.TOP_BOTTOM,
+			inventoryWindowUpdateOnChange = true
+		},
+
 		-- Tint item tooltip borders to match the item's quality level.
 		{
 			name = "qualityColorTooltipBorders",
@@ -1427,18 +1521,6 @@ Bagshui.config.Settings = {
 			type = BS_SETTING_TYPE.BOOLEAN,
 			hidden = true,
 			defaultValue = false,
-		},
-
-		-- Content Alignment.
-		-- Groups and item slots will anchor to this side of the window.
-		-- Code to actually make this work probably isn't fully functional.
-		{
-			name = "windowContentAlignment",
-			scope = BS_SETTING_SCOPE.INVENTORY,
-			hidden = true,
-			defaultValue = POSITION_CHOICES.LEFT_RIGHT[2].value,  -- "RIGHT"
-			type = BS_SETTING_TYPE.CHOICES,
-			choices = POSITION_CHOICES.LEFT_RIGHT,
 		},
 
 		-- The right-click/Alt+click attach preferences are hidden because we rely
@@ -1570,7 +1652,7 @@ Bagshui.config.Settings = {
 Bagshui.config.InventorySettingOverrides = {
 
 	[BS_INVENTORY_TYPE.BANK] = {
-		-- Bank should start at the bottom-left
+		-- Bank should start at the bottom-left.
 		windowAnchorXPoint = "LEFT",
 		windowAnchorXOffset = 20,
 	},
