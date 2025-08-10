@@ -417,6 +417,7 @@ local bagshuiEnvironment = {
 		periodicTable          = { 'PeriodicTable("%s")'},
 		quality                = { 'Quality(%s)' },
 		qualityLocalized       = { 'Quality("%s")' },
+		slotNum                = true,
 		soulbound              = { 'Soulbound()' },
 		stacks                 = { 'Stacks()' },
 		subtype                = { 'Subtype("%s")' },
@@ -457,6 +458,10 @@ local bagshuiEnvironment = {
 			end
 			-- Text mode (Item Information window) should show the entire list of sets.
 			return Bagshui.components.ItemInfo.periodicTableSetCache
+		end,
+
+		slotNum = function(item)
+			return tostring(item.slotNum)
 		end,
 
 		soulbound = function(item)

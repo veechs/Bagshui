@@ -386,6 +386,7 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
 ["Menu_Settings_ToolbarButtons"] = "Toolbar Buttons",
+["Menu_Settings_ToolbarButtons_TooltipText"] = "Manage the display of icons on the toolbars",
 ["Menu_Settings_Tooltips"] = "Tooltips",
 ["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
 ["Menu_Settings_StockBadgeColors"] = "Stock Colors",
@@ -1170,7 +1171,7 @@ BsLocalization:AddLocale("enUS", {
 ["itemUsableBadges_TooltipTitle"] = "Item Unusable Badges",
 ["itemUsableBadges_TooltipText"] = "Show icons in the top left for unusable/learned items.",
 
-["itemUsableColors"] = "Unusable",
+["itemUsableColors"] = "Unusable Tinting",
 ["itemUsableColors_TooltipTitle"] = "Item Unusable Tinting",
 ["itemUsableColors_TooltipText"] = "Apply red/green overlay for unusable/learned items.",
 
@@ -1292,13 +1293,9 @@ BsLocalization:AddLocale("enUS", {
 ["toggleBagsWithTradeFrame_TooltipTitle"] = "Toggle Bags with Trade",
 ["toggleBagsWithTradeFrame_TooltipText"] = "Open and close Bags when trading with another player.",
 
-["windowAnchorXPoint"] = "Horizontal",
-["windowAnchorXPoint_TooltipTitle"] = "Horizontal Anchor",
-["windowAnchorXPoint_TooltipText"] = "Window will grow horizontally from this edge of the screen.",
-
-["windowAnchorYPoint"] = "Vertical",
-["windowAnchorYPoint_TooltipTitle"] = "Vertical Anchor",
-["windowAnchorYPoint_TooltipText"] = "Window will grow vertically from this edge of the screen.",
+["windowAnchor"] = "Anchor",
+["windowAnchor_TooltipTitle"] = "Window Anchor",
+["windowAnchor_TooltipText"] = "Window will grow from this corner of the screen.",
 
 ["windowBackground"] = "Background",
 ["windowBackground_TooltipTitle"] = "Window Background Color",
@@ -1307,6 +1304,10 @@ BsLocalization:AddLocale("enUS", {
 ["windowBorder"] = "Border",
 ["windowBorder_TooltipTitle"] = "Window Border Color",
 ["windowBorder_TooltipText"] = "Color to use for this inventory window's border.",
+
+["windowContentAnchor"] = "!!Inventory!!",
+["windowContentAnchor_TooltipTitle"] = "Inventory Content Anchoring",
+["windowContentAnchor_TooltipText"] = "Groups and items will be laid out starting from this corner of the inventory window.",
 
 ["windowLocked"] = "Lock Position",
 ["windowLocked_TooltipText"] = "Don't allow this window to be moved.",

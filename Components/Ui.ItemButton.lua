@@ -676,6 +676,14 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 		end
 	end
 
+
+	-- Debug - display bag:slot as count text.
+	if BS_DEBUG and inventory and inventory.debugShowBagSlotNum then
+		buttonComponents.count:SetText(item.bagNum .. ":" .. item.slotNum)
+		buttonComponents.count:SetTextColor(1, 1, 1)
+		buttonComponents.count:Show()
+	end
+
 end
 
 
