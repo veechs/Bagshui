@@ -505,7 +505,7 @@ BsLocalization:AddLocale("zhCN", {
 
 -- Special categories.
 -- 特殊类别。
-["TurtleWoWGlyphs"] = "雕文（Turtle WoW）",
+["Glyphs_TurtleWoW"] = "雕文（Turtle WoW）",
 ["SoulboundGear"] = "灵魂绑定装备",
 
 -- Name/Tooltip identifiers sed to categorize items using strings that appear
@@ -521,6 +521,7 @@ BsLocalization:AddLocale("zhCN", {
 ["NameIdentifier_Elixir"] = [[药剂]],
 ["NameIdentifier_Firestone"] = [[火焰石]],
 ["NameIdentifier_FrostOil"] = [[冰霜之油]],
+["NameIdentifier_Glyph_TurtleWoW"] = [[雕文]],  -- 与 type('Key') 一起使用以识别 Turtle WoW 雕文。
 ["NameIdentifier_HallowedWand"] = [[神圣魔杖]],
 ["NameIdentifier_Idol"] = [[神像]],
 ["NameIdentifier_Juju"] = [[巫毒]],
@@ -532,7 +533,6 @@ BsLocalization:AddLocale("zhCN", {
 ["NameIdentifier_SharpeningStone"] = [[磨刀石]],
 ["NameIdentifier_Soulstone"] = [[灵魂石]],
 ["NameIdentifier_Spellstone"] = [[法术石]],
-["NameIdentifier_TurtleWoWGlyph"] = [[雕文]],  -- 与 type('Key') 一起使用以识别 Turtle WoW 雕文。
 ["NameIdentifier_Weightstone"] = [[重石]],
 ["NameIdentifier_WizardOil"] = [[巫师之油]],
 
@@ -544,19 +544,19 @@ BsLocalization:AddLocale("zhCN", {
 ["TooltipIdentifier_Buff_AlsoIncreases"] = [[同时增加你的]],
 ["TooltipIdentifier_Buff_WellFed"] = [[进食充分]],
 ["TooltipIdentifier_Companion"] = [[使用..-右键点击以召唤或解散你的]],
-["TooltipIdentifier_CompanionTurtleWoW"] = [[右键点击以召唤和解散你的]],
+["TooltipIdentifier_Companion_TurtleWoW"] = [[右键点击以召唤和解散你的]],
 ["TooltipIdentifier_Drink"] = [[必须在坐下时饮用]],
 ["TooltipIdentifier_Food"] = [[必须在坐下时进食]],
 ["TooltipIdentifier_Locked"] = [[已锁]],
 ["TooltipIdentifier_Mount"] = [[使用..-召唤或解散一只可供骑乘的]],
 ["TooltipIdentifier_MountAQ40"] = [[使用..-发出高频声波]],
-["TooltipIdentifier_MountTurtleWoW"] = [[使用..-在玩家的坐骑收藏中增加一个新坐骑]],
+["TooltipIdentifier_Mount_TurtleWoW"] = [[使用..-在玩家的坐骑收藏中增加一个新坐骑]],
 ["TooltipIdentifier_Openable"] = [[<右键单击打开>]],
 ["TooltipIdentifier_PotionHealth"] = [[/恢复%d+到%d+点生命值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_PotionMana"] = [[/恢复%d+到%d+点法力值\。/]],  -- 用斜杠包裹以激活模式匹配。
 ["TooltipIdentifier_QuestItem"] = [[任务物品]],
 ["TooltipIdentifier_Recipe"] = [[使用: 教你学会制]],
-["TooltipIdentifier_ToyTurtleWoW"] = [[使用..-将玩具添加到玩家的玩具收藏中]],
+["TooltipIdentifier_Toy_TurtleWoW"] = [[使用..-将玩具添加到玩家的玩具收藏中]],
 
 -- Tooltip parsing -- extracting data from tooltips.
 -- 提示框解析 -- 从提示框中提取数据。

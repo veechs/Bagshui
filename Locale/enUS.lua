@@ -471,7 +471,7 @@ BsLocalization:AddLocale("enUS", {
 ["Suffix_Reagents"] = "%s Reagents",
 
 -- Special categories.
-["TurtleWoWGlyphs"] = "Glyphs (Turtle WoW)",
+["Glyphs_TurtleWoW"] = "Glyphs (Turtle WoW)",
 ["SoulboundGear"] = "Soulbound Gear",
 
 -- Name/Tooltip identifiers sed to categorize items using strings that appear
@@ -485,6 +485,7 @@ BsLocalization:AddLocale("enUS", {
 ["NameIdentifier_Elixir"] = [[Elixir]],
 ["NameIdentifier_Firestone"] = [[Firestone]],
 ["NameIdentifier_FrostOil"] = [[Frost Oil]],
+["NameIdentifier_Glyph_TurtleWoW"] = [[Glyph]],  -- Used along with type('Key') to identify Turtle WoW glyphs.
 ["NameIdentifier_HallowedWand"] = [[Hallowed Wand]],
 ["NameIdentifier_Idol"] = [[Idol]],
 ["NameIdentifier_Juju"] = [[Juju]],
@@ -496,7 +497,6 @@ BsLocalization:AddLocale("enUS", {
 ["NameIdentifier_SharpeningStone"] = [[Sharpening Stone]],
 ["NameIdentifier_Soulstone"] = [[Soulstone]],
 ["NameIdentifier_Spellstone"] = [[Spellstone]],
-["NameIdentifier_TurtleWoWGlyph"] = [[Glyph]],  -- Used along with type('Key') to identify Turtle WoW glyphs.
 ["NameIdentifier_Weightstone"] = [[Weightstone]],
 ["NameIdentifier_WizardOil"] = [[Wizard Oil]],
 
@@ -506,19 +506,19 @@ BsLocalization:AddLocale("enUS", {
 ["TooltipIdentifier_Buff_AlsoIncreases"] = [[also increases your]],
 ["TooltipIdentifier_Buff_WellFed"] = [[well fed]],
 ["TooltipIdentifier_Companion"] = [[Use: Right Click to summon and dismiss your]],
-["TooltipIdentifier_CompanionTurtleWoW"] = [[Use: Adds a companion to the player's companion collection]],
+["TooltipIdentifier_Companion_TurtleWoW"] = [[Use: Adds a companion to the player's companion collection]],
 ["TooltipIdentifier_Drink"] = [[Must remain seated while drinking]],
 ["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
 ["TooltipIdentifier_Locked"] = [[Locked]],
 ["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
 ["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
-["TooltipIdentifier_MountTurtleWoW"] = [[Use: Adds a mount to the player's mount collection]],  -- Turtle has a completely different tooltip for mounts.
+["TooltipIdentifier_Mount_TurtleWoW"] = [[Use: Adds a mount to the player's mount collection]],  -- Turtle has a completely different tooltip for mounts.
 ["TooltipIdentifier_Openable"] = [[<Right Click to Open>]],
 ["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
 ["TooltipIdentifier_QuestItem"] = [[Quest Item]],
 ["TooltipIdentifier_Recipe"] = [[Use: Teaches you how to]],  -- Needed because Turtle WoW has some of their custom recipes categorized as Consumables.
-["TooltipIdentifier_ToyTurtleWoW"] = [[Use: Add a toy to the player's toy collection]],
+["TooltipIdentifier_Toy_TurtleWoW"] = [[Use: Add a toy to the player's toy collection]],
 
 -- Tooltip parsing -- extracting data from tooltips.
 ["TooltipParse_Charges"] = [[^(%d+) Charges$]],  -- MUST contain the (%d) capture group.
