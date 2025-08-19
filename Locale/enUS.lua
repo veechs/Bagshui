@@ -481,7 +481,7 @@ BsLocalization:AddLocale("enUS", {
 -- handling rules (see `TooltipIdentifier_PotionHealth` for an example).
 ["NameIdentifier_AntiVenom"] = [[Anti-Venom]],
 ["NameIdentifier_Bandage"] = [[Bandage]],
-["NameIdentifier_Concoction_TurtleWoW"] = [[^Concoction of]],
+["NameIdentifier_Concoction_TurtleWoW"] = [[/^Concoction of/]],
 ["NameIdentifier_Elixir"] = [[Elixir]],
 ["NameIdentifier_Firestone"] = [[Firestone]],
 ["NameIdentifier_FrostOil"] = [[Frost Oil]],
