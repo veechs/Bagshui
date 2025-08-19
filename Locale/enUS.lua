@@ -477,7 +477,7 @@ BsLocalization:AddLocale("enUS", {
 -- Name/Tooltip identifiers sed to categorize items using strings that appear
 -- in their names or tooltips.
 -- Using [[bracket quoting]] to avoid the need for any Lua pattern escapes (like \.).
--- Any Lua patterns must be wrapped in slashes per the normal Bagshui string
+-- Any Lua patterns must be wrapped in /slashes/ per the normal Bagshui string
 -- handling rules (see `TooltipIdentifier_PotionHealth` for an example).
 ["NameIdentifier_AntiVenom"] = [[Anti-Venom]],
 ["NameIdentifier_Bandage"] = [[Bandage]],
@@ -492,7 +492,7 @@ BsLocalization:AddLocale("enUS", {
 ["NameIdentifier_ManaOil"] = [[Mana Oil]],
 ["NameIdentifier_Poison"] = [[Poison]],
 ["NameIdentifier_Potion"] = [[Potion]],
-["NameIdentifier_Scroll"] = [[^Scroll of]],
+["NameIdentifier_Scroll"] = [[/^Scroll of]/]],
 ["NameIdentifier_ShadowOil"] = [[Shadow Oil]],
 ["NameIdentifier_SharpeningStone"] = [[Sharpening Stone]],
 ["NameIdentifier_Soulstone"] = [[Soulstone]],

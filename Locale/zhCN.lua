@@ -528,7 +528,7 @@ BsLocalization:AddLocale("zhCN", {
 ["NameIdentifier_ManaOil"] = [[法力之油]],
 ["NameIdentifier_Poison"] = [[毒药]],
 ["NameIdentifier_Potion"] = [[药水]],
-["NameIdentifier_Scroll"] = [[^卷轴：]],
+["NameIdentifier_Scroll"] = [[/^卷轴：/]],
 ["NameIdentifier_ShadowOil"] = [[暗影之油]],
 ["NameIdentifier_SharpeningStone"] = [[磨刀石]],
 ["NameIdentifier_Soulstone"] = [[灵魂石]],
