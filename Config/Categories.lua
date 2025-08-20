@@ -93,8 +93,12 @@ Bagshui.config.Categories = {
 			id = "Elixirs",
 			name = L.Elixirs,
 			nameSort = L.Consumables .. " - " .. L.Buffs .. " - " .. L.Elixirs,
-			sequence = 68,  -- This has to run before the Health Potions rule
-			rule = string.format('Name("%s")', L.NameIdentifier_Elixir),
+			sequence = 68,  -- This has to run before the Health Potions rule	
+			rule = string.format(
+				'Name("%s", "%s")',
+				L.NameIdentifier_Elixir,
+				L.NameIdentifier_Concoction_TurtleWoW
+			),
 			list = {   -- There are items that have Elixir-like effects but don't have Elixir in the name
 				20079,  -- Spirit of Zanza
 				20080,  -- Sheen of Zanza
@@ -138,11 +142,7 @@ Bagshui.config.Categories = {
 			id = "Potions",
 			name = L.Potions,
 			nameSort = L.Consumables .. " - " .. L.Potions,
-			rule = string.format(
-				'Name("%s", "%s")',
-				L.NameIdentifier_Potion,
-				L.NameIdentifier_Concoction_TurtleWoW
-			),
+			rule = string.format('Name("%s")', L.NameIdentifier_Potion),
 		},
 
 		{
