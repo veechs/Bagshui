@@ -518,6 +518,7 @@ BsLocalization:AddLocale("zhCN", {
 -- 任何 Lua 模式必须按照正常的 Bagshui 字符串处理规则用斜杠包裹（请参阅 `TooltipIdentifier_PotionHealth` 示例）。
 ["NameIdentifier_AntiVenom"] = [[抗毒药剂]],
 ["NameIdentifier_Bandage"] = [[绷带]],
+["NameIdentifier_Concoction_TurtleWoW"] = [[/药剂$/]],
 ["NameIdentifier_Elixir"] = [[药剂]],
 ["NameIdentifier_Firestone"] = [[火焰石]],
 ["NameIdentifier_FrostOil"] = [[冰霜之油]],
