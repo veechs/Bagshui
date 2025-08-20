@@ -2,7 +2,7 @@
 
 ## 1.5.12 - 2025-08-04
 ### Fixed
-* The new "Concoctions" in Turtle WoW 1.18 are now [categorized correctly](https://github.com/veechs/Bagshui/issues/173). <sup><small>🗃️&nbsp;[@xeropresence](https://github.com/xeropresence)</small></sup>
+* The new "Concoctions" in Turtle WoW 1.18 are now [correctly categorized with elixirs](https://github.com/veechs/Bagshui/issues/173). <sup><small>🗃️&nbsp;[@xeropresence](https://github.com/xeropresence)+ [@Sunelegy](https://github.com/Sunelegy) for zhCN</small></sup>
 
 ## 1.5.11 - 2025-08-04
 ### Fixed
