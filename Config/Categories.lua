@@ -93,8 +93,12 @@ Bagshui.config.Categories = {
 			id = "Elixirs",
 			name = L.Elixirs,
 			nameSort = L.Consumables .. " - " .. L.Buffs .. " - " .. L.Elixirs,
-			sequence = 68,  -- This has to run before the Health Potions rule
-			rule = string.format('Name("%s")', L.NameIdentifier_Elixir),
+			sequence = 68,  -- This has to run before the Health Potions rule	
+			rule = string.format(
+				'Name("%s", "%s")',
+				L.NameIdentifier_Elixir,
+				L.NameIdentifier_Concoction_TurtleWoW
+			),
 			list = {   -- There are items that have Elixir-like effects but don't have Elixir in the name
 				20079,  -- Spirit of Zanza
 				20080,  -- Sheen of Zanza
@@ -500,7 +504,7 @@ Bagshui.config.Categories = {
 				'Tooltip("%s", "%s", "%s")',
 				L.TooltipIdentifier_Mount,
 				L.TooltipIdentifier_MountAQ40,
-				L.TooltipIdentifier_MountTurtleWoW
+				L.TooltipIdentifier_Mount_TurtleWoW
 			),
 		},
 
@@ -513,9 +517,9 @@ Bagshui.config.Categories = {
 			rule = string.format(
 				'Tooltip("%s", "%s")',
 				L.TooltipIdentifier_Companion,
-				L.TooltipIdentifier_CompanionTurtleWoW,
+				L.TooltipIdentifier_Companion_TurtleWoW,
 				-- Throwing TW toys in here too until someone complains. ;)
-				L.TooltipIdentifier_ToyTurtleWoW
+				L.TooltipIdentifier_Toy_TurtleWoW
 			),
 		},
 
@@ -658,9 +662,9 @@ Bagshui.config.Categories = {
 		-- TW classifies their glyphs as keys.
 		{
 			id = "TWGlyphs",
-			name = L.TurtleWoWGlyphs,
+			name = L.Glyphs_TurtleWoW,
 			sequence = 69,  -- Run before the normal Keys rule, just to be safe
-			rule = string.format('Type("%s") and Name("%s")', L.Key, L.NameIdentifier_TurtleWoWGlyph),
+			rule = string.format('Type("%s") and Name("%s")', L.Key, L.NameIdentifier_Glyph_TurtleWoW),
 		},
 	},
 
