@@ -4,6 +4,10 @@
 ### Changes
 * Add 3rd party interface skin API to support UI replacements like [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded).
 
+## 1.5.12 - 2025-08-04
+### Fixed
+* The new "Concoctions" in Turtle WoW 1.18 are now [correctly categorized with elixirs](https://github.com/veechs/Bagshui/issues/173). <sup><small>🗃️&nbsp;[@xeropresence](https://github.com/xeropresence)+ [@Sunelegy](https://github.com/Sunelegy) for zhCN</small></sup>
+
 ## 1.5.11 - 2025-08-04
 ### Fixed
 * [Sharing works consistently now](https://github.com/veechs/Bagshui/issues/160) (previously there were errors if all objects of a given type were selected). <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
