@@ -1,6 +1,6 @@
 # Bagshui Changelog
 
-## 1.6.0 - 2025-06-05
+*** IN PROGRESS *** ## 1.6.0 - 2025-06-05
 ### Changes
 * Add 3rd party interface skin API to support UI replacements like [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded).
 
