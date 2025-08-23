@@ -4,6 +4,10 @@
 ### Changes
 * Add 3rd party interface skin API to support UI replacements like [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded).
 
+## 1.5.14 - 2025-08-23
+### Fixed
+* Remove stray double negative in localization checks introduced by the #175 fix.
+
 ## 1.5.13 - 2025-08-23
 ### Fixed
 * Empty slot backgrounds in non-enUS clients that don't have a Bagshui localization [shouldn't go on vacation anymore](https://github.com/veechs/Bagshui/issues/175). <sup><small>🪲&nbsp;[@Trust-WoW](https://github.com/Trust-WoW)</small></sup>
