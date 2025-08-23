@@ -3,7 +3,7 @@
 ## 1.5.13 - 2025-08-23
 ### Fixed
 * Empty slot backgrounds in non-enUS clients that don't have a Bagshui localization [shouldn't go on vacation anymore](https://github.com/veechs/Bagshui/issues/175). <sup><small>🪲&nbsp;[@Trust-WoW](https://github.com/Trust-WoW)</small></sup>
-* Prevent [an error](https://github.com/veechs/Bagshui/issues/172) during the bank slot purchase flow. <sup><small>🪲&nbsp;[@Arcitec](https://github.com/Arcitec)</small></sup>
+* Prevent [an error](https://github.com/veechs/Bagshui/issues/177) during the bank slot purchase flow. <sup><small>🪲&nbsp;[@Arcitec](https://github.com/Arcitec)</small></sup>
 * Potential fix for [missing toolbars](https://github.com/veechs/Bagshui/issues/172). <sup><small>🪲&nbsp;[@Sleepybear](https://github.com/Sleepybear)</small></sup>
 * Turtle WoW's **Verdant Rune** is now [correctly placed in the Teleports Category](https://github.com/veechs/Bagshui/issues/179). <sup><small>🗃️&nbsp;[@xeropresence](https://github.com/xeropresence)</small></sup>
 
