@@ -161,7 +161,13 @@ function Bank:UpdateBagSlotPurchaseStatus(bagSlotButton, numSlotsPurchased, allS
 	if numSlotsPurchased == nil then
 		numSlotsPurchased, allSlotsPurchased = _G.GetNumBankSlots()
 	end
-	-- `<button>.bagshuiData.bagNum` is the sequential bag slot number as set in InitUi().
+	-- Apparently GetNumBankSlots() can return nil sometimes. If that happens,
+	-- don't try to update anything and stick with the previous purchase status.
+	-- https://github.com/veechs/Bagshui/issues/177
+	if numSlotsPurchased == nil then
+		return
+	end
+	-- `<button>.bagshuiData.bagSlotNum` is the sequential bag slot number as set in InventoryUi:CreateBagSlotButtons().
 	self.containers[bagSlotButton.bagshuiData.bagNum].purchased = (
 			allSlotsPurchased
 			or bagSlotButton.bagshuiData.bagSlotNum <= numSlotsPurchased

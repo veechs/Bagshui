@@ -403,6 +403,7 @@ Bagshui.config.Categories = {
 				18984,  -- Dimensional Ripper - Overlook
 				51313,  -- Portable Wormhole Generator: Orgrimmar (Turtle WoW)
 				61000,  -- Time-Worn Rune (Turtle WoW)
+				41915,  -- Verdant Rune (Turtle WoW)
 			},
 		},
 

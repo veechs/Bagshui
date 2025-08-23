@@ -781,7 +781,11 @@ function Inventory:UpdateWindow()
 			if totalItemsInRow == 0 and not self.editMode then
 				-- All groups are not visible.
 				for groupNum = uiGroupNumStart, uiGroupNumEnd do
-					groupFrames[groupNum]:Hide()
+					-- This check doesn't seem like it should be necessary, but https://github.com/veechs/Bagshui/issues/172
+					-- says otherwise.
+					if groupFrames[groupNum] then
+						groupFrames[groupNum]:Hide()
+					end
 				end
 
 			else

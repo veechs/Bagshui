@@ -97,6 +97,7 @@ function Localization:Init()
 
 	-- Choose the correct locale -- try the current locale first, then fall back to the default if needed.
 	local locale = _G.GetLocale()
+
 	if locale and self.locales[locale] then
 		Localization.activeLocaleId = locale
 	else
@@ -137,10 +138,12 @@ function Localization:Init()
 
 
 	-- Build automatic localization as much as possible (it's not all that much in Vanilla).
+	-- Checks in this section are to avoid overriding provided localizations (`not self.activeLocale[enUS]`)
+	-- but go ahead and override if we're using enUS as a fallback (`locale ~= BS_DEFAULT_LOCALE`).
 
 	-- Item classes.
 	for enUS, localized in pairs(BsGameInfo.itemClasses) do
-		if localized and not self.activeLocale[enUS] then
+		if localized and (not self.activeLocale[enUS] or locale ~= BS_DEFAULT_LOCALE) then
 			self.activeLocale[enUS] = localized
 		end
 	end
@@ -148,7 +151,7 @@ function Localization:Init()
 	-- Item subclasses.
 	for _, subClassList in pairs(BsGameInfo.itemSubclasses) do
 		for enUS, localized in pairs(subClassList) do
-			if localized and not self.activeLocale[enUS] then
+			if localized and (not self.activeLocale[enUS] or locale ~= BS_DEFAULT_LOCALE) then
 				self.activeLocale[enUS] = localized
 			end
 		end
@@ -156,7 +159,7 @@ function Localization:Init()
 
 	-- Inventory slots.
 	for enUS, localized in pairs(BsGameInfo.inventorySlots) do
-		if localized and not self.activeLocale[enUS] then
+		if localized and not (not self.activeLocale[enUS] or locale ~= BS_DEFAULT_LOCALE) then
 			self.activeLocale[enUS] = localized
 		end
 	end
