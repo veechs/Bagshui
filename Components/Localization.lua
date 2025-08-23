@@ -159,7 +159,7 @@ function Localization:Init()
 
 	-- Inventory slots.
 	for enUS, localized in pairs(BsGameInfo.inventorySlots) do
-		if localized and not (not self.activeLocale[enUS] or locale ~= BS_DEFAULT_LOCALE) then
+		if localized and (not self.activeLocale[enUS] or locale ~= BS_DEFAULT_LOCALE) then
 			self.activeLocale[enUS] = localized
 		end
 	end
