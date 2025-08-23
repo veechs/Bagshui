@@ -46,6 +46,8 @@ Bagshui.config.Skins = {
 		toolbarGroupSpacing = 14,
 		---@type number Space between toolbar and Close button.
 		toolbarCloseButtonOffset = 11,
+		---@type number Minimum space between left and right toolbars.
+		toolbarMiddleSpace = 5,
 
 		---@type function Accepts that accepts a tooltip as the only parameter and styles it.
 		tooltipSkinFunc = nil,
@@ -101,7 +103,7 @@ Bagshui.config.Skins = {
 		inventoryBorderColorFromSkin = nil,
 
 		---@type number Minimum inventory window width. (⚠️ 3rd party skins probably shouldn't override this unless there's a *really* good reason.)
-		inventoryWindowMinWidth = 400,
+		inventoryWindowMinWidth = 100,
 		---@type number Inventory window padding.
 		inventoryWindowPadding = 6,
 		---@type number Header/footer will be shifted up/down by this much relative to window padding.

@@ -554,6 +554,7 @@ function Inventory:InitUi()
 				self:ForceUpdateWindow()
 			else
 				self:UpdateToolbar()
+				self:SetWindowSize()
 			end
 		end
 	end)
@@ -658,7 +659,7 @@ function Inventory:InitUi()
 	---@param justifyH string? FontString justification.
 	---@return table spaceSummary
 	local function CreateSpaceSummary(parent, justifyH)
-		local spaceSummary = _G.CreateFrame("Frame", nil, parent)
+		local spaceSummary = _G.CreateFrame("Frame", ui:CreateElementName("SpaceSummary"), parent)
 		spaceSummary:SetHitRectInsets(-(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2))
 		spaceSummary.bagshuiData = {
 			text = spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
@@ -715,7 +716,7 @@ function Inventory:InitUi()
 
 
 	-- Bottom right toolbar anchor.
-	frames.bottomRightToolbarAnchor = _G.CreateFrame("Frame", nil, footer)
+	frames.bottomRightToolbarAnchor = _G.CreateFrame("Frame", ui:CreateElementName("BottomRightToolbarAnchor"), footer)
 	frames.bottomRightToolbarAnchor:SetHeight(25)
 	frames.bottomRightToolbarAnchor:SetWidth(1)
 	frames.bottomRightToolbarAnchor:SetPoint("RIGHT", footer, "RIGHT", 5, 0)
@@ -994,6 +995,7 @@ function Inventory:PopulateToolbarAndMainMenuItems()
 				end
 				self.ui.frames.searchBox:Show()
 				self:UpdateToolbar()
+				self:SetWindowSize()
 				self.ui.frames.searchBox:SetFocus()
 			end,
 		},

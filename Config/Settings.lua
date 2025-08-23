@@ -891,7 +891,7 @@ Bagshui.config.Settings = {
 					profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
 					type = BS_SETTING_TYPE.NUMBER,
 					defaultValue = 13,
-					min = 10,
+					min = 5,
 					max = 30,
 					inventoryWindowUpdateOnChange = true,
 				},
@@ -1486,6 +1486,20 @@ Bagshui.config.Settings = {
 			hidden = true,
 			type = BS_SETTING_TYPE.NUMBER,
 			defaultValue = 90,
+		},
+
+		-- Enforce a minimum window width instead of shrinking to the content size.
+		-- Hidden because there's not a UI flow for setting arbitrary number values right now.
+		{
+			name = "windowMinWidth",
+			scope = BS_SETTING_SCOPE.INVENTORY,
+			profileScope = BS_SETTING_PROFILE_SCOPE.DESIGN,
+			type = BS_SETTING_TYPE.NUMBER,
+			hidden = true,
+			defaultValue = 0,
+			min = 0,
+			max = 1000,
+			inventoryWindowUpdateOnChange = true,
 		},
 
 		-- Inventory content will be laid out starting from this edge of the window.

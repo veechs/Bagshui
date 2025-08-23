@@ -67,6 +67,7 @@ function Inventory:Update(cascade)
 	self:UpdateWindow()
 	self:UpdateBagBar()
 	self:UpdateToolbar()
+	self:SetWindowSize()
 
 	-- Reset status.
 	self.windowUpdateBlocked = false
@@ -449,6 +450,39 @@ function Inventory:SortGroups()
 		BsSortOrders:SortGroup(self.groupItems[groupId], groupConfig, self.settings.defaultSortOrder)
 	end
 end
+
+
+
+
+--- Correctly size the inventory window based on inventory contents and header/footer contents.
+--- - `desiredWindowWidth/Height` is calculated in `Inventory:UpdateWindow()`.
+--- - Toolbar widths are calculated in `Inventory:UpdateToolbarItemAnchorsAndCalculateWidth()`.
+function Inventory:SetWindowSize()
+
+	local headerWidth =
+		self.settings.showHeader
+		and (
+			(self.topLeftToolbarWidth or 0)
+			+ (self.topRightToolbarWidth or 0)
+			+ (self.ui.frames.status:IsShown() and self.ui.text.status:GetStringWidth() or 0)
+			+ BsSkin.inventoryWindowPadding * 2
+			+ 30
+		)
+		or 0
+
+	local footerWidth =
+		self.settings.showFooter
+		and (
+			(self.ui.frames.bagBar:IsShown() and (self.ui.frames.bagBar:GetWidth() * self.ui.frames.bagBar:GetScale()) or 0)
+			+ (self.bottomRightToolbarWidth or 0)
+			+ BsSkin.inventoryWindowPadding * 2
+		)
+		or 0
+
+	self.uiFrame:SetWidth(math.max(self.desiredWindowWidth, self.settings.windowMinWidth or 0, headerWidth, footerWidth))
+	self.uiFrame:SetHeight(self.desiredWindowHeight or 250)
+end
+
 
 
 --- Actually do the work of updating the UI.  
@@ -1141,9 +1175,10 @@ function Inventory:UpdateWindow()
 			uiFrames.footer:Hide()
 		end
 
-		-- We can finally size the window frame.
-		self.uiFrame:SetWidth(math.max(finalWindowWidth, BsSkin.inventoryWindowMinWidth))
-		self.uiFrame:SetHeight(finalWindowHeight)
+		-- These are the final minimum sizes to fit everything in the window.
+		-- They'll be picked up by `Inventory:SetWindowSize()`.
+		self.desiredWindowWidth = finalWindowWidth
+		self.desiredWindowHeight = finalWindowHeight
 
 		-- Set scale and anchor for docked frame.
 		if self.dockTo then
@@ -2098,10 +2133,17 @@ end
 function Inventory:UpdateToolbar()
 	local toolbarButtons = self.ui.buttons.toolbar
 
-	-- Resort icon.
-	self:SetToolbarButtonState(
+	-- Search icon.
+	self:SetToolbarWidgetState(
 		toolbarButtons.resort,
-		nil,
+		true,
+		not self.editMode
+	)
+
+	-- Resort icon.
+	self:SetToolbarWidgetState(
+		toolbarButtons.resort,
+		true,
 		(
 			self.enableResortIcon
 			or (
@@ -2113,9 +2155,9 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Restack icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.restack,
-		nil,
+		true,
 		(
 			self.multiplePartialStacks
 			or (
@@ -2127,9 +2169,9 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Show/Hide icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.showHide,
-		nil,
+		true,
 		(self.hasHiddenGroups or self.hasHiddenItems) and not self.editMode,
 		self.showHidden,
 		L.Toolbar_Hide_TooltipTitle,
@@ -2137,9 +2179,9 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Highlight Changes icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.highlightChanges,
-		nil,
+		true,
 		self.highlightChangesEnabled and not self.editMode,
 		self.highlightChanges,
 		L.Toolbar_UnHighlightChanges_TooltipTitle,
@@ -2147,26 +2189,26 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Character icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.character,
-		nil,
+		true,
 		table.getn(BsCharacterData.characterIdList) > 1,  -- Only enable when there's more than one character.
 		self.activeCharacterId ~= Bagshui.currentCharacterId
 	)
 
 	-- Lock highlights for inventories when they're open.
 	for inventoryType, _ in self:OtherInventoryTypesInToolbarIconOrder(true) do
-		self:SetToolbarButtonState(
+		self:SetToolbarWidgetState(
 			toolbarButtons[inventoryType],
-			nil,
+			true,
 			true,
 			Bagshui.components[inventoryType]:Visible()
 		)
 	end
 	-- Catalog.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.catalog,
-		nil,
+		true,
 		true,
 		BsCatalog:Visible()
 	)
@@ -2177,9 +2219,9 @@ function Inventory:UpdateToolbar()
 	end
 
 	-- State buttons.
-	self:SetToolbarButtonState(toolbarButtons.offline, (not self.online))
-	self:SetToolbarButtonState(toolbarButtons.error, (string.len(self.errorText or "") > 0))
-	self:SetToolbarButtonState(toolbarButtons.editMode, self.editMode, nil, self.editMode)
+	self:SetToolbarWidgetState(toolbarButtons.offline, (not self.online))
+	self:SetToolbarWidgetState(toolbarButtons.error, (string.len(self.errorText or "") > 0))
+	self:SetToolbarWidgetState(toolbarButtons.editMode, self.editMode, nil, self.editMode)
 
 	-- Error button needs its tooltip updated.
 	toolbarButtons.error.bagshuiData.tooltipText = self.errorText
@@ -2191,15 +2233,15 @@ function Inventory:UpdateToolbar()
 			NORMAL_FONT_COLOR_CODE .. string.format(L.Symbol_Colon, L.Profile_Structure) .. FONT_COLOR_CODE_CLOSE
 			.. " " .. BsProfiles:GetName(self.settings.profileStructure)
 		)
-		self.ui.frames.status:Show()
+		self:SetToolbarWidgetState(self.ui.frames.status, true)  -- Show.
 		-- Move the offline character name into the tooltip in edit mode.
 		toolbarButtons.offline.bagshuiData.tooltipText = GRAY_FONT_COLOR_CODE .. self.activeCharacterId .. FONT_COLOR_CODE_CLOSE
 	else
 		self.ui.text.status:SetText(self.activeCharacterId)
 		if self.activeCharacterId ~= Bagshui.currentCharacterId then
-			self.ui.frames.status:Show()
+			self:SetToolbarWidgetState(self.ui.frames.status, true)  -- Show.
 		else
-			self.ui.frames.status:Hide()
+			self:SetToolbarWidgetState(self.ui.frames.status, false)  -- Hide.
 		end
 		-- Don't need the offline character name in the tooltip normally.
 		toolbarButtons.offline.bagshuiData.tooltipText = nil
@@ -2207,14 +2249,14 @@ function Inventory:UpdateToolbar()
 
 	-- Money frame.
 	if self.settings.showMoney then
-		self.ui.frames.money:Show()
+		self:SetToolbarWidgetState(self.ui.frames.money, true)  -- Show.
 		self.ui.frames.money:SetAlpha(self.editMode and 0.2 or 1)
 		-- Use label colors for money text.
 		for _, text in pairs(self.ui.frames.money.bagshuiData.texts) do
 			text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
 		end
 	else
-		self.ui.frames.money:Hide()
+		self:SetToolbarWidgetState(self.ui.frames.money, false)  -- Hide.
 	end
 
 	-- Hearthstone button.
@@ -2224,23 +2266,22 @@ function Inventory:UpdateToolbar()
 		and self.settings.showHearthstone
 		and self.hearthstoneItemRef
 	then
-		toolbarButtons.hearthstone:Show()
+		self:SetToolbarWidgetState(toolbarButtons.hearthstone, true, not self.editMode)  -- Show, disable in Edit Mode.
 
 		-- Display cooldown.
 		local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
 		self.ui:SetIconButtonCooldown(toolbarButtons.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
 
 	else
-		toolbarButtons.hearthstone:Hide()
+		self:SetToolbarWidgetState(toolbarButtons.hearthstone, false)  -- Hide.
 	end
 
 	-- Clam (open container) button.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.clam,
 		(
 			self.clamButton
 			and self.settings.showClam
-			or false
 		),
 		(
 			self.hasOpenables
@@ -2254,25 +2295,23 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Disenchant button.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.disenchant,
 		(
 			self.disenchantButton
 			and BsCharacter.spellNamesToIds[toolbarButtons.disenchant.bagshuiData.spellName]
 			and self.settings.showDisenchant
-			or false
 		),
 		not self.editMode
 	)
 
 	-- Pick Lock button.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.pickLock,
 		(
 			self.pickLockButton
 			and BsCharacter.spellNamesToIds[toolbarButtons.pickLock.bagshuiData.spellName]
 			and self.settings.showPickLock
-			or false
 		),
 		not self.editMode
 	)
@@ -2289,30 +2328,21 @@ function Inventory:UpdateToolbar()
 		)
 	then
 		if self.settings.showFooter then
-			self.ui.frames.miniSpaceSummaryBottom:Show()
-			self.ui.frames.miniSpaceSummaryTop:Hide()
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryBottom, true)  -- Show.
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryTop, false)  -- Hide.
 		else
-			self.ui.frames.miniSpaceSummaryBottom:Hide()
-			self.ui.frames.miniSpaceSummaryTop:Show()
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryBottom, false)  -- Hide.
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryTop, true)  -- Show.
 		end
 	else
-		self.ui.frames.miniSpaceSummaryBottom:Hide()
-		self.ui.frames.miniSpaceSummaryTop:Hide()
+		self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryBottom, false)  -- Hide.
+		self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryTop, false)  -- Hide.
 	end
 
 	-- Re-anchor all toolbar widgets based on visibility.
-	self:UpdateToolbarAnchoring("topLeftToolbar", "LEFT")
-	self:UpdateToolbarAnchoring("topRightToolbar", "RIGHT")
-	self:UpdateToolbarAnchoring("bottomRightToolbar", "RIGHT")
-
-	-- Disable unusable stuff in Edit Mode.
-	local editModeState = (self.editMode) and "Disable" or "Enable"
-	-- Hearthstone
-	if self.hearthButton then
-		self.ui.buttons.toolbar.hearthstone[editModeState](self.ui.buttons.toolbar.hearthstone)
-	end
-	-- Search
-	self.ui.buttons.toolbar.search[editModeState](self.ui.buttons.toolbar.search)
+	self:UpdateToolbarItemAnchorsAndCalculateWidth("topLeftToolbar", "LEFT")
+	self:UpdateToolbarItemAnchorsAndCalculateWidth("topRightToolbar", "RIGHT")
+	self:UpdateToolbarItemAnchorsAndCalculateWidth("bottomRightToolbar", "RIGHT")
 
 	-- Parent toolbar needs to sync state.
 	if self.dockedToInventory then
@@ -2322,15 +2352,15 @@ end
 
 
 
---- Control the state and appearance of a toolbar button.
----@param button table Button object.
----@param visible boolean? Whether the button should be displayed.
----@param enable boolean? Whether the button should be enabled.
----@param lockHighlight boolean? Whether the button should be highlighted.
----@param lockedHighlightTooltip string? Tooltip title to display when the button highlight is locked.
----@param unlockedHighlightTooltip string? Tooltip title to display when the button highlight is unlocked.
-function Inventory:SetToolbarButtonState(
-	button,
+--- Control the state and appearance of a toolbar widget.
+---@param widget table Widget object (usually a button, but can be any UI object).
+---@param visible boolean? Whether the widget should be displayed.
+---@param enable boolean? Whether the widget should be enabled.
+---@param lockHighlight boolean? For buttons, whether the button should be highlighted.
+---@param lockedHighlightTooltip string? For buttons, tooltip title to display when the button highlight is locked.
+---@param unlockedHighlightTooltip string? For buttons, tooltip title to display when the button highlight is unlocked.
+function Inventory:SetToolbarWidgetState(
+	widget,
 	visible,
 	enable,
 	lockHighlight,
@@ -2341,50 +2371,60 @@ function Inventory:SetToolbarButtonState(
 	if visible == nil then
 		visible = true
 	end
-	button[visible and "Show" or "Hide"](button)
+	widget[visible and "Show" or "Hide"](widget)
 
-	if button.Enable then
+	if widget.Enable then
 		if enable == nil then
 			enable = true
 		end
-		button[enable and "Enable" or "Disable"](button)
+		widget[enable and "Enable" or "Disable"](widget)
 	end
 
-	if button.LockHighlight then
+	if widget.LockHighlight then
 		if lockHighlight then
 			if lockedHighlightTooltip then
-				button.bagshuiData.tooltipTitle = lockedHighlightTooltip
+				widget.bagshuiData.tooltipTitle = lockedHighlightTooltip
 			end
-			button:LockHighlight()
+			widget:LockHighlight()
 		else
 			if unlockedHighlightTooltip then
-				button.bagshuiData.tooltipTitle = unlockedHighlightTooltip
+				widget.bagshuiData.tooltipTitle = unlockedHighlightTooltip
 			end
-			button:UnlockHighlight()
+			widget:UnlockHighlight()
 		end
 	end
 
 	-- Update tooltip if it's visible so that text stays current.
 	if
-		button.bagshuiData.isIconButton
-		and button.bagshuiData.mouseIsOver
+		widget.bagshuiData.isIconButton
+		and widget.bagshuiData.mouseIsOver
 		and BsIconButtonTooltip:IsVisible()
-		and BsIconButtonTooltip:IsOwned(button)
+		and BsIconButtonTooltip:IsOwned(widget)
 	then
-		self.ui:ShowIconButtonTooltip(button, 0)
+		self.ui:ShowIconButtonTooltip(widget, 0)
 	end
 end
 
 
 
---- Toolbar icons need their anchors updated based on what's shown.
+--- Toolbar widgets need their anchors updated based on what's shown, and we need
+--- to calculate the width of the toolbar for use in determining minimum window width.
 ---@param widgetOrderTable string Name of table in `self.ui.ordering`, which is an array of WoW UI widgets, in display order. Can also include numbers as spacing directives that override the default.
 ---@param anchorPoint "LEFT"|"RIGHT" Place to anchor each widget. This point will be anchored to the opposing point of the previous widget.
-function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
+function Inventory:UpdateToolbarItemAnchorsAndCalculateWidth(widgetOrderTable, anchorPoint)
 	local widgetList = self.ui.ordering[widgetOrderTable]
 	local invert = (anchorPoint == "RIGHT" and -1 or 1)
 	local defaultOffset = invert * BsSkin.toolbarSpacing
 	local nextOffset
+
+	-- The easy way to calculate the width would be the same thing we do for inventory
+	-- contents: get the distance between the Left/Right points of the two edge widgets.
+	-- For some reason, that doesn't work well here -- the problem is that there seems to
+	-- be a 1 frame delay between showing/hiding items in the toolbar and the values
+	-- returned by GetLeft/Right().
+	-- So instead, we're going the slightly more annoying route of totaling up the widths of
+	-- all visible items, plus padding as we encounter them.
+	local toolbarWidth = widgetList[1]:GetWidth()
 
 	-- Go through the list of widgets in order, but skip the first one since
 	-- that's only there as the left/rightmost anchor.
@@ -2404,15 +2444,19 @@ function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
 					end
 				else
 					-- Check visibility and update anchoring.
-					local anchorButton = widgetList[anchorPosition]
-					if anchorButton:IsShown() then
+					local anchorWidget = widgetList[anchorPosition]
+					if not anchorWidget.bagshuiData then
+						anchorWidget.bagshuiData = {}
+					end
+					if anchorWidget:IsShown() then
 						widget:SetPoint(
 							anchorPoint,
-							anchorButton,
+							anchorWidget,
 							BsUtil.FlipAnchorPoint(anchorPoint),
 							nextOffset,
 							0
 						)
+						toolbarWidth = toolbarWidth + widget:GetWidth() + math.abs(nextOffset)
 						break
 					end
 				end
@@ -2421,7 +2465,11 @@ function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
 		end
 
 	end -- Widget iteration.
+
+	-- Store the toolbar width for use by `Inventory:SetWindowSize()`.
+	self[widgetOrderTable .. "Width"] = toolbarWidth
 end
+
 
 
 --- It seems like the client doesn't always catch situations where frames move out from
