@@ -396,7 +396,7 @@ Bagshui.config.Categories = {
 		{
 			id = "Teleports",
 			name = L.Teleports,
-			sequence = 87,  -- Must run before Soulbound because some of these are soulbound.
+			sequence = 74,  -- Must run before Quest Items (and Soulbound).
 			list = {
 				6948,  -- Hearthstone
 				18986,  -- Ultrasafe Transporter: Gadgetzan
