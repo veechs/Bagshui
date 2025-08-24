@@ -1,5 +1,10 @@
 # Bagshui Changelog
 
+## 1.5.15 - 2025-08-23
+### Fixed
+* *Actually* fix [empty slot backgrounds in non-enUS clients that don't have a Bagshui localization](https://github.com/veechs/Bagshui/issues/175) (was working in 1.5.13, but only due to the bug that was resolved in 1.5.14). <sup><small>🪲&nbsp;[@Trust-WoW](https://github.com/Trust-WoW)</small></sup>
+* *Actually* move Turtle WoW's **Verdant Rune** [to the Teleports Category](https://github.com/veechs/Bagshui/issues/179). <sup><small>🗃️&nbsp;[@xeropresence](https://github.com/xeropresence)</small></sup>
+
 ## 1.5.14 - 2025-08-23
 ### Fixed
 * Remove stray double negative in localization checks introduced by the #175 fix.
@@ -8,7 +13,7 @@
 ### Fixed
 * Empty slot backgrounds in non-enUS clients that don't have a Bagshui localization [shouldn't go on vacation anymore](https://github.com/veechs/Bagshui/issues/175). <sup><small>🪲&nbsp;[@Trust-WoW](https://github.com/Trust-WoW)</small></sup>
 * Prevent [an error](https://github.com/veechs/Bagshui/issues/177) during the bank slot purchase flow. <sup><small>🪲&nbsp;[@Arcitec](https://github.com/Arcitec)</small></sup>
-* Potential fix for [missing toolbars](https://github.com/veechs/Bagshui/issues/172). <sup><small>🪲&nbsp;[@Sleepybear](https://github.com/Sleepybear)</small></sup>
+* Fix for [rare occurrence of missing toolbars](https://github.com/veechs/Bagshui/issues/172). <sup><small>🪲&nbsp;[@Sleepybear](https://github.com/Sleepybear)</small></sup>
 * Turtle WoW's **Verdant Rune** is now [correctly placed in the Teleports Category](https://github.com/veechs/Bagshui/issues/179). <sup><small>🗃️&nbsp;[@xeropresence](https://github.com/xeropresence)</small></sup>
 
 ## 1.5.12 - 2025-08-20
