@@ -464,7 +464,6 @@ function Inventory:SetWindowSize()
 		and (
 			(self.topLeftToolbarWidth or 0)
 			+ (self.topRightToolbarWidth or 0)
-			+ (self.ui.frames.status:IsShown() and self.ui.text.status:GetStringWidth() or 0)
 			+ BsSkin.inventoryWindowPadding * 2
 			+ 30
 		)
@@ -478,7 +477,8 @@ function Inventory:SetWindowSize()
 			+ BsSkin.inventoryWindowPadding * 2
 		)
 		or 0
-
+	
+	Bagshui:PrintDebug(math.floor(self.desiredWindowWidth) .. " / " .. math.floor(headerWidth) .. " / " .. math.floor(footerWidth))
 	self.uiFrame:SetWidth(math.max(self.desiredWindowWidth, self.settings.windowMinWidth or 0, headerWidth, footerWidth))
 	self.uiFrame:SetHeight(self.desiredWindowHeight or 250)
 end
@@ -2246,6 +2246,10 @@ function Inventory:UpdateToolbar()
 		-- Don't need the offline character name in the tooltip normally.
 		toolbarButtons.offline.bagshuiData.tooltipText = nil
 	end
+	-- Use text width instead of widget width for toolbar sizing.
+	if self.ui.frames.status:IsShown() then
+		self.ui.frames.status.bagshuiData.widthOverride = self.ui.text.status:GetStringWidth()
+	end
 
 	-- Money frame.
 	if self.settings.showMoney then
@@ -2456,7 +2460,11 @@ function Inventory:UpdateToolbarItemAnchorsAndCalculateWidth(widgetOrderTable, a
 							nextOffset,
 							0
 						)
-						toolbarWidth = toolbarWidth + widget:GetWidth() + math.abs(nextOffset)
+						local widgetWidth =
+							(widget.bagshuiData and type(widget.bagshuiData.widthOverride) == "number")
+							and widget.bagshuiData.widthOverride
+							or widget:GetWidth()
+						toolbarWidth = toolbarWidth + widgetWidth + math.abs(nextOffset)
 						break
 					end
 				end
