@@ -1484,7 +1484,7 @@ function Inventory:ResetEmptySlotStackCounts(resetBagsRepresented)
 	for _, emptySlotStack in pairs(self.emptySlotStacks) do
 		emptySlotStack.count = 0
 		emptySlotStack.displayed = false
-		if resetBagsRepresented then
+		if resetBagsRepresented and emptySlotStack._bagsRepresented then
 			BsUtil.TableClear(emptySlotStack._bagsRepresented)
 		end
 	end
