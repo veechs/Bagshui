@@ -62,15 +62,15 @@ function ActiveQuestItemManager:OnEvent(event, arg1)
 	-- WoW says "Something has happened with the quest log!" (it says this a lot).
 	-- Queue an event so that we only do our update after all the events have finished firing
 	-- This will be the most common event received, by far, so it goes first.
+	-- Updates are further throttled when the player is in combat.
 	if event == "QUEST_LOG_UPDATE" then
-		Bagshui:QueueEvent("BAGSHUI_QUEST_LOG_UPDATE", 1)
+		Bagshui:QueueEvent("BAGSHUI_QUEST_LOG_UPDATE", Bagshui.playerInCombat and 5 or 1)
 		return
 	end
 
 	-- Enough time has elapsed since the last QUEST_LOG_UPDATE event to actually do our update.
 	if event == "BAGSHUI_QUEST_LOG_UPDATE" then
 		self:Update()
-		Bagshui:RaiseEvent("BAGSHUI_ACTIVE_QUEST_ITEM_UPDATE")
 		return
 	end
 
@@ -145,6 +145,8 @@ function ActiveQuestItemManager:Update()
 	if previouslySelectedQuestNum then
 		_G.SelectQuestLogEntry(previouslySelectedQuestNum)
 	end
+
+	Bagshui:RaiseEvent("BAGSHUI_ACTIVE_QUEST_ITEM_UPDATE")
 end
 
 

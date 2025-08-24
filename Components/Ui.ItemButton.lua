@@ -202,7 +202,7 @@ function Ui:CreateItemButtonCooldown(button, disableText)
 	-- Pretend we're a pfUI frame so we can get pfUI cooldown text without the 
 	-- "Foreign Frames" option (so long as the pfUI cooldown module is enabled).
 	if pfUI and pfUI.env.C.disabled and pfUI.env.C.disabled.cooldown ~= "1" then
-		cooldown.pfCooldownType = "ALL"
+		cooldown.pfCooldownType = "BAGSHUI"
 	end
 	return cooldown
 end
@@ -234,7 +234,7 @@ end
 
 --- Apply all our visual customizations to an item slot (or bag slot) button.
 ---@param button table Button to skin.
-function Ui:SkinItemButton(button, buttonType)
+function Ui:SkinItemButton(button)
 	if not button.bagshuiData then
 		button.bagshuiData = {}
 	end
@@ -245,7 +245,7 @@ function Ui:SkinItemButton(button, buttonType)
 	buttonInfo.originalSizeAdjusted = button.bagshuiData.originalSize + (BsSkin.itemSlotSizeFudge or 0)
 
 	-- Treat as an item slot button unless the button has been configured as something else.
-	buttonType = buttonInfo.type or BS_UI_ITEM_BUTTON_TYPE.ITEM
+	local buttonType = buttonInfo.type or BS_UI_ITEM_BUTTON_TYPE.ITEM
 
 	local buttonName = button:GetName()
 
@@ -329,11 +329,27 @@ function Ui:SkinItemButton(button, buttonType)
 	buttonComponents.border:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", BsSkin.itemSlotBorderAnchor, -BsSkin.itemSlotBorderAnchor)
 	buttonInfo.borderBackdropTable = {
 		tile = false, tileSize = 0,
-		edgeFile = BsSkin.itemSlotBorderTexture,
+		edgeFile = BsUtil.GetFullTexturePath(BsSkin.itemSlotBorderTexture),
 		edgeSize = BsSkin.itemSlotEdgeSize,
 		insets = { left = BsSkin.itemSlotInset, right = BsSkin.itemSlotInset, top = BsSkin.itemSlotInset, bottom = BsSkin.itemSlotInset }
 	}
 	buttonComponents.border:SetBackdrop(buttonInfo.borderBackdropTable)
+
+	-- Inspired by [BetterBags "Extra Glowy Buttons"](https://github.com/Cidan/BetterBags/blob/main/frames/item.lua).
+	buttonComponents.borderBold = buttonComponents.border:CreateTexture(nil, "BORDER")
+	buttonComponents.borderBold:SetAllPoints(buttonComponents.border)
+	buttonComponents.borderBold:SetBlendMode("ADD")
+	if BsSkin.itemSlotBoldBorderSupported then
+		buttonComponents.borderBold:SetTexture(BsUtil.GetFullTexturePath(BsSkin.itemSlotBoldBorderTexture))
+		buttonComponents.borderBold:SetTexCoord(
+			BsSkin.itemSlotBoldBorderTexCoord[1],
+			BsSkin.itemSlotBoldBorderTexCoord[2],
+			BsSkin.itemSlotBoldBorderTexCoord[3],
+			BsSkin.itemSlotBoldBorderTexCoord[4]
+		)
+	end
+	buttonComponents.borderBold:SetVertexColor(1, 1, 1, 0)
+
 	buttonInfo.forceBorderDisplay = BsSkin.itemSlotBorderAlwaysShow
 	buttonInfo.qualityColor = BsSkin.itemSlotBorderDefaultColor
 
@@ -660,6 +676,14 @@ function Ui:AssignItemToItemButton(button, item, groupId)
 		end
 	end
 
+
+	-- Debug - display bag:slot as count text.
+	if BS_DEBUG and inventory and inventory.debugShowBagSlotNum then
+		buttonComponents.count:SetText(item.bagNum .. ":" .. item.slotNum)
+		buttonComponents.count:SetTextColor(1, 1, 1)
+		buttonComponents.count:Show()
+	end
+
 end
 
 
@@ -760,7 +784,10 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			buttonComponents.highlightTexture:SetVertexColor(1, 1, 1, 0)
 		end
 
-		-- Hide badges in Edit Mode
+		-- Hide bold borders in Edit Mode.
+		buttonComponents.borderBold:SetVertexColor(1, 1, 1, 0)
+
+		-- Hide badges in Edit Mode.
 		buttonComponents.stockBadge:Hide()
 		buttonComponents.qualityBadge:Hide()
 		buttonComponents.topLeftBadge:Hide()
@@ -768,6 +795,8 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 
 	else
 		-- Normal processing (non-Inventory item slot buttons or Inventory and not Edit Mode).
+
+		local boldBorders = BsSkin.itemSlotBoldBorderSupported and inventory and inventory.settings.itemBordersBold or false
 
 		-- Dim non-matching items on container highlight.
 		if
@@ -836,11 +865,13 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			buttonInfo.qualityColor.r,
 			buttonInfo.qualityColor.g,
 			buttonInfo.qualityColor.b,
-			(
-				((inventory or buttonInfo.colorBorders) and item and item.quality > -1 and item.locked ~= 1) and (opacityOverride or BsSkin.itemSlotBorderOpacity)
-				or (buttonInfo.forceBorderDisplay and opacityOverride or buttonInfo.qualityColor.a)
-				or 0
-			)
+			self:GetItemButtonBorderOpacity(true, 0, (boldBorders and 1 or nil), opacityOverride, inventory, buttonInfo, item)
+		)
+		buttonComponents.borderBold:SetVertexColor(
+			buttonInfo.qualityColor.r,
+			buttonInfo.qualityColor.g,
+			buttonInfo.qualityColor.b,
+			self:GetItemButtonBorderOpacity(false, (boldBorders and 2 or 999), nil, opacityOverride, inventory, buttonInfo, item)
 		)
 
 		-- Only color inner glow for Uncommon and up.
@@ -889,6 +920,12 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 				BS_COLOR.ITEM_SLOT_HIGHLIGHT[2],
 				BS_COLOR.ITEM_SLOT_HIGHLIGHT[3],
 				BsSkin.itemSlotBorderContainerHighlightOpacity
+			)
+			buttonComponents.borderBold:SetVertexColor(
+				BS_COLOR.ITEM_SLOT_HIGHLIGHT[1],
+				BS_COLOR.ITEM_SLOT_HIGHLIGHT[2],
+				BS_COLOR.ITEM_SLOT_HIGHLIGHT[3],
+				boldBorders and BsSkin.itemSlotBorderContainerHighlightOpacity or 0
 			)
 			if buttonComponents.innerGlow then
 				buttonComponents.innerGlow:SetVertexColor(
@@ -1038,6 +1075,43 @@ function Ui:UpdateItemButtonStockState(button)
 		end
 	end
 
+end
+
+
+
+--- Decide whether an item border should be visible based on the provided criteria.
+---@param isDefaultBorder boolean Is this for the primary item slot border or the bold one?
+---@param qualityMin number? If an item is provided, its quality must be of this level or higher for the border to show.
+---@param qualityMax number? If an item is provided, its quality must be of this level or lower for the border to show.
+---@param opacityOverride number? Alpha override from UpdateItemButtonColorsAndBadges().
+---@param inventory table? Bagshui Inventory class that owns the item button, if any.
+---@param buttonInfo table `bagshuiData` property from the item button.
+---@param item table? Item assigned to the button, if any.
+---@return number opacity
+function Ui:GetItemButtonBorderOpacity(isDefaultBorder, qualityMin, qualityMax, opacityOverride, inventory, buttonInfo, item)
+	qualityMin = qualityMin or -1
+	qualityMax = qualityMax or 999
+	return
+		(
+			(
+				inventory
+				or buttonInfo.colorBorders
+			)
+			and item
+			and item.quality >= qualityMin
+			and item.quality <= qualityMax
+			and item.locked ~= 1
+		)
+		and (opacityOverride or BsSkin.itemSlotBorderOpacity)
+
+		or isDefaultBorder
+		and (
+			buttonInfo.forceBorderDisplay
+			and opacityOverride
+			or buttonInfo.qualityColor.a
+		)
+
+		or 0
 end
 
 

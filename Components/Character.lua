@@ -31,6 +31,7 @@ local CHARACTER_EVENTS = {
 	SPELLS_CHANGED = true,  -- Need to update spells.
 	TRADE_SKILL_SHOW = true,  -- Profession window is opened (other than Enchanting).
 	UNIT_INVENTORY_CHANGED = true,  -- Equipped gear has changed -- requires arg1 == "player" check.
+	UNIT_INVENTORY_CHANGED = true,  -- Equipped gear has changed -- requires arg1 == "player" check.
 }
 
 -- Events that should trigger a money update.
@@ -212,9 +213,9 @@ function Character:OnEvent(event, arg1)
 	-- Refresh spells/skills and remove any items from the profession tables that shouldn't be there anymore.
 	-- This is also where the initial update after PLAYER_ENTERING_WORLD occurs.
 	if
-				event == "SPELLS_CHANGED"
-				or event == "CHAT_MSG_SKILL"
-				or event == "SKILL_LINES_CHANGED"
+		event == "SPELLS_CHANGED"
+		or event == "CHAT_MSG_SKILL"
+		or event == "SKILL_LINES_CHANGED"
 	then
 		Bagshui:QueueClassCallback(self, self.UpdateSkillsAndSpells, 1)
 		return
@@ -251,6 +252,11 @@ local _updateInfo_oldValues = {}
 --- Refresh basic character information.
 ---@param newLevel number? `arg1` from the `PLAYER_LEVEL_UP` event, needed because `UnitLevel()` can be wrong just after gaining a level.
 function Character:UpdateInfo(newLevel)
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateSkillsAndSpells, newLevel) then
+		return
+	end
+
 	-- Record old values.
 	for key, value in pairs(self.info) do
 		_updateInfo_oldValues[key] = value
@@ -298,6 +304,11 @@ end
 
 --- Keep money current.
 function Character:UpdateMoney()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateMoney) then
+		return
+	end
+
 	local newMoney = _G.GetMoney()
 	if not newMoney then
 		return
@@ -318,6 +329,10 @@ local update_tempSkills = {}
 
 --- Refresh the list of known skills and spells.
 function Character:UpdateSkillsAndSpells()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateSkillsAndSpells) then
+		return
+	end
 
 	-- Backup copy to compare against so we know whether changes actually happened.
 	BsUtil.TableCopy(self.spells, update_tempSpells)
@@ -385,6 +400,11 @@ end
 
 --- Refresh the list of equipped armor and weapons.
 function Character:UpdateGear()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateGear) then
+		return
+	end
+
 	-- Bs:PrintDebug("Character:UpdateGear()")
 	local historyChanged = false
 	local equippedChanged = false
@@ -491,6 +511,9 @@ end
 
 -- Perform a profession update.
 function Character:UpdateProfessionItems(event)
+	-- No protection against in-combat updates is needed here because this is only
+	-- called when the player opens a tradeskill window.
+
 	local changesMade = false
 
 	-- Functions for professions other than Enchanting.

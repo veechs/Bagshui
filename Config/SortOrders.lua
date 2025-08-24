@@ -99,7 +99,7 @@ Bagshui.config.SortOrders = {
 			name  = L.SortOrder_Manual,
 			fields = {
 				{ field = "bagNum",    direction = "desc",  },
-				{ field = "slotNum",   direction = "desc",  },
+				{ field = "slotNum",   direction = "asc",  },
 			},
 		},
 	},

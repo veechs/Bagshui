@@ -80,6 +80,9 @@ function InventoryUi:CreateInventoryItemSlotButton(buttonNum)
 			-- Inventory button events.
 			slotButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			slotButton:RegisterForDrag("LeftButton")
+			
+			-- Store original function for use by `Inventory:ItemButton_OnClick()` (offline item linking).
+			slotButton.bagshuiData.oldOnClick = slotButton:GetScript("OnClick")
 
 			slotButton:SetScript("OnClick", inventory._itemSlotButton_ScriptWrapper_OnClick)
 			slotButton:SetScript("OnDragStart", inventory._itemSlotButton_ScriptWrapper_OnDragStart)
@@ -933,8 +936,10 @@ function Inventory:ItemButton_OnClick(mouseButton, isDrag)
 				return
 			end
 
-			-- Can't do anything else offline.
+			-- Can't do much else offline.
 			if not self.online then
+				-- Allow shift-click to link items offline.
+				itemButton.bagshuiData.oldOnClick(itemButton)
 				return
 			end
 

@@ -294,12 +294,12 @@ function InventoryUi:SetGroupColors(uiGroup, mouseDown)
 		-- 3. Default colors.
 
 		backdropColor = inventory.groups[groupId] and inventory.groups[groupId].background
-						or inventory.settings.groupUseSkinColors and BsSkin.skinBackgroundColor
+						or inventory.settings.groupUseSkinColors and BsSkin.inventoryBackgroundColorFromSkin
 		                or inventory.settings.groupBackgroundDefault
 		backdropOpacity = backdropColor[4]
 
 		borderColor = inventory.groups[groupId] and inventory.groups[groupId].border
-					  or inventory.settings.groupUseSkinColors and BsSkin.skinBorderColor
+					  or inventory.settings.groupUseSkinColors and BsSkin.inventoryBorderColorFromSkin
 		              or inventory.settings.groupBorderDefault
 		borderOpacity = borderColor[4]
 

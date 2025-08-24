@@ -1,5 +1,17 @@
 # Bagshui Changelog
 
+*** IN PROGRESS *** ## 1.6.0 - 2025-TBD
+### Changes
+* Bold item borders are now available ([similar to BetterBags' Extra Glowy Item Buttons"](https://github.com/veechs/Bagshui/discussions/59)) (**Settings** > **Design** > **View** > **Item Slots** > **Bold Borders**). <sup><small>🫶&nbsp;Miwi</small></sup>
+* Shift+Clicking items to chat from offline Bank works now. <sup><small>🫶&nbsp;Evilko</small></sup>
+* Bagnon devotees, rejoice!
+  * Inventory content can now be laid out from any corner (**Settings** > **Design** > **View** > **Anchoring**).
+  * Make your inventory as narrow as 5 slots wide (**Settings** > **Design** > **Sizing** > **Maximum Columns**).
+  * "Manual" Sort Order now arranges slots from lowest to highest instead of the reverse, which didn't really make sense.
+* Further minor optimizations to [defer event processing while in combat](https://github.com/veechs/Bagshui/issues/153).
+* For developers:
+  * Add 3rd party interface skin API to support UI replacements.<br><sup>Originally intended for [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded), which isn't using it, but the feature is here in case another developer wants it in the future.</sup>
+
 ## 1.5.15 - 2025-08-23
 ### Fixed
 * *Actually* fix [empty slot backgrounds in non-enUS clients that don't have a Bagshui localization](https://github.com/veechs/Bagshui/issues/175) (was working in 1.5.13, but only due to the bug that was resolved in 1.5.14). <sup><small>🪲&nbsp;[@Trust-WoW](https://github.com/Trust-WoW)</small></sup>
@@ -24,7 +36,7 @@
 ### Fixed
 * [Sharing works consistently now](https://github.com/veechs/Bagshui/issues/160) (previously there were errors if all objects of a given type were selected). <sup><small>🪲&nbsp;[@Szalor](https://github.com/Szalor)</small></sup>
 
-## 1.5.10 - 2025-04-26
+## 1.5.10 - 2025-05-19
 ### Fixed
 * Prevent lag while in a raid group. Additional protections for in-combat performance are being tested, but this should resolve the worst of the [issues](https://github.com/veechs/Bagshui/issues/153). Thanks to jj for their patient testing that helped me locate the root cause.
 

@@ -228,6 +228,8 @@ BsLocalization:AddLocale("enUS", {
 
 ["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! Examples:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444".. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
 
+["Slash_Debug"] = "Debug",
+
 -- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
 ["Binding_Resort"] = "Organize All",
 ["Binding_Restack"] = "Restack All",
@@ -383,6 +385,8 @@ BsLocalization:AddLocale("enUS", {
 ["Menu_Settings_Tinting"] = "Item Tinting",
 ["Menu_Settings_Toggles"] = "Toggles",
 ["Menu_Settings_Toolbar"] = "Toolbar",
+["Menu_Settings_ToolbarButtons"] = "Toolbar Buttons",
+["Menu_Settings_ToolbarButtons_TooltipText"] = "Manage the display of icons on the toolbars",
 ["Menu_Settings_Tooltips"] = "Tooltips",
 ["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
 ["Menu_Settings_StockBadgeColors"] = "Stock Colors",
@@ -1041,6 +1045,7 @@ BsLocalization:AddLocale("enUS", {
 ["SettingScope_Account"] = "Applies to all characters on this account.",
 ["SettingScope_Character"] = "Applies to all of this character's inventory windows.",
 ["Setting_DisabledBy_HideGroupLabels"] = "× Disabled because the active Structure has Hide Group Labels enabled.",
+["Setting_DisabledBy_Skin"] = "× Disabled because the current interface skin does not support this feature.",
 ["Setting_EnabledBy_ColorblindMode"] = "√ Enabled because Colorblind Mode is on.",
 ["Setting_Profile_SetAllHint"] = "Shift+Click to use for all profile types.",
 ["Setting_Reset_TooltipText"] = "Reset to default: Ctrl+Alt+Shift+Click.",
@@ -1155,6 +1160,10 @@ BsLocalization:AddLocale("enUS", {
 ["itemActiveQuestBadges_TooltipTitle"] = "Item Slot Active Quest Badges",
 ["itemActiveQuestBadges_TooltipText"] = "Show a ? in the top when the item is an objective of an active quest.",
 
+["itemBordersBold"] = "Bold Borders",
+["itemBordersBold_TooltipTitle"] = "Bold Item Quality Borders",
+["itemBordersBold_TooltipText"] = "Add an extra glow to items of Uncommon quality and higher.",
+
 ["itemQualityBadges"] = "!!Quality!!",
 ["itemQualityBadges_TooltipTitle"] = "Item Quality Badges",
 ["itemQualityBadges_TooltipText"] = "Show icons in the bottom left for item rarity levels.",
@@ -1163,7 +1172,7 @@ BsLocalization:AddLocale("enUS", {
 ["itemUsableBadges_TooltipTitle"] = "Item Unusable Badges",
 ["itemUsableBadges_TooltipText"] = "Show icons in the top left for unusable/learned items.",
 
-["itemUsableColors"] = "Unusable",
+["itemUsableColors"] = "Unusable Tinting",
 ["itemUsableColors_TooltipTitle"] = "Item Unusable Tinting",
 ["itemUsableColors_TooltipText"] = "Apply red/green overlay for unusable/learned items.",
 
@@ -1285,13 +1294,9 @@ BsLocalization:AddLocale("enUS", {
 ["toggleBagsWithTradeFrame_TooltipTitle"] = "Toggle Bags with Trade",
 ["toggleBagsWithTradeFrame_TooltipText"] = "Open and close Bags when trading with another player.",
 
-["windowAnchorXPoint"] = "Horizontal",
-["windowAnchorXPoint_TooltipTitle"] = "Horizontal Anchor",
-["windowAnchorXPoint_TooltipText"] = "Window will grow horizontally from this edge of the screen.",
-
-["windowAnchorYPoint"] = "Vertical",
-["windowAnchorYPoint_TooltipTitle"] = "Vertical Anchor",
-["windowAnchorYPoint_TooltipText"] = "Window will grow vertically from this edge of the screen.",
+["windowAnchor"] = "Anchor",
+["windowAnchor_TooltipTitle"] = "Window Anchor",
+["windowAnchor_TooltipText"] = "Window will grow from this corner of the screen.",
 
 ["windowBackground"] = "Background",
 ["windowBackground_TooltipTitle"] = "Window Background Color",
@@ -1300,6 +1305,10 @@ BsLocalization:AddLocale("enUS", {
 ["windowBorder"] = "Border",
 ["windowBorder_TooltipTitle"] = "Window Border Color",
 ["windowBorder_TooltipText"] = "Color to use for this inventory window's border.",
+
+["windowContentAnchor"] = "!!Inventory!!",
+["windowContentAnchor_TooltipTitle"] = "Inventory Content Anchoring",
+["windowContentAnchor_TooltipText"] = "Groups and items will be laid out starting from this corner of the inventory window.",
 
 ["windowLocked"] = "Lock Position",
 ["windowLocked_TooltipText"] = "Don't allow this window to be moved.",
