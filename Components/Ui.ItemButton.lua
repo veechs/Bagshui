@@ -784,7 +784,10 @@ function Ui:UpdateItemButtonColorsAndBadges(button, force)
 			buttonComponents.highlightTexture:SetVertexColor(1, 1, 1, 0)
 		end
 
-		-- Hide badges in Edit Mode
+		-- Hide bold borders in Edit Mode.
+		buttonComponents.borderBold:SetVertexColor(1, 1, 1, 0)
+
+		-- Hide badges in Edit Mode.
 		buttonComponents.stockBadge:Hide()
 		buttonComponents.qualityBadge:Hide()
 		buttonComponents.topLeftBadge:Hide()
