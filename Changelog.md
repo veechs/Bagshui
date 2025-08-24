@@ -2,7 +2,8 @@
 
 *** IN PROGRESS *** ## 1.6.0 - 2025-TBD
 ### Changes
-* Bold item borders are now available ([similar to BetterBags' Extra Glowy Item Buttons"](https://github.com/veechs/Bagshui/discussions/59)) (**Settings** > **Design** > **View** > **Item Slots** > **Bold Borders**)..
+* Bold item borders are now available ([similar to BetterBags' Extra Glowy Item Buttons"](https://github.com/veechs/Bagshui/discussions/59)) (**Settings** > **Design** > **View** > **Item Slots** > **Bold Borders**). <sup><small>🫶&nbsp;Miwi</small></sup>
+* Shift+Clicking items to chat from offline Bank works now. <sup><small>🫶&nbsp;Evilko</small></sup>
 * Bagnon devotees, rejoice!
   * Inventory content can now be laid out from any corner (**Settings** > **Design** > **View** > **Anchoring**).
   * Make your inventory as narrow as 5 slots wide (**Settings** > **Design** > **Sizing** > **Maximum Columns**).
