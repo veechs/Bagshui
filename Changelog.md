@@ -1,8 +1,12 @@
 # Bagshui Changelog
 
-*** IN PROGRESS *** ## 1.6.0 - 2025-06-05
+*** IN PROGRESS *** ## 1.6.0 - 2025-TBD
 ### Changes
-* Add 3rd party interface skin API to support UI replacements like [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded).
+* Bagnon devotees, rejoice!
+  * Inventory content can now be laid out from any corner (**Settings** > **Design** > **View** > **Anchoring**).
+  * Make your inventory as narrow as 5 slots wide (**Settings** > **Design** > **Sizing** > **Maximum Columns**).
+* For developers:
+  * Add 3rd party interface skin API to support UI replacements.<br><sup>Originally intended for [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded), which isn't using it, but the feature is here in case another developer wants it in the future.</sup>
 
 ## 1.5.15 - 2025-08-23
 ### Fixed
