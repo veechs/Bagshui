@@ -477,8 +477,7 @@ function Inventory:SetWindowSize()
 			+ BsSkin.inventoryWindowPadding * 2
 		)
 		or 0
-	
-	Bagshui:PrintDebug(math.floor(self.desiredWindowWidth) .. " / " .. math.floor(headerWidth) .. " / " .. math.floor(footerWidth))
+
 	self.uiFrame:SetWidth(math.max(self.desiredWindowWidth, self.settings.windowMinWidth or 0, headerWidth, footerWidth))
 	self.uiFrame:SetHeight(self.desiredWindowHeight or 250)
 end
