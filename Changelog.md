@@ -5,6 +5,7 @@
 * Bagnon devotees, rejoice!
   * Inventory content can now be laid out from any corner (**Settings** > **Design** > **View** > **Anchoring**).
   * Make your inventory as narrow as 5 slots wide (**Settings** > **Design** > **Sizing** > **Maximum Columns**).
+  * "Manual" Sort Order now arranges slots from lowest to highest instead of the reverse, which didn't really make sense.
 * For developers:
   * Add 3rd party interface skin API to support UI replacements.<br><sup>Originally intended for [Dragonflight: Reloaded](https://github.com/MtxGrower33/DragonflightReloaded), which isn't using it, but the feature is here in case another developer wants it in the future.</sup>
 
