@@ -651,14 +651,14 @@ end
 
 -- Reusable variables for OnEvent to slightly lighten garbage collector load.
 
-local onEvent_updateDelay, onEvent_action, onEvent_function, onEvent_uiFrameHidden
+local onEvent_updateDelay, onEvent_action, onEvent_uiFrameHidden
 
 --- Event handling.
 ---@param event string Event identifier.
 ---@param arg1 any? Argument 1 from the event.
 ---@param arg2 any? Argument 2 from the event.
 function Inventory:OnEvent(event, arg1, arg2)
-	-- self:PrintDebug("OnEvent(): " ..  event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
+	-- self:PrintDebug("Inventory OnEvent(): " ..  event .. " // " .. tostring(arg1) .. " // " .. tostring(arg2))
 
 	-- We use this multiple times so saving a function call seems worth it? Maybe?
 	onEvent_uiFrameHidden = self.uiFrame and (not self.uiFrame:IsVisible()) or true
@@ -787,15 +787,14 @@ function Inventory:OnEvent(event, arg1, arg2)
 		return
 	end
 
-	-- Call the event function if it exists.
+	-- Call the class event function if it exists.
 	-- If the function returns false, don't continue processing.
-	-- NOT CURRENTLY USED. Vestigial from early development and might never be used again.
-	-- onEvent_function = self[onEvent_action]
-	-- if type(onEvent_function) == "function" then
-	-- 	if onEvent_function(self) == false then
-	-- 		return
-	-- 	end
-	-- end
+	-- This is used by the Bank to map events to class functions (for example, `BANKFRAME_OPENED` => `Inventory:Open()`)
+	if type(onEvent_action) == "string" and self[onEvent_action] and type(self[onEvent_action]) == "function" then
+		if self[onEvent_action](self) == false then
+			return
+		end
+	end
 
 	-- Actually perform initial inventory cache update.
 	if event == "BAGSHUI_INITIAL_INVENTORY_UPDATE" then
