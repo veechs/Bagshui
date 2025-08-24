@@ -30,6 +30,10 @@ local Localization = {
 
 	-- List of available locales in the form of `{ <locale> = { <localization table> } }`.
 	locales = {},
+
+	-- Used by `Localization:AutoLocalize()` to keep track of what has already been automatically localized
+	-- so we don't double-localize (see that function for further explanation).
+	autoLocalized = {},
 }
 Bagshui.environment.BsLocalization = Localization
 Bagshui.components.Localization = Localization
