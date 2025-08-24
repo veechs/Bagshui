@@ -202,7 +202,7 @@ function Ui:CreateItemButtonCooldown(button, disableText)
 	-- Pretend we're a pfUI frame so we can get pfUI cooldown text without the 
 	-- "Foreign Frames" option (so long as the pfUI cooldown module is enabled).
 	if pfUI and pfUI.env.C.disabled and pfUI.env.C.disabled.cooldown ~= "1" then
-		cooldown.pfCooldownType = "ALL"
+		cooldown.pfCooldownType = "BAGSHUI"
 	end
 	return cooldown
 end
