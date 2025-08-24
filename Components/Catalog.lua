@@ -792,6 +792,23 @@ function Catalog:InitUi()
 		managerWidth = 400,
 		searchPlaceholderText = L.CatalogManager_SearchBoxPlaceholder,
 		wikiPage = BS_WIKI_PAGES.Search,
+
+		managerSelectionChangedFunc = function(listFrame)
+			-- Allow shift-click chat linking of items by clicking the row instead of
+			-- having to click the item button.
+			-- (This is a slightly gross hack because I don't feel like building out a clean
+			-- callback that provides access to the selected entry frame.)
+			if _G.IsShiftKeyDown() and listFrame.bagshuiData.selectedEntry then
+				for _, entryFrame in ipairs(listFrame.bagshuiData.entryFrames) do
+					if
+						(entryFrame.bagshuiData.scrollableListEntry == listFrame.bagshuiData.selectedEntry or entryFrame == listFrame.bagshuiData.selectedEntry)
+						and entryFrame.bagshuiData.itemButton
+					then
+						entryFrame.bagshuiData.itemButton:GetScript("OnClick")(entryFrame.bagshuiData.itemButton)
+					end
+				end
+			end
+		end,
 	})
 
 
