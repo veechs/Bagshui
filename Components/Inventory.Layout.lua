@@ -501,18 +501,6 @@ function Inventory:UpdateWindow()
 		Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline = nil
 	end
 
-	-- Can only highlight changes if there's something to highlight.
-	self.highlightChangesEnabled = (
-		self.hasChanges
-		or (self.dockedInventory and self.dockedInventory.hasChanges)
-		or (self.dockedToInventory and self.dockedToInventory.hasChanges)
-	) or false
-
-	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
-	if not self.highlightChangesEnabled then
-		self.highlightChanges = false
-	end
-
 
 	-- There are a few things that always need to happen even if we're not
 	-- doing a full layout update.
@@ -2131,6 +2119,19 @@ end
 --- Enable/disable/highlight toolbar buttons as appropriate.
 function Inventory:UpdateToolbar()
 	local toolbarButtons = self.ui.buttons.toolbar
+
+	-- Can only highlight changes if there's something to highlight.
+	self.highlightChangesEnabled = (
+		self.hasChanges
+		or (self.dockedInventory and self.dockedInventory:Visible() and self.dockedInventory.hasChanges)
+		or (self.dockedToInventory and self.dockedToInventory.hasChanges)
+	) or false
+
+	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
+	if not self.highlightChangesEnabled then
+		self.highlightChanges = false
+	end
+
 
 	-- Search icon.
 	self:SetToolbarWidgetState(

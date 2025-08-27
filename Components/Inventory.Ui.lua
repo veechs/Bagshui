@@ -1178,6 +1178,11 @@ function Inventory:UiFrame_OnShow()
 	self:NotifySkinOfPositionChange()
 	-- Do NOT use QueueUpdate() here.
 	self:Update()
+
+	-- Keep Highlight Changes toolbar button in sync.
+	if self.dockedToInventory then
+		self.dockedToInventory:UpdateToolbar()
+	end
 end
 
 
@@ -1203,6 +1208,15 @@ function Inventory:UiFrame_OnHide()
 		self.dockedInventory:Close()
 	end
 
+	-- Turn off Highlight Changes if it was only available because of the docked inventory.
+	if self.dockedToInventory then
+		if self.hasChanges and not self.dockedToInventory.hasChanges then
+			self.highlightChanges = false
+			self.dockedToInventory.highlightChanges = false
+			self.dockedToInventory.windowUpdateNeeded = true
+			self.dockedToInventory:Update()
+		end
+	end
 end
 
 
