@@ -2104,8 +2104,6 @@ function Inventory:UpdateBagBar()
 		self.ui.frames.spaceSummary:SetAlpha(0)  -- Using SetAlpha() instead of Hide() so it's still responsive to mouseover.
 	end
 
-	
-
 	-- Set the Bag Bar to the correct width.
 	self.ui.frames.bagBar:SetWidth(
 		self.ui.frames.bagBar.bagshuiData.baseWidth
