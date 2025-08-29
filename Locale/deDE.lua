@@ -1,0 +1,1334 @@
+Bagshui:LoadComponent(function()
+
+BsLocalization:AddLocale("deDE", {
+
+-- ### Game Stuff ###
+
+-- Player classes.
+["Druid"] = "Druide",
+["Hunter"] = "Jäger",
+["Mage"] = "Magier",
+["Paladin"] = "Paladin",
+["Priest"] = "Priester",
+["Rogue"] = "Schurke",
+["Shaman"] = "Schamane",
+["Warlock"] = "Hexenmeister",
+["Warrior"] = "Krieger",
+
+-- Item classes and subclasses that can't be automatically localized because they're not
+-- returned from `GetAuctionItemClasses()` / `GetAuctionItemSubClasses()`.
+["Devices"] = "Geräte",
+["Explosives"] = "Sprengstoff",
+["Junk"] = "Plunder",
+["Key"] = "Schlüssel",
+["Miscellaneous"] = "Verschiedenes",
+["Parts"] = "Teile",
+["Quest"] = "Quest",
+["Trade Goods"] = "Handwerkswaren",
+
+-- Skill types.
+-- Must cover all keys in `LOCALIZED_TO_EN_SKILL_ID` and `IGNORE_SKILL_CATEGORY`.
+["Class Skills"] = "Class Skills",
+["Professions"] = "Professions",
+["Secondary Skills"] = "Secondary Skills",
+["Weapon Skills"] = "Weapon Skills",
+["Armor Proficiencies"] = "Armor Proficiencies",
+["Languages"] = "Languages",
+
+
+-- Skills.
+-- Must cover any skill that the game can return from `GetSkillLineInfo()`.
+["Axes"] = "Äxte",
+["Dual Wield"] = "Beidhändigkeit",
+["Fishing"] = "Angeln",
+["Maces"] = "Streitkolben",
+["Swords"] = "Schwerter",
+["Plate Mail"] = "Plattenrüstung",
+["Shield"] = "Schild",
+
+-- Professions that have their own bag types.
+-- Referenced in GameInfo.lua to build the `professionsToBags` table.
+["Enchanting"] = "Verzauberkunst",
+["Herbalism"] = "Kräuterkunde",
+
+
+
+
+-- ### General ###
+
+["AbandonChanges"] = "Änderungen verwerfen",
+["About"] = "Über",
+["Actions"] = "Aktionen",
+["Add"] = "Hinzufügen",
+["AddSlashRemove"] = "Hinzufügen/Entfernen",
+["Aliases"] = "Aliasse",
+["AltClick"] = "Alt+Klick",
+["AltRightClick"] = "Alt+Rechtsklick",
+["Ascending"] = "Aufsteigend",
+["Available"] = "Verfügbar",
+["Background"] = "Hintergrund",
+["Bag"] = "Tasche",
+["Border"] = "Rahmen",
+["Bottom"] = "Unten",
+["Cancel"] = "Abbrechen",
+["Catalog"] = "Katalog",
+["Categories"] = "Kategorien",
+["Category"] = "Kategorie",
+["Character"] = "Charakter",
+["CharacterData"] = "Charakterdaten",
+["CategorySlashItem"] = "Kategorie/Gegenstand",
+["ClassCategory"] = "Klassenkategorie",
+["Clear"] = "Leeren",
+["Click"] = "Klick",
+["Close"] = "Schließen",
+["Color"] = "Farbe",
+["Column"] = "Spalte",
+["Copy"] = "Kopieren",
+["Create"] = "Erstellen",
+["Creation"] = "Erstellung",
+["Custom"] = "Benutzerdefiniert",
+["Default"] = "Standard",
+["Delete"] = "Löschen",
+["Deletion"] = "Löschung",
+["Descending"] = "Absteigend",
+["Details"] = "Details",
+["Dialog"] = "Dialog",
+["Disable"] = "Deaktivieren",
+["Duplicate"] = "Duplizieren",
+["Edit"] = "Bearbeiten",
+["Editing"] = "Bearbeitung",
+["EmptyBagSlot"] = "Leerer Taschenplatz",
+["Export"] = "Exportieren",
+["Full"] = "Voll",
+["Group"] = "Gruppe",
+["Help"] = "Hilfe",
+["Hidden"] = "Verborgen",
+["Hide"] = "Verbergen",
+["HoldAlt"] = "Alt halten",
+["HoldControlAlt"] = "Strg+Alt halten",
+["Horizontal"] = "Horizontal",
+["ID"] = "ID",
+["Ignore"] = "Ignorieren",
+["Import"] = "Importieren",
+["ImportSlashExport"] = "Import/Export",
+["Info"] = "Info",
+["Information"] = "Information",
+["Instance"] = "Instanz",
+["Inventory"] = "Inventar",
+["Item"] = "Gegenstand",
+["ItemId"] = "Gegenstands-ID",
+["ItemProperties"] = "Gegenstandseigenschaften",
+["KeepEditing"] = "Weiter bearbeiten",
+["Label"] = "Beschriftung",
+["Left"] = "Links",
+["Location"] = "Ort",
+["Lock"] = "Sperren",
+["LogWindow"] = "Protokollfenster",
+["Manage"] = "Verwalten",
+["Menu"] = "Menü",
+["MoreInformation"] = "Weitere Infos",
+["Move"] = "Bewegen",
+["MoveDown"] = "Nach unten",
+["MoveUp"] = "Nach oben",
+["Name"] = "Name",
+["New"] = "Neu",
+["No"] = "Nein",
+["NotNow"] = "Nicht jetzt",
+["NoItemsAvailable"] = "(Keine Gegenstände verfügbar)",
+["NoneAssigned"] = "(Keine zugewiesen)",
+["NoneParenthesis"] = "(Keine)",
+["NoRuleFunction"] = "(Keine Regel-Funktion)",
+["NoValue"] = "(Kein Wert)",
+["Open"] = "Öffnen",
+["OpenContainer"] = "Behälter öffnen",
+["Openable"] = "Öffnbar",
+["PleaseWait"] = "Bitte warten...",
+["Profile"] = "Profil",
+["Prefix_Add"] = "%s hinzufügen",
+["Prefix_Bag"] = "Tasche %s",
+["Prefix_Class"] = "Klasse %s",
+["Prefix_ClickFor"] = "Klicke für %s",
+["Prefix_Default"] = "Standard %s",
+["Prefix_Edit"] = "%s bearbeiten",
+["Prefix_Manage"] = "%s verwalten",
+["Prefix_Move"] = "%s bewegen",
+["Prefix_New"] = "Neues %s",
+["Prefix_OpenMenuFor"] = "Menü für %s öffnen",
+["Prefix_Remove"] = "%s entfernen",
+["Prefix_Search"] = "%s suchen",
+["Prefix_Sort"] = "%s sortieren",
+["Prefix_Target"] = "Ziel %s",
+["Prefix_Toggle"] = "%s umschalten",
+["Prefix_Unnamed"] = "(Unbenanntes %s)",
+["Profiles"] = "Profile",
+["Quality"] = "Qualität",
+["ReleaseAlt"] = "Alt loslassen",
+["Reload"] = "Neu laden",
+["Remove"] = "Entfernen",
+["Rename"] = "Umbenennen",
+["Replace"] = "Ersetzen",
+["Report"] = "Bericht",
+["ResetPosition"] = "Position zurücksetzen",
+["Right"] = "Rechts",
+["RightClick"] = "Rechtsklick",
+["Row"] = "Zeile",
+["Save"] = "Speichern",
+["Search"] = "Suchen",
+["Settings"] = "Einstellungen",
+["Share"] = "Teilen",
+["ShiftClick"] = "Shift+Klick",
+["Show"] = "Anzeigen",
+["SortOrder"] = "Sortierreihenfolge",
+["SortOrders"] = "Sortierreihenfolgen",
+["Sorting"] = "Sortierung",
+["Stack"] = "Stapeln",
+["Subzone"] = "Unterzone",
+["Suffix_Default"] = "%s " .. LIGHTYELLOW_FONT_COLOR_CODE .. " [Standard]" .. FONT_COLOR_CODE_CLOSE,
+["Suffix_EmptySlot"] = "%s Leerer Platz",
+["Suffix_Menu"] = "%s Menü",
+["Suffix_ReadOnly"] = "%s " .. LIGHTYELLOW_FONT_COLOR_CODE .. "[Schreibgeschützt]" .. FONT_COLOR_CODE_CLOSE,
+["Suffix_Reversed"] = "%s [umgekehrt]",
+["Suffix_Sets"] = "%d Set(s)",
+["Symbol_Brackets"] = "[%s]",
+["Symbol_Colon"] = "%s:",
+["Symbol_Ellipsis"] = "%s…",
+["Symbol_Parentheses"] = "(%s)",
+["Templates"] = "Vorlagen",
+["Text"] = "Text",
+["Toggle"] = "Umschalten",
+["Top"] = "Oben",
+["Total"] = "Gesamt",
+["Undo"] = "Rückgängig",
+["Unknown"] = "Unbekannt",
+["Unlock"] = "Entsperren",
+["Unnamed"] = "(Unbenannt)",
+["Unstack"] = "Entstapeln",
+["Used"] = "Benutzt",
+["UseDefault"] = "Standard verwenden",
+["Validate"] = "Überprüfen",
+["Vertical"] = "Vertikal",
+["VersionNumber"] = "Version %s",
+["Yes"] = "Ja",
+["Zone"] = "Zone",
+
+
+-- Inventory types.
+["Bags"] = "Taschen",
+["Bank"] = "Bank",
+["Equipped"] = "Ausgerüstet",
+["Keyring"] = "Schlüsselbund",
+
+
+-- Abbreviations for tooltip use.
+["Abbrev_Bags"] = "Tasche",
+["Abbrev_Bank"] = "Bank",
+["Abbrev_Keyring"] = "Schlüssel",
+["Abbrev_Equipped"] = "Ausgerüstet",
+
+-- Slash command help messages and localizations.
+["Slash_Help"] = "%s commands:",
+["Slash_Help_Postscript"] = "For a list of subcommands, append Help to the command.",
+
+["Slash_Help_ItemInfo"] = "/Bagshui !!Info!! Examples:" .. BS_NEWLINE .. "   /Bagshui !!Info!! 13444".. BS_NEWLINE .. "   /Bagshui !!Info!! item:13446:0:0:0",
+
+-- Key bindings (other than Inventory class names; those are handled in `Inventory:New()`).
+["Binding_Resort"] = "Alles organisieren",
+["Binding_Restack"] = "Alles stapeln",
+
+
+-- Item properties to friendly names as `ItemPropFriendly_<propertyName>`.
+-- Anything non-private in `BS_ITEM_SKELETON` or `BS_REALTIME_ITEM_INFO_PROPERTIES` must be present.
+["ItemPropFriendly_activeQuest"] = "Aktives Quest-Gegenstand",
+["ItemPropFriendly_baseName"] = "Basisname",
+["ItemPropFriendly_bagNum"] = "Taschennummer",
+["ItemPropFriendly_bagType"] = "Taschenart",
+["ItemPropFriendly_bindsOnEquip"] = "Wird beim Anlegen gebunden",
+["ItemPropFriendly_charges"] = "Aufladungen",
+["ItemPropFriendly_count"] = "Anzahl",
+["ItemPropFriendly_equipLocation"] = "Ausrüstungsplatz",
+["ItemPropFriendly_equipLocationLocalized"] = "Ausrüstungsplatz (lokalisiert)",
+["ItemPropFriendly_equipLocationSort"] = "Ausrüstungsplatz",
+["ItemPropFriendly_emptySlot"] = "Leerer Platz",
+["ItemPropFriendly_id"] = "Gegenstands-ID",
+["ItemPropFriendly_itemLink"] = "Gegenstandslink",
+["ItemPropFriendly_itemString"] = "Gegenstands-String",
+["ItemPropFriendly_locked"] = "Gesperrt",
+["ItemPropFriendly_maxStackCount"] = "Maximale Stapelgröße",
+["ItemPropFriendly_minLevel"] = "Mindeststufe",
+["ItemPropFriendly_name"] = "!!Name!!",
+["ItemPropFriendly_periodicTable"] = "Periodensystem",
+["ItemPropFriendly_quality"] = "!!Qualität!!",
+["ItemPropFriendly_qualityLocalized"] = "!!Qualität!! (lokalisiert)",
+["ItemPropFriendly_readable"] = "Lesbar",
+["ItemPropFriendly_slotNum"] = "Platznummer",
+["ItemPropFriendly_soulbound"] = "Seelengebunden",
+["ItemPropFriendly_stacks"] = "Stapel",
+["ItemPropFriendly_subtype"] = "Untertyp",
+["ItemPropFriendly_suffixName"] = "Suffixname",
+["ItemPropFriendly_tooltip"] = "Tooltip",
+["ItemPropFriendly_type"] = "Typ",
+["ItemPropFriendly_uncategorized"] = "Nicht kategorisiert",
+
+
+
+
+
+-- ### Inventory UI ###
+
+["Inventory_NoData"] = "Offline inventory not available.",
+
+-- Spell names that enable special features.
+["Spell_Disenchant"] = "Disenchant",
+["Spell_PickLock"] = "Pick Lock",
+
+-- Special item tooltips.
+["Inventory_Item_SellProtection_ConfirmSale"] = "Control+Right-Click to confirm sale.",
+["Inventory_Item_SellProtection_Reason"] = "Protected: %s.",
+["Inventory_Item_SellProtection_OverrideHint"] = "Skip confirmation: Ctrl+Alt+Shift+Right-Click.",
+
+-- Bag tooltips.
+["Bag_SlotsNeededToSwap"] = "%d more free slot(s) required to swap.",
+["Bag_SupplementalSpaceAvailable"] = "You may be to swap at the %s without cleaning your %s.",
+
+-- Toolbar.
+["Toolbar_Menu_TooltipTitle"] = "Menu",
+["Toolbar_ExitEditMode"] = "Exit Edit Mode",
+["Toolbar_Catalog_TooltipTitle"] = "Catalog (Account-Wide Inventory)",
+["Toolbar_Catalog_TooltipText"] = "View and search the combined inventories of all characters on this account.",
+["Toolbar_Character_TooltipTitle"] = "Character",
+["Toolbar_Character_TooltipText"] = "View your other characters' %s.",  -- %s = Inventory type.
+["Toolbar_Hide_TooltipTitle"] = "Don't Show Hidden",
+["Toolbar_Show_TooltipTitle"] = "Show Hidden",
+["Toolbar_Show_TooltipText"] = "Toggle display of hidden items.",
+["Toolbar_Search_TooltipTitle"] = "Search",
+["Toolbar_Search_TooltipText"] = "Filter the contents of your %s." .. BS_NEWLINE .. "Press Shift+Enter while searching to open the Catalog.",  -- %s = Inventory type.
+["Toolbar_Resort_TooltipTitle"] = "Organize",
+["Toolbar_Resort_TooltipText"] = "Categorize and sort.",
+["Toolbar_Restack_TooltipTitle"] = "Restack",
+["Toolbar_Restack_TooltipText"] = "Consolidate stackable items.",
+["Toolbar_HighlightChanges_TooltipTitle"] = "Highlight Changes",
+["Toolbar_HighlightChanges_TooltipText"] = "Toggle spotlighting of recently changed items." .. BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. "Alt-click to mark all items as unchanged.",
+["Toolbar_UnHighlightChanges_TooltipTitle"] = "Don't Highlight Changes",
+
+-- Action Tooltips.
+["Tooltip_Inventory_PlaceBagInBagHint"] = "%s to move into bag instead of swapping.",  -- "Shift-Click to lock/unlock slot highlighting"
+["Tooltip_Inventory_ToggleBagSlotHighlightLockHint"] = "%s to %s slot highlighting.",  -- "Alt-Click to lock/unlock slot highlighting"
+["Tooltip_Inventory_ToggleEmptySlotStacking"] = "%s to %s empty slots.",  -- "Click to stack/unstack empty slots"
+["Tooltip_Inventory_TradeShortcut"] = "%s to trade with %s.",  -- "Alt-Click to trade with <Player Name>"
+
+-- Edit Mode.
+["EditMode"] = "Edit Mode",
+["EditMode_CategoryInGroup"] = "Currently assigned to group '%s' in the current structure.",  -- %s = group name or (Unnamed Group)
+["EditMode_CategoryNotInGroup"] = "Not assigned to a group in the current structure.",
+["EditMode_Prompt_NewGroupName"] = "Label for new group (optional but recommended):",
+["EditMode_Prompt_RenameGroup"] = "New label for %s:",
+["EditMode_Prompt_DeleteGroup"] = "Delete the selected group?!!Warning_NoUndo!!",
+["EditMode_Tooltip_SelectNew"] = "Select new %s.",  -- %s = L.Location or L.Group
+
+-- Main Menu.
+["Menu_Main_EditMode_TooltipText"] = "Modify the current structure (rearrange groups, assign categories, etc.).",
+["Menu_Main_Settings_TooltipText"] = "Open the Settings menu.",
+["Menu_Main_ManageCategories_TooltipText"] = "Open the Category manager.",
+["Menu_Main_ManageProfiles_TooltipText"] = "Open the Profile manager.",
+["Menu_Main_ManageSortOrders_TooltipText"] = "Open the Sort Order manager.",
+["Menu_Main_Toggle_TooltipText"] = "Toggle the %s window.",
+
+-- Settings Menu (localizations for settings themselves are configured at the end of this file).
+["Menu_Settings"] = "%s Settings",  -- "Bags Settings"
+["Menu_Settings_About"] = "About Bagshui",
+["Menu_Settings_Accessibility"] = "Accessibility",
+["Menu_Settings_ActiveDesignProfileHint"] = "Applies to the active Design Profile.",
+["Menu_Settings_Advanced"] = "Advanced",
+["Menu_Settings_Anchoring"] = "Anchoring",
+["Menu_Settings_BagUsage"] = "Utilization",
+["Menu_Settings_BagUsage_TooltipText"] = "Display of available slots and overall capacity.",
+["Menu_Settings_Behaviors"] = "Behaviors",
+["Menu_Settings_Badges"] = "Item Badges",
+["Menu_Settings_Buttons"] = "Buttons",
+["Menu_Settings_ChangeTiming"] = "Stock Change Timers",
+["Menu_Settings_Colors"] = "Colors",
+["Menu_Settings_ColorHistory_TooltipTitle"] = "Color Picker History",
+["Menu_Settings_Commands"] = "Commands",
+["Menu_Settings_DefaultProfiles"] = "Default Profiles",
+["Menu_Settings_DefaultProfiles_TooltipText"] = "Manage how profiles are created for new characters.",
+["Menu_Settings_Defaults"] = "Defaults",
+["Menu_Settings_DesignColors_TooltipTitle"] = "Design Colors",
+["Menu_Settings_DesignColors_TooltipText"] = "Change inventory colors.",
+["Menu_Settings_DesignSize_TooltipTitle"] = "Design Sizing",
+["Menu_Settings_DesignSize_TooltipText"] = "Change inventory dimensions.",
+["Menu_Settings_DesignView_TooltipTitle"] = "Design View",
+["Menu_Settings_DesignView_TooltipText"] = "Change inventory interface element visibility.",
+["Menu_Settings_Etcetera"] = "Etcetera",
+["Menu_Settings_Format"] = "Format",
+["Menu_Settings_General"] = "General",
+["Menu_Settings_General_TooltipText"] = "General Settings",
+["Menu_Settings_GroupDefaults"] = "Group Defaults",
+["Menu_Settings_Groups"] = "Groups",
+["Menu_Settings_Hooks_Suffix"] = "%s Hooks",  -- %s = Inventory type.
+["Menu_Settings_InfoTooltip"] = "Info Tooltip",
+["Menu_Settings_Integration"] = "Integration",
+["Menu_Settings_Integration_TooltipText"] = "Control how Bagshui integrates with the game.",
+["Menu_Settings_Interface"] = "Interface",
+["Menu_Settings_ItemProperties"] = "Item Properties",
+["Menu_Settings_ItemSlots"] = "Item Slots",
+["Menu_Settings_More"] = "More",
+["Menu_Settings_More_TooltipTitle"] = "Additional Settings",
+["Menu_Settings_NitpickyDetails"] = "Nitpicky Details",
+["Menu_Settings_Overrides"] = "Overrides",
+["Menu_Settings_Open"] = "!!Open!!",
+["Menu_Settings_Options"] = "Options",
+["Menu_Settings_PerBag"] = "Per-Bag",
+["Menu_Settings_Profile"] = "Profile",
+["Menu_Settings_SellProtection"] = "Selling Protection",
+["Menu_Settings_Size"] = "Sizing",
+["Menu_Settings_SizeAndLayering"] = "Sizing and Layering",
+["Menu_Settings_StructureOptions_TooltipTitle"] = "Structure Options",
+["Menu_Settings_StructureOptions_TooltipText"] = "Settings for the active Structure Profile.",
+["Menu_Settings_Summary"] = "Summary",
+["Menu_Settings_Tinting"] = "Item Tinting",
+["Menu_Settings_Toggles"] = "Toggles",
+["Menu_Settings_Toolbar"] = "Toolbar",
+["Menu_Settings_Tooltips"] = "Tooltips",
+["Menu_Settings_ToggleBagsWith"] = "Toggle Bags With",
+["Menu_Settings_StockBadgeColors"] = "Stock Colors",
+["Menu_Settings_View"] = "View",
+["Menu_Settings_Visibility"] = "Visibility",
+["Menu_Settings_Window"] = "Window",
+
+-- Category Menu.
+["Menu_Category_Move_TooltipText"] = "Pick up this category so it can be moved to a new group.",
+["Menu_Category_Edit_TooltipText"] = "Open this category in the editor.",
+["Menu_Category_Remove_TooltipText"] = "Remove this category from the current group.!!Info_NoDelete!!",
+
+-- Group Menu.
+["Menu_Group_Rename_TooltipTitle"] = "Rename Group",
+["Menu_Group_Rename_TooltipText"] = "Change this group's label.",
+["Menu_Group_Move_TooltipTitle"] = "Move Group",
+["Menu_Group_Move_TooltipText"] = "Pick this group up so it can be moved to a new location.",
+["Menu_Group_Delete_TooltipTitle"] = "Delete Group",
+["Menu_Group_Delete_TooltipText"] = "Delete this group completely and unassign any categories.!!Warning_NoUndo!!",
+
+["Menu_Group_Add_Category_TooltipText"] = "Assign an existing category to this group.",
+["Menu_Group_Configure_Category_TooltipText"] = "Display the context menu for this category.",
+["Menu_Group_New_Category_TooltipTitle"] = "New Category",
+["Menu_Group_New_Category_TooltipText"] = "Create a new category and assign it to this group.",
+["Menu_Group_Move_Category_TooltipText"] = "Pick up a category that is currently assigned to this group so it can be moved to another group.",
+["Menu_Group_Remove_Category_TooltipText"] = "Remove a category that is currently assigned to this group.!!Info_NoDelete!!",
+["Menu_Group_Edit_Category_TooltipText"] = "Edit a category that is currently assigned to this group.",
+["Menu_Group_DefaultColor_TooltipTitle"] = "Use Default Group %s Color",  -- %s = Background/Border
+["Menu_Group_DefaultColor_TooltipText"] = "Apply the group %s color defined in Settings.",  -- %s = Background/Border
+["Menu_Group_DefaultSortOrder_TooltipTitle"] = "Use Default Sort Order",
+["Menu_Group_DefaultSortOrder_TooltipText"] = "Apply the current Structure's default sort order:" .. BS_NEWLINE .. "%s",  -- %s = <Name of default sort order>
+["Menu_Group_HideGroup"] = "Hide Group",
+["Menu_Group_HideGroup_TooltipText"] = "Don't display this group unless Show Hidden is toggled on.",
+["Menu_Group_HideStockBadge"] = "Hide Stock Badge",
+["Menu_Group_HideStockBadge_TooltipText"] = "Prevent the display of Stock Change Badges (new/increased/decreased) for this group.",
+["Menu_Group_Settings_TooltipTitle"] = "Group Settings",
+["Menu_Group_Settings_TooltipText"] = "Manage group-specific options, including background and border color.",
+["Menu_Group_Color_TooltipTitle"] = "Group %s Color",  -- %s = Background/Border
+["Menu_Group_Color_TooltipText"] = "Set the %s for this group.",  -- %s = background/border
+["Menu_Group_SortOrder_TooltipTitle"] = "Group Sort Order",
+["Menu_Group_SortOrder_TooltipText"] = "Change how items are sorted within this group.",
+
+-- Item Menu.
+["Menu_Item_AssignToCategory"] = "Category Assignment",
+["Menu_Item_AssignToCategory_TooltipTitle"] = "Direct Category Assignment",
+["Menu_Item_AssignToCategory_TooltipText"] = "Assign this item's ID to one or more custom categories (as opposed to using rule functions).",
+["Menu_Item_AssignToCategory_CreateNew_TooltipText"] = "Assign the item to a new custom category.",
+["Menu_Item_AssignToCategory_Hint_CustomOnly"] = "Built-in Categories are read-only - see FAQ on the Bagshui Wiki for reasoning.",
+["Menu_Item_AssignToClassCategory"] = "Assign to Class Category",
+["Menu_Item_EquipBag"] = "Equip Bag",
+["Menu_Item_EquipBag_TooltipText"] = "Replace one of the currently equipped bags.",
+["Menu_Item_Information_TooltipTitle"] = "Item Information",
+["Menu_Item_Information_TooltipText"] = "View details about this item's properties and access the Item Information window.",
+["Menu_Item_Information_Submenu_TooltipText"] = "Click to open the Item Information window.",
+["Menu_Item_Manage_TooltipTitle"] = "Manage Item",
+["Menu_Item_Manage_TooltipText"] = "Bagshui-specific item actions.",
+["Menu_Item_MatchedCategories"] = "Matched",
+["Menu_Item_MatchedCategories_TooltipTitle"] = "Matched Categories",
+["Menu_Item_MatchedCategories_TooltipText"] = "List of all categories that match this item, ordered by sequence.",
+["Menu_Item_MatchedCategory_TooltipText"] = "Click to edit.",
+["Menu_Item_Move_TooltipText"] = "Pick up this item so it can be directly assigned to a new category.",
+["Menu_Item_RemoveFromEquippedGear"] = "Remove from Equipped",
+["Menu_Item_RemoveFromEquippedGear_TooltipText"] = "Take this item out of the list of gear you've equipped (i.e. the Equipped() rule will no longer match).",
+["Menu_Item_ResetStockState"] = "Reset Stock State",
+["Menu_Item_ResetStockState_TooltipText"] = "Clear the new/increased/decreased status of this item.",
+
+-- Item Stock State.
+["StockState"] = "Stock State",
+["StockLastChange"] = "Last Change",
+-- BS_ITEM_STOCK_STATE localizations as `Stock_<BS_ITEM_STOCK_STATE value>`.
+["Stock_New"] = "!!New!!",
+["Stock_Up"] = "Increased",
+["Stock_Down"] = "Decreased",
+["Stock_"] = "N/A",
+
+-- Item Information window title.
+["BagshuiItemInformation"] = "Bagshui Item Information",
+
+
+
+-- ### Categories and Groups ###
+
+-- Templates.
+["Suffix_Items"] = "%s Items",
+["Suffix_Potions"] = "%s Potions",
+["Suffix_Reagents"] = "%s Reagents",
+
+-- Special categories.
+["TurtleWoWGlyphs"] = "Glyphs (Turtle WoW)",
+["SoulboundGear"] = "Soulbound Gear",
+
+-- Name/Tooltip identifiers sed to categorize items using strings that appear
+-- in their names or tooltips.
+-- Using [[bracket quoting]] to avoid the need for any Lua pattern escapes (like \.).
+-- Any Lua patterns must be wrapped in slashes per the normal Bagshui string
+-- handling rules (see `TooltipIdentifier_PotionHealth` for an example).
+["NameIdentifier_AntiVenom"] = [[Anti-Venom]],
+["NameIdentifier_Bandage"] = [[Bandage]],
+["NameIdentifier_Elixir"] = [[Elixir]],
+["NameIdentifier_Firestone"] = [[Firestone]],
+["NameIdentifier_FrostOil"] = [[Frost Oil]],
+["NameIdentifier_HallowedWand"] = [[Hallowed Wand]],
+["NameIdentifier_Idol"] = [[Idol]],
+["NameIdentifier_Juju"] = [[Juju]],
+["NameIdentifier_ManaOil"] = [[Mana Oil]],
+["NameIdentifier_Poison"] = [[Poison]],
+["NameIdentifier_Potion"] = [[Potion]],
+["NameIdentifier_Scroll"] = [[^Scroll of]],
+["NameIdentifier_ShadowOil"] = [[Shadow Oil]],
+["NameIdentifier_SharpeningStone"] = [[Sharpening Stone]],
+["NameIdentifier_Soulstone"] = [[Soulstone]],
+["NameIdentifier_Spellstone"] = [[Spellstone]],
+["NameIdentifier_TurtleWoWGlyph"] = [[Glyph]],  -- Used along with type('Key') to identify Turtle WoW glyphs.
+["NameIdentifier_Weightstone"] = [[Weightstone]],
+["NameIdentifier_WizardOil"] = [[Wizard Oil]],
+
+["NameIdentifier_Recipe_BottomHalf"] = [[Bottom Half]],
+["NameIdentifier_Recipe_TopHalf"] = [[Top Half]],
+
+["TooltipIdentifier_Buff_AlsoIncreases"] = [[also increases your]],
+["TooltipIdentifier_Buff_WellFed"] = [[well fed]],
+["TooltipIdentifier_Companion"] = [[Use: Right Click to summon and dismiss your]],
+["TooltipIdentifier_CompanionTurtleWoW"] = [[Use: Adds a companion to the player's companion collection]],
+["TooltipIdentifier_Drink"] = [[Must remain seated while drinking]],
+["TooltipIdentifier_Food"] = [[Must remain seated while eating]],
+["TooltipIdentifier_Locked"] = [[Locked]],
+["TooltipIdentifier_Mount"] = [[Use: Summons and dismisses a rideable]],
+["TooltipIdentifier_MountAQ40"] = [[Use: Emits a high frequency sound]],
+["TooltipIdentifier_MountTurtleWoW"] = [[Use: Adds a mount to the player's mount collection]],  -- Turtle has a completely different tooltip for mounts.
+["TooltipIdentifier_Openable"] = [[<Right Click to Open>]],
+["TooltipIdentifier_PotionHealth"] = [[/Restores %d+ to %d+ health\./]],  -- Wrap in slashes to activate pattern matching.
+["TooltipIdentifier_PotionMana"] = [[/Restores %d+ to %d+ mana\./]],  -- Wrap in slashes to activate pattern matching.
+["TooltipIdentifier_QuestItem"] = [[Quest Item]],
+["TooltipIdentifier_Recipe"] = [[Use: Teaches you how to]],  -- Needed because Turtle WoW has some of their custom recipes categorized as Consumables.
+["TooltipIdentifier_ToyTurtleWoW"] = [[Use: Add a toy to the player's toy collection]],
+
+-- Tooltip parsing -- extracting data from tooltips.
+["TooltipParse_Charges"] = [[^(%d+) Charges$]],  -- MUST contain the (%d) capture group.
+-- ItemInfo:IsUsable() Tooltip parsing
+["TooltipParse_AlreadyKnown"] = _G.ITEM_SPELL_KNOWN,
+
+
+-- Shared Category/Group Names.
+["ActiveQuest"] = "Active Quest",
+["Bandages"] = "Bandages",
+["BindOnEquip"] = "Bind on Equip",
+["Books"] = "Books",
+["Buffs"] = "Buffs",
+["Companions"] = "Companions",
+["Consumables"] = "Consumables",
+["Disguises"] = "Disguises",
+["Drink"] = "Drink",
+["Elixirs"] = "Elixirs",
+["Empty"] = "Empty",
+["EmptySlots"] = "Empty Slots",
+["Equipment"] = "Equipment",
+["EquippedGear"] = "Equipped Gear",
+["FirstAid"] = "First Aid",
+["Food"] = "Food",
+["FoodBuffs"] = "Food Buffs",
+["Gear"] = "Gear",
+["Glyphs"] = "Glyphs",
+["Gray"] = "Gray",  -- Used in "Gray Items"
+["Health"] = "Health",
+["Items"] = "Items",
+["Juju"] = "Juju",
+["Keys"] = "Keys",
+["Mana"] = "Mana",
+["Misc"] = "Misc",
+["Mounts"] = "Mounts",
+["MyGear"] = "My Gear",
+["Other"] = "Other",
+["Potions"] = "Potions",
+["PotionsSlashRunes"] = "Potions/Runes",
+["ProfessionBags"] = "Profession Bags",
+["ProfessionCrafts"] = "Profession Crafts",
+["ProfessionReagents"] = "Profession Reagents",
+["Reagents"] = "Reagents",
+["Recipes"] = "Recipes",
+["Runes"] = "Runes",
+["Scrolls"] = "Scrolls",
+["Teleports"] = "Teleports",
+["Tokens"] = "Tokens",
+["Tools"] = "Tools",
+["TradeTools"] = "Trade Tools",
+["Uncategorized"] = "Uncategorized",
+["WeaponBuffs"] = "Weapon Buffs",
+["Weapons"] = "Weapons",
+
+-- Category names that are different from group names.
+["Category_ProfessionBags"] = "Profession Bags (Trained)",
+["Category_ProfessionBagsAll"] = "Profession Bags (All)",
+["Category_ProfessionCrafts"] = "Profession Crafts (Learned Recipes)",
+["Category_ProfessionReagents"] = "Profession Reagents (Learned Recipes)",
+
+
+
+
+-- ### Sort Orders ###
+
+["SortOrder_Default_MinLevel"] = "Standard with Minimum Level",
+["SortOrder_Default_MinLevelNameRev"] = "Standard with Minimum Level - Reversed Item Names",
+["SortOrder_Default_NameRev"] = "Standard - Reversed Item Names",
+["SortOrder_Default"] = "Standard",
+["SortOrder_Manual"] = "Manual (Bag/Slot# Only)",
+
+
+
+
+-- ### Profiles ###
+["ManageProfile"] = "Manage Profiles",
+-- Profile types.
+["Profile_Design"] = "Design",
+["Profile_Structure"] = "Structure",
+["Profile_Abbrev_Design"] = "Dsgn",
+["Profile_Abbrev_Structure"] = "Struct",
+
+["Object_UsedInProfiles"] = "Used in Profiles:",
+["Object_UsedByCharacters"] = "Used by characters:",
+["Object_ProfileUses"] = "Profile uses:",
+
+
+-- ### Object List/Manager/Editor ###
+
+-- General.
+["ObjectList_ActionNotAllowed"] = "%s is not allowed for %s.",  -- "<Creation/Editing/Deletion> is not allowed for <objectNamePlural>"
+["ObjectList_ShowObjectUses"] = "Show %s Uses",
+["ObjectList_ShowProfileUses"] = "Show Profile Uses",
+["ObjectList_ImportSuccessful"] = "Imported %s '%s'.",  -- "Imported <objectType> '<objectName>'"
+["ObjectList_ImportReusingExisting"] = "Skipping import of %s '%s' since it's identical to '%s'.",  -- "Skipping import of <objectType> '<objectName>' since it's identical to '<existingObjectName'."
+
+-- Default column names.
+["ObjectManager_Column_Name"] = "!!Name!!",
+["ObjectManager_Column_InUse"] = "Used",
+["ObjectManager_Column_Realm"] = "Realm",
+["ObjectManager_Column_Sequence"] = "Seq.",
+["ObjectManager_Column_Source"] = "Source",
+["ObjectManager_Column_LastInventoryUpdate"] = "Inventory Updated",
+
+-- The third %s after the ? is used to insert additional text if the ObjectManager's deletePromptExtraInfo property is set.
+["ObjectManager_DeletePrompt"] = "Delete the following %s?%s%s!!Warning_NoUndo!!",  -- "Delete category '<category name>'?"
+["ObjectManager_DeleteForPrompt"] = "Delete %s for '%s'?%s!!Warning_NoUndo!!",  -- "Delete character data for '<character name>'?"
+
+["ObjectEditor_UnsavedPrompt"] = "Save changes to %s '%s' before closing?",   -- "Save changes to <objectType> '<objectName>' before closing?"
+["ObjectEditor_RequiredField"] = "%s is required",
+
+-- Object editor prompt when adding a new item to an item list.
+["ItemList_NewPrompt"] = "Identifier(s) of item(s) to add:" .. BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. "Can be IDs, ItemLinks/ItemStrings, or database URLs." .. BS_NEWLINE .. "Separate multiple by any combination of space, tab, comma, semicolon, or newline." .. FONT_COLOR_CODE_CLOSE,
+["ItemList_CopyPrompt"] = "Item IDs:",
+
+
+
+-- ### Managers and Windows ###
+
+-- Category Manager/Editor.
+["CategoryManager"] = "Bagshui Category Manager",  -- Window title.
+["CategoryEditor"] = "Edit Category",  -- Window title.
+["CategoryEditor_Field_name"] = "!!Name!!",
+["CategoryEditor_Field_nameSort"] = "Name (Sort By)",
+["CategoryEditor_Field_nameSort_TooltipText"] = "Override the Category Name used in Sort Orders without changing how its name is displayed.",
+["CategoryEditor_Field_sequence"] = "Sequence",
+["CategoryEditor_Field_sequence_TooltipText"] = "Control the order in which categories are evaluated." .. BS_NEWLINE .. "0 = first, 100 = last",
+["CategoryEditor_Field_class"] = "Class",
+["CategoryEditor_Field_rule"] = "Rule",
+["CategoryEditor_Field_rule_TooltipText"] = "One or more Bagshui rule functions, combined with and/or/not keywords, optionally grouped via parentheses. See documentation for help.",
+["CategoryEditor_Field_list"] = "Assigned Items",
+["CategoryEditor_Field_list_TooltipText"] = "List of items that are directly assigned to this category instead of using rule functions.",
+["CategoryEditor_ID_TooltipTitle"] = "Category ID",
+["CategoryEditor_ID_TooltipText"] = "Pass to the MatchCategory() rule function to check if an item matches this Category.",
+-- Button tooltips.
+["CategoryEditor_AddRuleFunction"] = "Add Rule Function",
+["CategoryEditor_RuleFunctionWiki"] = "Rules Help",
+["CategoryEditor_RuleValidation_Validate"] = "Validate rule",
+["CategoryEditor_RuleValidation_Valid"] = "Rule is valid",
+["CategoryEditor_RuleValidation_Invalid"] = "Rule validation error:",
+
+
+
+-- Character Data Manager.
+["CharacterDataManager"] = "Bagshui Character Data Manager",
+["CharacterDataManager_DeleteInfo"] = "This only removes inventory data; profiles will NOT be touched.",
+
+
+-- Sort Order Editor.
+["SortOrderManager"] = "Bagshui Sort Order Manager",  -- Window title.
+["SortOrderEditor"] = "Edit Sort Order",  -- Window title.
+["SortOrderEditor_Field_name"] = "!!Name!!",
+["SortOrderEditor_Field_fields"] = "Fields",
+-- Button tooltips.
+["SortOrderEditor_NormalWordOrder"] = "Normal Word Order",
+["SortOrderEditor_ReverseWordOrder"] = "Reverse Word Order",
+
+
+
+-- Profile Manager/Editor.
+["ProfileManager"] = "Bagshui Profile Manager",  -- Window title.
+["ProfileManager_ReplaceTooltipTitle"] = "Replace %s",  -- "Replace Design"
+["ProfileManager_ReplaceTooltipText"] = "Copy the %s configuration from the '%s' profile to '%s'." ,  -- "Copy the Design configuration from the 'Source' profile to 'Target'."
+["ProfileManager_ReplacePrompt"] = "Replace the %s configuration of the '%s' profile with that of '%s'?!!Warning_NoUndo!!",  -- "Replace the Design configuration of the 'Target' profile with that of 'Source'?"
+
+["ProfileEditor"] = "Edit Profile",  -- Window title.
+["ProfileEditor_Field_name"] = "!!Name!!",
+["ProfileEditor_FooterText"] = "Profiles are edited via the Settings menu and Edit Mode.",
+
+
+-- Share (Import/Export).
+["ShareManager"] = "Bagshui Import/Export",
+["ShareManager_ExportPrompt"] = "Press Ctrl+C to copy.",
+["ShareManager_ExportEncodeCheckbox"] = "Optimize for sharing",
+["ShareManager_ExportEncodeExplanation"] = "Please share the optimized (compressed/encoded) version, since it's pretty much guaranteed to survive any form of internet transmission. To review what is being shared, copy the un-optimized version into a text editor.",
+["ShareManager_ImportPrompt"] = "Paste the Bagshui data you want to import using Ctrl+V.",
+
+
+-- Catalog (Account-wide search).
+["CatalogManager"] = "Bagshui Catalog",
+["CatalogManager_SearchBoxPlaceholder"] = "Search Account-Wide Inventory",
+["CatalogManager_KnownCharacters"] = "Displaying inventory from:",
+
+
+-- Game Report
+["GameReport"] = "Bagshui Game Environment Report",
+["GameReport_Instructions"] = "Copy and paste the text below in the Environment section of your bug report.",
+
+
+-- ### Rule Function Templates ###
+-- See `Rules:AddRuleExamplesFromLocalization()` for details.
+
+-- Shared values for rule function !!placeholders!! that will be replaced when the localization is loaded.
+["RuleFunction_LuaStringPatternsSupported"] = BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. 'Use Lua string patterns by "/wrapping with slashes/".' .. FONT_COLOR_CODE_CLOSE,
+["RuleFunction_PT_CaseSensitiveParameters"] = BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. "Set names are case-sensitive." .. FONT_COLOR_CODE_CLOSE,
+
+-- DO NOT Localize rule function names (`ActiveQuest()`, `BindsOnEquip()`, etc. as they are NOT localized in the rule environment).
+
+["RuleFunction_ActiveQuest_Example1"] = 'ActiveQuest()',
+["RuleFunction_ActiveQuest_ExampleDescription1"] = "Check if the item is a quest objective in the current character's quest log.",
+
+["RuleFunction_Bag_GenericDescription"] = "Check if the item is in the specified bag number",
+["RuleFunction_Bag_ExampleDescription"] = "Check if the item is in the specified bag number (%d is container #%d in %s)",  -- "(0 is container #1 in Bags)"
+["RuleFunction_Bag_ExampleExtra1"] = 'Bag(num1, num2, numN)',
+["RuleFunction_Bag_ExampleDescriptionExtra1"] = "Check if the item is in any of the specified bag numbers.",
+
+["RuleFunction_BagType_GenericDescription"] = "Check if the item is in a bag of the specified type.",
+["RuleFunction_BagType_ExampleDescription"] = "Check if the item is in a bag of the type '%s'.",
+["RuleFunction_BagType_ExampleExtra1"] = 'BagType(ProfessionBag)',
+["RuleFunction_BagType_ExampleDescriptionExtra1"] = "Check if the item is in a bag that is specific to one of the current character's professions" .. GRAY_FONT_COLOR_CODE .. BS_NEWLINE .. "ProfessionBag is the special trigger for this functionality and must NOT be in quotes." .. FONT_COLOR_CODE_CLOSE,
+["RuleFunction_BagType_ExampleExtra2"] = 'BagType(AllProfessionBags)',
+["RuleFunction_BagType_ExampleDescriptionExtra2"] = "Check if the item is in a bag that belongs to any profession-specific container." .. GRAY_FONT_COLOR_CODE .. BS_NEWLINE .. "AllProfessionBags is the special trigger for this functionality and must NOT be in quotes." .. FONT_COLOR_CODE_CLOSE,
+["RuleFunction_BagType_ExampleExtra3"] = 'BagType("type1", "type2", "typeN")',
+["RuleFunction_BagType_ExampleDescriptionExtra3"] = 'Check if the item is in a bag of any of the specified types.',
+
+["RuleFunction_BindsOnEquip_Example1"] = 'BindsOnEquip()',
+["RuleFunction_BindsOnEquip_ExampleDescription1"] = string.format("Check if the item %s", string.lower(_G.ITEM_BIND_ON_EQUIP)),
+
+["RuleFunction_CharacterLevelRange_GenericDescription"] = "Check if the item is usable based on the current character's level.",
+["RuleFunction_CharacterLevelRange_Example1"] = 'CharacterLevelRange()',
+["RuleFunction_CharacterLevelRange_ExampleDescription1"] = "Check if the item is usable at exactly the current character's level.",
+["RuleFunction_CharacterLevelRange_Example2"] = 'CharacterLevelRange(levelsBelowOrAbove)',
+["RuleFunction_CharacterLevelRange_ExampleDescription2"] = "Check if the item is usable at <levelsBelowOrAbove> the current character's level.",
+["RuleFunction_CharacterLevelRange_Example3"] = 'CharacterLevelRange(levelsBelow, levelsAbove)',
+["RuleFunction_CharacterLevelRange_ExampleDescription3"] = "Check if the item is usable at <below> through <above> levels around the current character's level.",
+
+["RuleFunction_Count_GenericDescription"] = "Check if there are a specified number of items in the stack.",
+["RuleFunction_Count_Example1"] = 'Count(number)',
+["RuleFunction_Count_ExampleDescription1"] = "Check if there are at least <number> of the item in the stack.",
+["RuleFunction_Count_Example2"] = 'Count(min, max)',
+["RuleFunction_Count_ExampleDescription2"] = "Check if there are <min> to <max> of the item in the stack.",
+
+["RuleFunction_EmptySlot_Example1"] = 'EmptySlot()',
+["RuleFunction_EmptySlot_ExampleDescription1"] = "Check if there is NOT an item in the bag slot.",
+
+["RuleFunction_EquipLocation_GenericDescription"] = "Check if the item can be equipped in the specified slot.",
+["RuleFunction_EquipLocation_ExampleDescription"] = "Check if the item can be equipped in the %s slot.",
+["RuleFunction_EquipLocation_ExampleExtra1"] = 'EquipLocation()',
+["RuleFunction_EquipLocation_ExampleDescriptionExtra1"] = "Check if the item is equippable.",
+["RuleFunction_EquipLocation_ExampleExtra2"] = 'EquipLocation("Slot1", "Slot2", "SlotN")',
+["RuleFunction_EquipLocation_ExampleDescriptionExtra2"] = "Check if the item can be equipped in any of the specified slots.",
+
+["RuleFunction_Equipped_Example1"] = 'Equipped()',
+["RuleFunction_Equipped_ExampleDescription1"] = "Check if the item has been equipped (useful to match gear that is not soulbound)." .. GRAY_FONT_COLOR_CODE .. BS_NEWLINE .. "You can also pass the same parameters as EquipLocation() to only match a specific inventory slot." .. FONT_COLOR_CODE_CLOSE,
+
+["RuleFunction_Id_GenericDescription"] = 'Check if the item ID is an exact match.',
+["RuleFunction_Id_Example1"] = 'Id(number)',
+["RuleFunction_Id_ExampleDescription1"] = "Check if the item ID is an exact match.",
+["RuleFunction_Id_ExampleExtra1"] = 'Id(id1, id2, idN)',
+["RuleFunction_Id_ExampleDescriptionExtra1"] = "Check if the item ID matches any of the specified parameters.",
+
+["RuleFunction_ItemString_GenericDescription"] = "Check if the item string matches (use to match specific enchant or suffix IDs).",
+["RuleFunction_ItemString_Example1"] = 'ItemString(number)',
+["RuleFunction_ItemString_ExampleDescription1"] = RED_FONT_COLOR_CODE .. "Use Id(itemId) instead." .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE .. "Check if the item string begins with 'item:<itemId>:'",
+["RuleFunction_ItemString_Example2"] = 'ItemString("item:number")',
+["RuleFunction_ItemString_ExampleDescription2"] = RED_FONT_COLOR_CODE .. "Use Id(itemId) instead." .. FONT_COLOR_CODE_CLOSE .. BS_NEWLINE .. "Check if the item string begins with 'item:<itemId>:' (the item: prefix is optional).",
+["RuleFunction_ItemString_Example3"] = 'ItemString("item:number:number")',
+["RuleFunction_ItemString_ExampleDescription3"] = "Check if the item string begins with 'item:<itemId>:<enchantId>:' (the item: prefix is optional).",
+["RuleFunction_ItemString_Example4"] = 'ItemString("item:number:number:number")',
+["RuleFunction_ItemString_ExampleDescription4"] = "Check if the item string begins with 'item:<itemId>:<enchantId>:<suffixId>:' (the item: prefix is optional).",
+["RuleFunction_ItemString_ExampleExtra1"] = 'ItemString(param1, param2, paramN)',
+["RuleFunction_ItemString_ExampleDescriptionExtra1"] = 'Check if the item string matches any of the specified parameters.',
+
+["RuleFunction_Location_GenericDescription"] = "Check if the item is stored in a specific location (Bags, Bank, etc.)",
+["RuleFunction_Location_ExampleDescription"] = "Check if the item is in your %s",
+["RuleFunction_Location_ExampleExtra1"] = 'Location("loc1", "loc2", "locN")',
+["RuleFunction_Location_ExampleDescriptionExtra1"] = "Check if the item is stored in any of the specified locations.",
+
+["RuleFunction_LootMethod_GenericDescription"] = "Check the current loot method.",
+["RuleFunction_LootMethod_Note"] = "To view: /Bagshui !!Info!! Group",
+["RuleFunction_LootMethod_Example1"] = 'LootMethod("FreeForAll")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription1"] = "Check if loot method is Free For All (this is the default loot method).",
+["RuleFunction_LootMethod_Example2"] = 'LootMethod("RoundRobin")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription2"] = "Check if loot method is Round Robin.",
+["RuleFunction_LootMethod_Example3"] = 'LootMethod("Master")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription3"] = "Check if loot method is Master.",
+["RuleFunction_LootMethod_Example4"] = 'LootMethod("NeedBeforeGreed")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription4"] = "Check if loot method is Need Before Greed.",
+["RuleFunction_LootMethod_Example5"] = 'LootMethod("PersonalLoot")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_LootMethod_ExampleDescription5"] = "Check if loot method is Personal Loot.",
+["RuleFunction_LootMethod_Example6"] = 'LootMethod("method1", "method2", "methodN")',
+["RuleFunction_LootMethod_ExampleDescription6"] = "Check if current loot method is any of the provided values.",
+["RuleFunction_LootMethod_Example7"] = 'LootMaster()',
+["RuleFunction_LootMethod_ExampleDescription7"] = "Check if you are the loot master.",
+
+["RuleFunction_MatchCategory_GenericDescription"] = "Check if the item matches one or more other Categories.",
+["RuleFunction_MatchCategory_Note"] = "Parameters are Category IDs (NOT NAMES) which can be found the bottom of the Category Editor.",
+["RuleFunction_MatchCategory_Example1"] = 'MatchCategory("KeyAndKeyLike")',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription1"] = "Check if the item matches the built-in Keys Category." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "IDs for built-in Categories are strings that may not match their names." .. FONT_COLOR_CODE_CLOSE,
+["RuleFunction_MatchCategory_Example2"] = 'MatchCategory(5)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription2"] = "Check if the item matches custom Category 5." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Custom Categories have numeric IDs.",
+["RuleFunction_MatchCategory_Example3"] = 'not MatchCategory(5)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription3"] = "Check if the item does NOT match custom Category 5.",
+["RuleFunction_MatchCategory_Example4"] = 'MatchCategory(ID1, ID2, IDN)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_MatchCategory_ExampleDescription4"] = "Check if the item matches any of the specified Categories." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. 'Remember that built-in Categories use strings that must be "quoted" and custom Categories use numbers.',
+
+["RuleFunction_MinLevel_GenericDescription"] = "Check if the item is usable based on the specified level.",
+["RuleFunction_MinLevel_Example1"] = 'MinLevel(level)',
+["RuleFunction_MinLevel_ExampleDescription1"] = "Check if the item is usable at <level> or above.",
+["RuleFunction_MinLevel_Example2"] = 'MinLevel(min, max)',
+["RuleFunction_MinLevel_ExampleDescription2"] = "Check if the item is usable at <min> to <max> level.",
+
+["RuleFunction_Name_GenericDescription"] = "Check if the item name contains the specified string(s).!!RuleFunction_LuaStringPatternsSupported!!",
+["RuleFunction_Name_Example1"] = 'Name("string")',
+["RuleFunction_Name_ExampleDescription1"] = "Check if the item name contains the specified string.!!RuleFunction_LuaStringPatternsSupported!!",
+["RuleFunction_Name_ExampleExtra1"] = 'Name("string1", "string2", "stringN")',
+["RuleFunction_Name_ExampleDescriptionExtra1"] = "Check if the item name contains any of the specified strings.!!RuleFunction_LuaStringPatternsSupported!!",
+
+["RuleFunction_NameExact_GenericDescription"] = "Check if the item name exactly matches the specified string(s).",
+["RuleFunction_NameExact_Example1"] = 'NameExact("string")',
+["RuleFunction_NameExact_ExampleDescription1"] = "Check if the item name exactly matches the specified string.",
+["RuleFunction_NameExact_ExampleExtra1"] = 'NameExact("string1", "string2", "stringN")',
+["RuleFunction_NameExact_ExampleDescriptionExtra1"] = "Check if the item name exactly matches any of the specified strings.",
+
+["RuleFunction_Openable_GenericDescription"] = "Check if the item can be opened.",
+["RuleFunction_Openable_Example1"] = 'Openable()',
+["RuleFunction_Openable_ExampleDescription1"] = "Check if the item is openable.",
+["RuleFunction_Openable_Example2"] = 'Openable(Locked)',
+["RuleFunction_Openable_ExampleDescription2"] = "Check if the item is openable, but locked.",
+["RuleFunction_Openable_Example3"] = 'Openable(Unlocked)',
+["RuleFunction_Openable_ExampleDescription3"] = "Check if the item is openable and unlocked.",
+
+["RuleFunction_Outfit_GenericDescription"] = "Check if the item is part of an outfit in %s.",
+["RuleFunction_Outfit_Example1"] = 'Outfit()',
+["RuleFunction_Outfit_ExampleDescription1"] = "Check if the item is part of an outfit in %s.",
+["RuleFunction_Outfit_Example2"] = 'Outfit("Outfit Name")',
+["RuleFunction_Outfit_ExampleDescription2"] = "Check if the item is part of the specified outfit in %s.",
+["RuleFunction_Outfit_ExampleExtra1"] = 'Outfit("outfit1", "outfit2", "outfitN")',
+["RuleFunction_Outfit_ExampleDescriptionExtra1"] = "Check if the item is part of any of the specified outfits in %s.",
+
+["RuleFunction_PeriodicTable_GenericDescription"] = "Check if the item belongs to a PeriodicTable set.!!RuleFunction_PT_CaseSensitiveParameters!!",
+["RuleFunction_PeriodicTable_ExampleDescription"] = "Check if the item belongs to the '%s' PeriodicTable set.!!RuleFunction_PT_CaseSensitiveParameters!!",
+["RuleFunction_PeriodicTable_ExampleExtra1"] = 'PeriodicTable("set1", "set2", "setN")',
+["RuleFunction_PeriodicTable_ExampleDescriptionExtra1"] = "Check if the item belongs to any of the specified PeriodicTable sets.!!RuleFunction_PT_CaseSensitiveParameters!!",
+
+["RuleFunction_PlayerInGroup_GenericDescription"] = "Check if you are in a group.",
+["RuleFunction_PlayerInGroup_Note"] = "To view: /Bagshui !!Info!! Group",
+["RuleFunction_PlayerInGroup_Example1"] = 'PlayerInGroup()',
+["RuleFunction_PlayerInGroup_ExampleDescription1"] = "Check if you are in any group (party or raid).",
+["RuleFunction_PlayerInGroup_Example2"] = 'PlayerInGroup(Party)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription2"] = "Check if you are in a party group.",
+["RuleFunction_PlayerInGroup_Example3"] = 'PlayerInGroup(Raid)',  -- DO NOT LOCALIZE THE PARAMETER.
+["RuleFunction_PlayerInGroup_ExampleDescription3"] = "Check if you are in a raid group.",
+
+["RuleFunction_ProfessionCraft_GenericDescription"] = "Check if the item is crafted by the current character's professions (learned recipes only).",
+["RuleFunction_ProfessionCraft_Example1"] = 'ProfessionCraft()',
+["RuleFunction_ProfessionCraft_ExampleDescription1"] = "Check if the item is crafted by any of the current character's professions (learned recipes only).",
+["RuleFunction_ProfessionCraft_Example2"] = 'ProfessionCraft("Profession Name")',
+["RuleFunction_ProfessionCraft_ExampleDescription2"] = "Check if the item is crafted by the current character's specified profession (learned recipes only).",
+["RuleFunction_ProfessionCraft_ExampleExtra1"] = 'ProfessionCraft("Profession1", "Profession2", "ProfessionN")',
+["RuleFunction_ProfessionCraft_ExampleDescriptionExtra1"] = "Check if the item is crafted by any of the current character's specified professions (learned recipes only).",
+
+["RuleFunction_ProfessionReagent_GenericDescription"] = "Check if the item is a reagent for the current character's profession crafts (learned recipes only).",
+["RuleFunction_ProfessionReagent_Example1"] = 'ProfessionReagent()',
+["RuleFunction_ProfessionReagent_ExampleDescription1"] = "Check if the item is a reagent for any of the current character's profession crafts (learned recipes only).",
+["RuleFunction_ProfessionReagent_Example2"] = 'ProfessionReagent("Profession Name")',
+["RuleFunction_ProfessionReagent_ExampleDescription2"] = "Check if the item is a reagent for the current character's specified profession (learned recipes only).",
+["RuleFunction_ProfessionReagent_ExampleExtra1"] = 'ProfessionReagent("Profession1", "Profession2", "ProfessionN")',
+["RuleFunction_ProfessionReagent_ExampleDescriptionExtra1"] = "Check if the item is a reagent for any of the current character's specified professions (learned recipes only).",
+
+["RuleFunction_Quality_GenericDescription"] = "Check if the item is of the specified quality.",
+["RuleFunction_Quality_ExampleDescription"] = "Check if the item is %s quality.",
+["RuleFunction_Quality_ExampleExtra1"] = 'Quality(qual1, qual2, qualN)',
+["RuleFunction_Quality_ExampleDescriptionExtra1"] = "Check if the item is of any of the specified qualities.",
+
+["RuleFunction_RecentlyChanged_GenericDescription"] = "Check if the item's stock state has changed.",
+["RuleFunction_RecentlyChanged_Example1"] = 'RecentlyChanged()',
+["RuleFunction_RecentlyChanged_ExampleDescription1"] = 'Check if the stock state has changed in any way.',
+["RuleFunction_RecentlyChanged_Example2"] = 'RecentlyChanged(New)',
+["RuleFunction_RecentlyChanged_ExampleDescription2"] = 'Check if the item is considered new.',
+["RuleFunction_RecentlyChanged_Example3"] = 'RecentlyChanged(Up)',
+["RuleFunction_RecentlyChanged_ExampleDescription3"] = 'Check if the stock has increased.',
+["RuleFunction_RecentlyChanged_Example4"] = 'RecentlyChanged(Down)',
+["RuleFunction_RecentlyChanged_ExampleDescription4"] = 'Check if the stock has decreased.',
+["RuleFunction_RecentlyChanged_Example5"] = 'RecentlyChanged(New, Up)',
+["RuleFunction_RecentlyChanged_ExampleDescription5"] = 'Check if the item is new or stock has increased, but ignore stock decreases.',
+
+["RuleFunction_RequiresClass_GenericDescription"] = "Check if the item is usable by the specified class.",
+["RuleFunction_RequiresClass_ExampleDescription"] = "Check if the item is usable by the %s class.",
+["RuleFunction_RequiresClass_ExampleExtra1"] = 'RequiresClass("class1", "class2", "classN")',
+["RuleFunction_RequiresClass_ExampleDescriptionExtra1"] = "Check if the item is usable by the any of the specified classes.",
+
+["RuleFunction_Soulbound_Example1"] = 'Soulbound()',
+["RuleFunction_Soulbound_ExampleDescription1"] = "Check if the item is soulbound.",
+
+["RuleFunction_Stacks_Example1"] = 'Stacks()',
+["RuleFunction_Stacks_ExampleDescription1"] = "Check if the item can be stacked.",
+
+["RuleFunction_Subtype_GenericDescription"] = "Check the item is of the specified subtype",
+["RuleFunction_Subtype_ExampleDescription"] = "Check if the item's subtype is '%s'.",
+["RuleFunction_Subtype_ExampleExtra1"] = 'Subtype("type1", "type2", "typeN")',
+["RuleFunction_Subtype_ExampleDescriptionExtra1"] = "Check the item is of any of the the specified subtypes.",
+
+["RuleFunction_Subzone_GenericDescription"] = "Check the current subzone (locale-specific).",
+["RuleFunction_Subzone_Note"] = "To view: /Bagshui !!Info!! Location",
+["RuleFunction_Subzone_Example1"] = 'Subzone("Spirit Rise")',  -- DO localize the parameter.
+["RuleFunction_Subzone_ExampleDescription1"] = "Check if you are in Spirit Rise.",
+["RuleFunction_Subzone_Example2"] = 'Subzone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Subzone_ExampleDescription2"] = "Check if you are in any of the specified subzones.",
+
+["RuleFunction_Tooltip_GenericDescription"] = "Check if the tooltip contains the specified string(s).!!RuleFunction_LuaStringPatternsSupported!!",
+["RuleFunction_Tooltip_Example1"] = 'Tooltip("string")',
+["RuleFunction_Tooltip_ExampleDescription1"] = "Check if the item tooltip contains the specified string.!!RuleFunction_LuaStringPatternsSupported!!",
+["RuleFunction_Tooltip_ExampleExtra1"] = 'Tooltip("string1", "string2", "stringN")',
+["RuleFunction_Tooltip_ExampleDescriptionExtra1"] = "Check if the tooltip contains any of the specified strings.!!RuleFunction_LuaStringPatternsSupported!!",
+
+["RuleFunction_Transmog_GenericDescription"] = "Check if the item is in your transmog collection or is eligible to be transmogged.",
+["RuleFunction_Transmog_Example1"] = 'Transmog()',
+["RuleFunction_Transmog_ExampleDescription1"] = 'Check if the item is in your transmog collection.',
+["RuleFunction_Transmog_Example2"] = 'Transmog(Eligible)',
+["RuleFunction_Transmog_ExampleDescription2"] = 'Check if the item eligible to be transmogged.',
+["RuleFunction_Transmog_Example3"] = 'Transmog(Eligible) and not Transmog()',
+["RuleFunction_Transmog_ExampleDescription3"] = 'Check if the item is transmoggable but has not yet been added to your collection.',
+
+["RuleFunction_Type_GenericDescription"] = "Check if the item is of the specified type.",
+["RuleFunction_Type_ExampleDescription"] = "Check if the item's type is '%s'.",
+["RuleFunction_Type_ExampleExtra1"] = 'Type("type1", "type2", "typeN")',
+["RuleFunction_Type_ExampleDescriptionExtra1"] = "Check the item is of any of the the specified types.",
+
+["RuleFunction_Usable_Example1"] = 'Usable()',
+["RuleFunction_Usable_ExampleDescription1"] = "Check if the item is usable by the current character based on level, skills, and professions.",
+
+["RuleFunction_Wishlist_Example1"] = 'Wishlist()',
+["RuleFunction_Wishlist_ExampleDescription1"] = "Check if the item is on the %s wishlist.",
+
+["RuleFunction_Zone_GenericDescription"] = "Check the current zone (locale-specific).",
+["RuleFunction_Zone_Note"] = "To view: /Bagshui !!Info!! Location",
+["RuleFunction_Zone_Example1"] = 'Zone("Thunder Bluff")',  -- DO localize the parameter.
+["RuleFunction_Zone_ExampleDescription1"] = "Check if you are in Thunder Bluff.",
+["RuleFunction_Zone_Example2"] = 'Zone("zone1", "zone2", "zoneN")',  -- DO localize the parameters.
+["RuleFunction_Zone_ExampleDescription2"] = "Check if you are in any of the specified zones.",
+
+-- ### Tips/Help ###
+["BagshuiTooltipIntro"] = "Show Bagshui Info Tooltip",
+
+
+-- ### Errors/Warnings ###
+
+["Error"] = "Error",
+["Error_AddonDependency_Generic"] = "An additional addon is required to enable this rule function (refer to the Rules page on the Bagshui wiki).",
+["Error_AddonDependency_Generic_FunctionName"] = "An additional addon is required to enable the use of %s (refer to the Rules page on the Bagshui wiki).",
+["Error_AddonDependency"] = "%s is not installed or enabled.",
+["Error_BagSwap_EmptyOldFailed"] = "Failed to empty the old bag.",
+["Error_BagSwap_EmptyOldInsufficientSpace"] = "Not enough free slots to empty the old bag.",
+["Error_BagSwap_EquipNewFailed"] = "Failed to equip the new bag.",
+["Error_CategoryEvaluation"] = "%s: %s",  -- "<Category Name>: <Error Message>"
+["Error_DuplicateName"] = "There is already a %s named %s.",  -- "There is already a <Object Type> named <Name>."
+["Error_GroupNotFound"] = "Group ID %s not found.",
+["Error_HearthstoneNotFound"] = "Hearthstone not found.",
+["Error_ImportInvalidFormat"] = "Import failed: Data was in an unexpected format.`",
+["Error_ImportVersionTooNew"] = "Import failed: Please upgrade to the latest version of Bagshui.",
+["Error_ItemCategoryUnknown"] = "!Unknown! (This shouldn't happen).",  -- Placed in the tooltip if the item doesn't have a category.
+["Error_ItemNotFound"] = "Item %s not found.",
+["Error_RestackFailed"] = "Failed to restack %s",
+["Error_SaveFailed"] = "%s could not be saved: %s",
+["Error_Suffix_Retrying"] = "%s; retrying…",  -- Appended to the end of an error message when an action has failed but is being attempted again.
+
+["Info_NoDelete"] = BS_NEWLINE .. GRAY_FONT_COLOR_CODE .. "Does NOT delete the category." .. FONT_COLOR_CODE_CLOSE,
+
+["Warning_NoUndo"] = BS_NEWLINE .. RED_FONT_COLOR_CODE .. "This cannot be undone!" .. FONT_COLOR_CODE_CLOSE,
+["Warning_RuleFunctionOverwrite"] = "Overwriting existing rule environment function %s()",
+["Warning_BuiltinRuleFunctionCollision"] = "3rd party rule function/alias %s() was not loaded because it is the name/alias of a built-in Bagshui rule function",
+
+["Compat_ReloadUIPrompt"] = "A UI reload is required.",
+["Compat_pfUIBags"] = "Disabling the pfUI Bags module is strongly recommended to avoid multiple Bank windows.",
+["Compat_pfUIBagsInfo"] = "If you change your mind, the pfUI Bags module can be managed in pfUI Config > Components > Modules.",
+["Compat_Swapper"] = "Swapper interferes with Bagshui's bag swapping functionality and must be disabled.",
+["Compat_SwapperInfo"] = "Swapper has been disabled.",
+["Compat_tDFAllInOneBags"] = "Disabling the tDF All-In-One-Bag module is recommended if you want to use Bagshui as your default bags.",
+["Compat_tDFAllInOneBagsInfo"] = "If you change your mind, the tDF All-In-One-Bag module can be managed in tDF Options.",
+
+-- Rule function errors.
+["Error_RuleFunctionInvalid"] = '«%s» is not a valid rule function -- if intended as a parameter, be sure to quote it like Function("parameter")',
+["Error_RuleVariablePropertyInvalid"] = "«%s» is not a valid %s property",
+["Error_RuleExecution"] = "Error from rule function %s: %s",
+["Error_RuleNoArguments"] = "At least one parameter is required but none were provided",
+["Error_RuleNilArgument"] = "Invalid parameter %s: nil is not allowed",
+["Error_RuleInvalidArgument"] = "Invalid parameter %s: «%s» is a %s, was expecting %s",
+["Error_RuleInvalidArgumentType"] = "%s is not a valid parameter type; allowed parameter types are: %s",
+["Error_RuleTooManyArguments"] = "Rule functions are limited to 50 parameters. To use more parameters, add a second call to %s separated by 'or', like this: or %s(param1, param2, etc)",
+
+["Error_Rule_ItemLevelStat"] = "Vanilla WoW doesn't have item levels (ilvl) so ItemLevelStat() is not available.",
+["Error_Rule_ItemStat"] = "ItemStat() and ItemStatActive() are not currently supported. Try using Tooltip() to check for stats instead.",
+
+["Error_Rule_MatchCategory_Loop"] = "MatchCategory() loop detected:",
+["Error_Rule_MatchCategory_DownstreamError"] = "MatchCategory() unable to proceed due to error in referenced category %s.",
+
+-- ### Logging ###
+
+["LogWindowTitle"] = "Bagshui Log",
+["ClearLog"] = "Clear Log",
+-- Log types.
+["Log_Info"] = "Info",
+["Log_Warn"] = "Warn",
+["Log_Error"] = "Error",
+
+-- Settings reset messages.
+["SettingReset_LogStart"] = "%s reset",
+["SettingReset_InvalidValue"] = "invalid value",
+["SettingReset_Outdated"] = "outdated",
+
+["SettingReset_WindowPositionAuto"] = "Window position reset because it was offscreen.",
+["SettingReset_WindowPositionManual"] = "Window position reset.",
+
+
+
+
+-- ### Help/Misc ###
+
+["BagshuiDataReset"] = "Configuration was reset due to version change (previous: %s / new: %s).",
+["HowToUrl"] = "WoW can't open a URL directly, so copy this URL (Ctrl+C) and navigate in your web browser.",
+
+
+-- ### Settings: Tooltips, Scopes, Special ###
+
+-- Automatically generated settings.
+["Setting_HookBagTooltipTitle"] = "Hook %s",
+["Setting_HookBagTooltipText"] = "Take over the key binding for Toggle %s.",
+-- Special settings stuff.
+["SettingScope_Account"] = "Applies to all characters on this account.",
+["SettingScope_Character"] = "Applies to all of this character's inventory windows.",
+["Setting_DisabledBy_HideGroupLabels"] = "× Disabled because the active Structure has Hide Group Labels enabled.",
+["Setting_EnabledBy_ColorblindMode"] = "√ Enabled because Colorblind Mode is on.",
+["Setting_Profile_SetAllHint"] = "Shift+Click to use for all profile types.",
+["Setting_Reset_TooltipText"] = "Reset to default: Ctrl+Alt+Shift+Click.",
+["Setting_Profile_Use"] = "Make this the active %s %s profile.",  -- Make this the active Bags Design profile.
+
+["Setting_BagUsageDisplay_Always"] = "Always",
+["Setting_BagUsageDisplay_Always_TooltipTitle"] = "Summary Always Visible",
+["Setting_BagUsageDisplay_Always_TooltipText"] = "Show utilization summary regardless of any other setting.",
+["Setting_BagUsageDisplay_Smart"] = "Automatic",
+["Setting_BagUsageDisplay_Smart_TooltipTitle"] = "Automatic Summary Visibility",
+["Setting_BagUsageDisplay_Smart_TooltipText"] = "Show utilization summary when empty slot stacking is off (or hovering over bag slots).",
+["Setting_BagUsageDisplay_Never"] = "Never",
+["Setting_BagUsageDisplay_Never_TooltipTitle"] = "Summary Never Visible",
+["Setting_BagUsageDisplay_Never_TooltipText"] = "Utilization summary will never be displayed (except when hovering over bag slots).",
+
+["Setting_BagUsageFormat_Empty"] = "Empty",
+["Setting_BagUsageFormat_Empty_Total"] = "Empty/Total",
+["Setting_BagUsageFormat_Empty_Used_Total"] = "Empty (Used/Total)",
+["Setting_BagUsageFormat_Used"] = "Used",
+["Setting_BagUsageFormat_Used_Total"] = "Used/Total",
+["Setting_BagUsageFormat_Used_Empty_Total"] = "Used (Empty/Total)",
+
+-- ### Settings ###
+-- Keys are settingName, settingName_TooltipTitle, or settingName_TooltipText.
+-- See localization notes in the declaration of `Settings:InitSettingsInfo()` for more information.
+
+["aboutBagshui_TooltipTitle"] = "About Bagshui",
+
+["bagUsageAlwaysShow"] = "Always Show",
+["bagUsageAlwaysShow_TooltipTitle"] = "Per-Bag Usage Always Visible",
+["bagUsageAlwaysShow_TooltipText"] = "Always display utilization over each bag (only applies if bag slots are visible).",
+
+["bagUsageDisplay"] = "Show",
+["bagUsageDisplay_TooltipText"] = "Control when the inventory consumption display is visible.",
+
+["bagUsageFormat"] = "Utilization Summary Format",
+["bagUsageFormat_TooltipText"] = "Control which numbers are shown in the inventory consumption display.",
+
+["colorblindMode"] = "Colorblind Mode",
+["colorblindMode_TooltipText"] = "Always show item quality and unusable badges regardless of Design settings.",
+
+["createNewProfileDesign"] = "Copy",
+["createNewProfileDesign_TooltipTitle"] = "Create Design Profile Copy",
+["createNewProfileDesign_TooltipText"] = "Duplicate the default profile for new characters.",
+
+["createNewProfileStructure"] = "Copy",
+["createNewProfileStructure_TooltipTitle"] = "Create Structure Profile Copy",
+["createNewProfileStructure_TooltipText"] = "Duplicate the default profile for new characters.",
+
+["defaultSortOrder"] = "Sort Order",
+["defaultSortOrder_TooltipTitle"] = "Default Sort Order",
+["defaultSortOrder_TooltipText"] = "How groups will be sorted when they don't have a specific sort order assigned.",
+
+["defaultProfileDesign"] = "Design",
+["defaultProfileDesign_TooltipTitle"] = "Default Design Profile",
+["defaultProfileDesign_TooltipText"] = "Profile to use for new characters.",
+
+["defaultProfileStructure"] = "Structure",
+["defaultProfileStructure_TooltipTitle"] = "Default Structure Profile",
+["defaultProfileStructure_TooltipText"] = "Profile to use for new characters.",
+
+["disableAutomaticResort"] = "Manual Organization",
+["disableAutomaticResort_TooltipText"] = "Don't categorize and sort items when the inventory window is closed and reopened." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "This is NOT the same as setting the default sort order to Manual." .. FONT_COLOR_CODE_CLOSE,
+
+["windowDoubleClickActions"] = "Double-Click",
+["windowDoubleClickActions_TooltipText"] = "Double-click a blank part of the inventory window to show/hide all toolbars." .. BS_NEWLINE .. "Alt+double-click to toggle position lock.",
+
+["emptySlotBackgroundImage"] = "Image",
+["emptySlotBackgroundImage_TooltipTitle"] = "Empty Slot Background Image",
+["emptySlotBackgroundImage_TooltipText"] = "Disable to use a solid background for empty item slots.",
+
+["emptySlotBackgroundColor"] = "Color",
+["emptySlotBackgroundColor_TooltipTitle"] = "Empty Slot Background Color",
+["emptySlotBackgroundColor_TooltipText"] = "Color to display in the background of empty slots.",
+
+["globalInfoTooltips"] = "Everywhere",
+["globalInfoTooltips_TooltipTitle"] = "Hook All Item Tooltips ",
+["globalInfoTooltips_TooltipText"] = "Show the Bagshui Info Tooltip when Alt is held while any item tooltip is displayed (i.e. Character window, chat links, etc.).",
+
+["groupBackgroundDefault"] = "Background",
+["groupBackgroundDefault_TooltipTitle"] = "Default Group Background Color",
+["groupBackgroundDefault_TooltipText"] = "Background color to use when a group-specific color has not been set.",
+
+["groupBorderDefault"] = "Border",
+["groupBorderDefault_TooltipTitle"] = "Default Group Border Color",
+["groupBorderDefault_TooltipText"] = "Border color to use when a group-specific color has not been set.",
+
+["groupLabelDefault"] = "Labels",
+["groupLabelDefault_TooltipTitle"] = "Default Group Label Color",
+["groupLabelDefault_TooltipText"] = "Label color to use when a group-specific color has not been set.",
+
+["groupMargin"] = "Margin",
+["groupMargin_TooltipTitle"] = "Group Margin",
+["groupMargin_TooltipText"] = "Space between groups.",
+
+["groupPadding"] = "Padding",
+["groupPadding_TooltipTitle"] = "Group Padding",
+["groupPadding_TooltipText"] = "Space between group border and items within.",
+
+["groupUseSkinColors"] = "Use %s Colors",
+["groupUseSkinColors_TooltipTitle"] = "%s Colors for Groups",
+["groupUseSkinColors_TooltipText"] = "Use colors from %s instead of Bagshui's settings.",
+
+["hideGroupLabelsOverride"] = "Hide Group Labels",
+["hideGroupLabelsOverride_TooltipText"] = "Suppress the display of group labels, even if the Design Group Labels setting is enabled.",
+
+["itemMargin"] = "Margin",
+["itemMargin_TooltipTitle"] = "Item Margin",
+["itemMargin_TooltipText"] = "Space between items.",
+
+["itemActiveQuestBadges"] = "Active Quest",
+["itemActiveQuestBadges_TooltipTitle"] = "Item Slot Active Quest Badges",
+["itemActiveQuestBadges_TooltipText"] = "Show a ? in the top when the item is an objective of an active quest.",
+
+["itemQualityBadges"] = "!!Quality!!",
+["itemQualityBadges_TooltipTitle"] = "Item Quality Badges",
+["itemQualityBadges_TooltipText"] = "Show icons in the bottom left for item rarity levels.",
+
+["itemUsableBadges"] = "Unusable",
+["itemUsableBadges_TooltipTitle"] = "Item Unusable Badges",
+["itemUsableBadges_TooltipText"] = "Show icons in the top left for unusable/learned items.",
+
+["itemUsableColors"] = "Unusable",
+["itemUsableColors_TooltipTitle"] = "Item Unusable Tinting",
+["itemUsableColors_TooltipText"] = "Apply red/green overlay for unusable/learned items.",
+
+["itemSize"] = "Size",
+["itemSize_TooltipTitle"] = "Item Size",
+["itemSize_TooltipText"] = "Height and width of items.",
+
+["itemStockBadges"] = "Stock",
+["itemStockBadges_TooltipTitle"] = "Item Stock Badges",
+["itemStockBadges_TooltipText"] = "Indicate when items are new or quantities increase/decrease.",
+
+["itemStockChangeClearOnInteract"] = "Clear on Click",
+["itemStockChangeClearOnInteract_TooltipTitle"] = "Clear Item Stock Badge On Click",
+["itemStockChangeClearOnInteract_TooltipText"] = "Immediately reset the item stock change state (new/increased/decreased) upon interaction.",
+
+["itemStockChangeExpiration"] = "Expiration",
+["itemStockChangeExpiration_TooltipTitle"] = "Item Stock Badge Change Expiration",
+["itemStockChangeExpiration_TooltipText"] = "After this time has elapsed, an item will no longer be considered changed (new/increased/decreased).",
+
+["itemStockBadgeFadeDuration"] = "Fade",
+["itemStockBadgeFadeDuration_TooltipTitle"] = "Item Stock Badge Fade Duration",
+["itemStockBadgeFadeDuration_TooltipText"] = "Stock change badges (new/increased/decreased) will begin fading this amount of time prior to the Expiration setting.",
+
+["profileDesign"] = "Profile",
+["profileDesign_TooltipTitle"] = "Design Profile",
+["profileDesign_TooltipText"] = "Profile to use for Design (how the inventory looks).",
+
+["profileStructure"] = "Profile",
+["profileStructure_TooltipTitle"] = "Structure Profile",
+["profileStructure_TooltipText"] = "Profile to use for Structure (how the inventory is organized).",
+
+["replaceBank"] = "Replace Bank",
+["replaceBank_TooltipText"] = "Use the Bagshui Bank instead of the Blizzard Bank.",
+
+["resetStockState"] = "Mark Items Unchanged",
+["resetStockState_TooltipText"] = "Set all items in this inventory as no longer new, increased, or decreased.",
+
+["sellProtectionActiveQuest"] = "!!ItemPropFriendly_activeQuest!!",
+["sellProtectionActiveQuest_TooltipTitle"] = "Protect !!ItemPropFriendly_activeQuest!! Items",
+["sellProtectionActiveQuest_TooltipText"] = "Require confirmation before selling.",
+
+["sellProtectionEnabled"] = "Enabled",
+["sellProtectionEnabled_TooltipTitle"] = "Selling Protection",
+["sellProtectionEnabled_TooltipText"] = "Require confirmation before selling certain items.",
+
+["sellProtectionEquipped"] = "!!EquippedGear!!",
+["sellProtectionEquipped_TooltipTitle"] = "Protect All !!EquippedGear!!",
+["sellProtectionEquipped_TooltipText"] = "Require confirmation before selling.",
+
+["sellProtectionQualityThreshold"] = "!!ItemPropFriendly_quality!! Threshold",
+["sellProtectionQualityThreshold_TooltipText"] = "Require confirmation before selling.",
+["sellProtectionQualityThreshold_Choice_TooltipTitle"] = "Protect %s Items",  -- %s = Quality (ex. Rare, Epic).
+["sellProtectionQualityThreshold_Choice_TooltipText"] = "Require confirmation before selling %s items or higher.",  -- %s = Quality (ex. Rare, Epic).
+
+["sellProtectionSoulbound"] = "!!ItemPropFriendly_soulbound!!",
+["sellProtectionSoulbound_TooltipTitle"] = "Protect !!ItemPropFriendly_soulbound!! Items",
+["sellProtectionSoulbound_TooltipText"] = "Require confirmation before selling.",
+
+["showBagBar"] = "Bag Slots",
+["showBagBar_TooltipText"] = "Show bag bar in the bottom left.",
+
+["showClam"] = "Clam",
+["showClam_TooltipTitle"] = "Clam (Open Container) Button",
+["showClam_TooltipText"] = "Show the Clam button to enable rapid container opening." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["showDisenchant"] = "Disenchant",
+["showDisenchant_TooltipTitle"] = "Disenchant Button",
+["showDisenchant_TooltipText"] = "Show the Disenchant button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to characters who have Enchanting and Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["showFooter"] = "Bottom Toolbar",
+["showFooter_TooltipTitle"] = "Bottom Toolbar",
+["showFooter_TooltipText"] = "Show the bottom toolbar." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Hiding this will conceal everything below the items, including the Bag Bar and money display." .. FONT_COLOR_CODE_CLOSE,
+
+["showGroupLabels"] = "Labels",
+["showGroupLabels_TooltipTitle"] = "Group Labels",
+["showGroupLabels_TooltipText"] = "Show labels above groups.",
+
+["showHeader"] = "Top Toolbar",
+["showHeader_TooltipTitle"] = "Top Toolbar",
+["showHeader_TooltipText"] = "Show the top toolbar." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Hiding this will conceal everything above the items, including the Close button, so you'll need to close via key bindings, action bar buttons, or macros." .. FONT_COLOR_CODE_CLOSE,
+
+["showHearthstone"] = "Hearthstone",
+["showHearthstone_TooltipTitle"] = "Hearthstone Button",
+["showHearthstone_TooltipText"] = "Show the Hearthstone button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["showInfoTooltipsWithoutAlt"] = "Show Without Alt",
+["showInfoTooltipsWithoutAlt_TooltipText"] = "Always display the Bagshui Info Tooltip (hold Shift to hide it temporarily).",
+
+["showLogWindow_TooltipText"] = "Open the Bagshui log window.",
+
+["showMoney"] = "Money",
+["showMoney_TooltipText"] = "Show money in the bottom right.",
+
+["showPickLock"] = "Pick Lock",
+["showPickLock_TooltipTitle"] = "Pick Lock Button",
+["showPickLock_TooltipText"] = "Show the Pick Lock button." .. BS_NEWLINE .. LIGHTYELLOW_FONT_COLOR_CODE .. "Applies to Rogues and Bags only." .. FONT_COLOR_CODE_CLOSE,
+
+["stackEmptySlots"] = "Stack Empty",
+["stackEmptySlots_TooltipTitle"] = "Stack Empty Slots",
+["stackEmptySlots_TooltipText"] = "Combine empty slots into single stacks that can be expanded on click (profession bags will stack separately).",
+
+["toolbarButtonColor"] = "Icons",
+["toolbarButtonColor_TooltipTitle"] = "Toolbar Icon Color",
+["toolbarButtonColor_TooltipText"] = "Color to use for this inventory's toolbar icons.",
+
+["toggleBagsWithAuctionHouse"] = "Auction House",
+["toggleBagsWithAuctionHouse_TooltipTitle"] = "Toggle Bags with Auction House",
+["toggleBagsWithAuctionHouse_TooltipText"] = "Open and close Bags when you visit the Auction House.",
+
+["toggleBagsWithBankFrame"] = "Bank",
+["toggleBagsWithBankFrame_TooltipTitle"] = "Toggle Bags with Bank",
+["toggleBagsWithBankFrame_TooltipText"] = "Open and close Bags when you visit the Bank.",
+
+["toggleBagsWithMailFrame"] = "Mail",
+["toggleBagsWithMailFrame_TooltipTitle"] = "Toggle Bags with Mail",
+["toggleBagsWithMailFrame_TooltipText"] = "Open and close Bags when you use a mailbox.",
+
+["toggleBagsWithTradeFrame"] = "Trade",
+["toggleBagsWithTradeFrame_TooltipTitle"] = "Toggle Bags with Trade",
+["toggleBagsWithTradeFrame_TooltipText"] = "Open and close Bags when trading with another player.",
+
+["windowAnchorXPoint"] = "Horizontal",
+["windowAnchorXPoint_TooltipTitle"] = "Horizontal Anchor",
+["windowAnchorXPoint_TooltipText"] = "Window will grow horizontally from this edge of the screen.",
+
+["windowAnchorYPoint"] = "Vertical",
+["windowAnchorYPoint_TooltipTitle"] = "Vertical Anchor",
+["windowAnchorYPoint_TooltipText"] = "Window will grow vertically from this edge of the screen.",
+
+["windowBackground"] = "Background",
+["windowBackground_TooltipTitle"] = "Window Background Color",
+["windowBackground_TooltipText"] = "Color to use for this inventory window's background.",
+
+["windowBorder"] = "Border",
+["windowBorder_TooltipTitle"] = "Window Border Color",
+["windowBorder_TooltipText"] = "Color to use for this inventory window's border.",
+
+["windowLocked"] = "Lock Position",
+["windowLocked_TooltipText"] = "Don't allow this window to be moved.",
+
+["windowMaxColumns"] = "Maximum Columns",
+["windowMaxColumns_TooltipText"] = "Window width limit in number of items per row.",
+
+["windowScale"] = "Scale",
+["windowScale_TooltipTitle"] = "Window Scale",
+["windowScale_TooltipText"] = "Relative size of entire window.",
+
+["windowStrata"] = "Strata",
+["windowStrata_TooltipTitle"] = "Window Strata",
+["windowStrata_TooltipText"] = "Control how Bagshui windows overlap with other frames (z-index).",
+["windowStrata_Choice_LOW"] = "Low",
+["windowStrata_Choice_MEDIUM"] = "Medium",
+["windowStrata_Choice_HIGH"] = "High",
+["windowStrata_Choice_DIALOG"] = "Very High",
+
+["windowUseSkinColors"] = "Use %s Colors",
+["windowUseSkinColors_TooltipTitle"] = "%s Colors for Window",
+["windowUseSkinColors_TooltipText"] = "Use colors from %s instead of Bagshui's settings.",
+
+
+})
+
+
+end)

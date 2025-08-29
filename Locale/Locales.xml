@@ -2,5 +2,6 @@
 
 	<Include file="enUS.lua" />
 	<Include file="zhCN.lua" />
+	<Include file="deDE.lua" />
 
 </Ui>
