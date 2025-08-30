@@ -11,8 +11,6 @@
 </picture><br>
 <a href="https://github.com/veechs/Bagshui/wiki/Screenshots">More Screenshots</a></h4>
 
-<a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
-
 
 ## Features
 
@@ -168,11 +166,6 @@ If Bagshui has not been localized for your client, many items will not be correc
 * Chinese (zhCN)
 
 [^1]: In Vanilla, a *lot* of item identification must be done either by parsing tooltips or hardcoding item IDs. Bagshui leans toward the former, and therefore is highly dependent on localization.
-
-
-## Donations
-Developing Bagshui is fun, but also a lot of work! Your support is hugely appreciated.  
-<a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
 
 
 ## Credits
