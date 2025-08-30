@@ -67,6 +67,7 @@ function Inventory:Update(cascade)
 	self:UpdateWindow()
 	self:UpdateBagBar()
 	self:UpdateToolbar()
+	self:SetWindowSize()
 
 	-- Reset status.
 	self.windowUpdateBlocked = false
@@ -451,6 +452,38 @@ function Inventory:SortGroups()
 end
 
 
+
+
+--- Correctly size the inventory window based on inventory contents and header/footer contents.
+--- - `desiredWindowWidth/Height` is calculated in `Inventory:UpdateWindow()`.
+--- - Toolbar widths are calculated in `Inventory:UpdateToolbarItemAnchorsAndCalculateWidth()`.
+function Inventory:SetWindowSize()
+
+	local headerWidth =
+		self.settings.showHeader
+		and (
+			(self.topLeftToolbarWidth or 0)
+			+ (self.topRightToolbarWidth or 0)
+			+ BsSkin.inventoryWindowPadding * 2
+			+ 30
+		)
+		or 0
+
+	local footerWidth =
+		self.settings.showFooter
+		and (
+			(self.ui.frames.bagBar:IsShown() and (self.ui.frames.bagBar:GetWidth() * self.ui.frames.bagBar:GetScale()) or 0)
+			+ (self.bottomRightToolbarWidth or 0)
+			+ BsSkin.inventoryWindowPadding * 2
+		)
+		or 0
+
+	self.uiFrame:SetWidth(math.max(self.desiredWindowWidth, self.settings.windowMinWidth or 0, headerWidth, footerWidth))
+	self.uiFrame:SetHeight(self.desiredWindowHeight or 250)
+end
+
+
+
 --- Actually do the work of updating the UI.  
 --- **Should not be called directly!** Use `Inventory:Update()` or `Inventory:ForceWindowUpdate()` to coordinate the process.
 ---
@@ -468,18 +501,6 @@ function Inventory:UpdateWindow()
 		Bagshui.currentCharacterData[self.inventoryTypeSavedVars].neverOnline = nil
 	end
 
-	-- Can only highlight changes if there's something to highlight.
-	self.highlightChangesEnabled = (
-		self.hasChanges
-		or (self.dockedInventory and self.dockedInventory.hasChanges)
-		or (self.dockedToInventory and self.dockedToInventory.hasChanges)
-	) or false
-
-	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
-	if not self.highlightChangesEnabled then
-		self.highlightChanges = false
-	end
-
 
 	-- There are a few things that always need to happen even if we're not
 	-- doing a full layout update.
@@ -487,14 +508,14 @@ function Inventory:UpdateWindow()
 	self.windowColor = self.settings.windowBackground
 	self.borderColor = self.settings.windowBorder
 
-	if self.settings.windowUseSkinColors and BsSkin.skinBackgroundColor then
-		self.windowColor = BsSkin.skinBackgroundColor
+	if self.settings.windowUseSkinColors and BsSkin.inventoryBackgroundColorFromSkin then
+		self.windowColor = BsSkin.inventoryBackgroundColorFromSkin
 	end
 
 	if not self.online then
 		self.borderColor = BS_COLOR.RED
-	elseif self.settings.windowUseSkinColors and BsSkin.skinBorderColor then
-		self.borderColor = BsSkin.skinBorderColor
+	elseif self.settings.windowUseSkinColors and BsSkin.inventoryBorderColorFromSkin then
+		self.borderColor = BsSkin.inventoryBorderColorFromSkin
 	end
 
 	self.uiFrame:SetBackdropColor(
@@ -543,7 +564,7 @@ function Inventory:UpdateWindow()
 		local groupPadding = self.settings.groupPadding + (BsSkin.groupPaddingFudge or 0) + ((BsSkin.itemSlotMarginFudge / 2) * itemSlotScale)
 
 		local maxColumns = self.settings.windowMaxColumns
-		local anchorLeft = self.settings.windowContentAlignment == "LEFT"
+		local anchorLeft = self.settings.windowContentAnchorXPoint == "LEFT"
 		local showGroupLabels = (self.settings.showGroupLabels and not self.settings.hideGroupLabelsOverride) or self.editMode
 
 		local firstFrame, widestRowLastFrame, topmostFrame
@@ -791,7 +812,6 @@ function Inventory:UpdateWindow()
 			else
 				-- There are groups to display, so let's continue.
 				-- Calculate the actual group widths, which we need to know when we make the group frame visible.
-				local totalActualGroupWidths = 0  -- Will be used to determine how wide the window needs to be.
 				for columnNum = rowGroupStart, rowGroupEnd, rowGroupStep do
 					local group = self.layout[rowNum][columnNum]
 
@@ -805,7 +825,6 @@ function Inventory:UpdateWindow()
 							-- Left and right group padding.
 							+ (groupPadding * 2)
 						)
-						totalActualGroupWidths = totalActualGroupWidths + self.actualGroupWidths[group.groupId]
 					else
 						self.actualGroupWidths[group.groupId] = 0
 					end
@@ -966,15 +985,15 @@ function Inventory:UpdateWindow()
 				currentRowLastFrameOutsideX = (
 					anchorLeft
 					and self.positioningTables.UpdateWindow.anchorToFrame:GetRight()
-					or self.positioningTables.UpdateWindow.anchorToFrame:GetLeft()
+					-- Invert for right anchor since left is smaller than right in the coordinate system.
+					-- This makes the decision of whether the row is wider than the widest
+					-- we've seen so far align between left and right anchoring (next if statement).
+					or self.positioningTables.UpdateWindow.anchorToFrame:GetLeft() * -1
 				)
+
 				if
 					widestRowLastFrameOutsideX == 0
-					or (
-						anchorLeft
-						and widestRowLastFrameOutsideX < currentRowLastFrameOutsideX
-						or widestRowLastFrameOutsideX > currentRowLastFrameOutsideX
-					)
+					or currentRowLastFrameOutsideX > widestRowLastFrameOutsideX
 				then
 					widestRowLastFrameOutsideX = currentRowLastFrameOutsideX
 					widestRowLastFrame = self.positioningTables.UpdateWindow.anchorToFrame
@@ -1028,7 +1047,11 @@ function Inventory:UpdateWindow()
 			-- Inventory content.
 			(
 				(firstFrame and widestRowLastFrame)
-				and math.abs(firstFrame:GetRight() - widestRowLastFrame:GetLeft())
+				and (
+					anchorLeft
+					and math.abs(firstFrame:GetLeft() - widestRowLastFrame:GetRight())
+					or math.abs(firstFrame:GetRight() - widestRowLastFrame:GetLeft())
+				)
 				or 0
 			)
 			-- Outer group margins.
@@ -1139,9 +1162,10 @@ function Inventory:UpdateWindow()
 			uiFrames.footer:Hide()
 		end
 
-		-- We can finally size the window frame.
-		self.uiFrame:SetWidth(math.max(finalWindowWidth, BsSkin.inventoryWindowMinWidth))
-		self.uiFrame:SetHeight(finalWindowHeight)
+		-- These are the final minimum sizes to fit everything in the window.
+		-- They'll be picked up by `Inventory:SetWindowSize()`.
+		self.desiredWindowWidth = finalWindowWidth
+		self.desiredWindowHeight = finalWindowHeight
 
 		-- Set scale and anchor for docked frame.
 		if self.dockTo then
@@ -1201,6 +1225,12 @@ end
 
 
 
+-- Reusable table to hold the visible items assigned to a group.
+-- This is needed in order to accurately calculate the size of the remainder row
+-- when it's at the bottom.
+local assignItemsToSlots_groupItems = {}
+
+
 --- Fill the given UI group frame with the items assigned to the given group.
 ---@param groupId number ID of the group to which items should be assigned.
 ---@param uiGroupNum number Frame in the `self.ui.frames.groups` table to use for display.
@@ -1221,8 +1251,6 @@ function Inventory:AssignItemsToSlots(
 )
 	-- self:PrintDebug(string.format("AssignItemsToSlots() groupId=%s uiGroupNum=%s groupWidthInItems=%s", groupId, uiGroupNum, groupWidthInItems))
 
-	local itemsPlacedInCurrentRow = 0
-	local rowNum = 0
 	local genericBagType
 	local button
 	local isEmptySlotStack
@@ -1235,34 +1263,20 @@ function Inventory:AssignItemsToSlots(
 	-- Make sure there are items to assign in this group.
 	if groupItemCount > 0 then
 
-		local buttons = self.ui.buttons
-		local frames = self.ui.frames
+		-- Reset the list of items that will be visible in the group.
+		BsUtil.TableClear(assignItemsToSlots_groupItems)
 
-		local groupFrame = frames.groups[uiGroupNum]
-
-		-- Prepare for layout
-		local initialOffset = groupPadding + itemSlotMargin
-		self:InitFramePositioningTable(
-			"AssignItemsToSlots",  -- Position tracking table
-			itemSlotMargin,        -- Frame X spacing
-			itemSlotMargin,        -- Frame Y spacing
-			groupFrame,            -- Initial frame to anchor to
-			-initialOffset,        -- Initial X offset
-			initialOffset          -- Initial Y offset
-		)
+		-- Do one pass to figure out what is actually going to be visible.
 
 		-- Update empty slot stack count for this group.
 		if self.emptySlotStackingAllowed then
 			self:CountEmptySlots(groupId)
 		end
 
-		-- Need to go in reverse because we're building right to left.
-		local firstItem = groupItemCount
-		local lastItem = 1
-		local step = -1
 		local item = nil
 		local hideItem = false
-		for position = firstItem, lastItem, step do
+
+		for position = 1, table.getn(self.groupItems[groupId]) do
 
 			-- Grab the item info.
 			item = self.groupItems[groupId][position]
@@ -1300,11 +1314,77 @@ function Inventory:AssignItemsToSlots(
 				hideItem = true
 			end
 
-
 			if not hideItem then
-				-- Ensure slot button exists.
-				self.ui:CreateInventoryItemSlotButton(currentItemSlotButtonNum)
+				table.insert(assignItemsToSlots_groupItems, item)
+			end
+		end
 
+		-- Make sure there's STILL something to do.
+		groupItemCount = table.getn(assignItemsToSlots_groupItems)
+		if groupItemCount > 0 then
+
+			local buttons = self.ui.buttons
+			local frames = self.ui.frames
+
+			local groupFrame = frames.groups[uiGroupNum]
+
+			-- Prepare for layout
+			local initialOffset = groupPadding + itemSlotMargin
+			self:InitFramePositioningTable(
+				"AssignItemsToSlots",  -- Position tracking table
+				itemSlotMargin,        -- Frame X spacing
+				itemSlotMargin,        -- Frame Y spacing
+				groupFrame,            -- Initial frame to anchor to
+				-initialOffset,        -- Initial X offset
+				initialOffset          -- Initial Y offset
+			)
+
+			-- When the remainder row is on the bottom, we'll need to know
+			-- the correct point to do an early shift to the next row.
+			local remainder = mod(groupItemCount, groupWidthInItems)
+			-- When the remainder row is on the top, we need to know when that point
+			-- is reached so the left-aligned offset can be shifted by the remainder
+			-- amount instead of the normal items-per-row amount.
+			local numRows = math.ceil(groupItemCount / groupWidthInItems)
+
+
+			-- Need to go in reverse because we always build bottom to top.
+			-- local firstItem = table.getn(assignItemsToSlots_groupItems)
+			-- local lastItem = 1
+			local step = -1
+			local itemPositionOffset = 0
+
+			local itemsPlacedInCurrentRow = 0
+			local itemsPlaced = 0
+			local rowNum = 1
+
+			--for position = firstItem, lastItem, step do
+			local position = table.getn(assignItemsToSlots_groupItems)
+
+			--Bagshui:PrintDebug("N:" .. numRows .. "  R: " .. remainder .. "  W: " .. groupWidthInItems .. "  C: " .. groupItemCount)
+
+			-- Left alignment needs to work forwards through each row of items.
+			if self.settings.windowContentAnchorXPoint == "LEFT" then
+				step = 1
+				if self.settings.windowContentAnchorYPoint == "TOP" and remainder > 0 then
+					itemPositionOffset = remainder
+				else
+					itemPositionOffset = groupWidthInItems
+				end
+				-- The starting position can't be higher than the number of items in the group.
+				position = math.min(position - itemPositionOffset + 1, groupItemCount)
+			end
+
+			-- Place the items.
+			-- Note that `currentItemSlotButtonNum` (corresponding to the actual item slot button frames)
+			-- always counts up, but `position` (the items themselves) shifts around as needed based on
+			-- whether it's right- or left-aligned, since left-aligned works forward through each row of items.
+			repeat
+
+				item = assignItemsToSlots_groupItems[position]
+
+				-- Create item slot button if needed, or reuse if possible.
+				self.ui:CreateInventoryItemSlotButton(currentItemSlotButtonNum)
 				button = buttons.itemSlots[currentItemSlotButtonNum]
 
 				-- Ensure parentage of item slot button is set to current group frame.
@@ -1344,15 +1424,39 @@ function Inventory:AssignItemsToSlots(
 				end
 
 				-- Increment counters.
+				itemsPlaced = itemsPlaced + 1
 				itemsPlacedInCurrentRow = itemsPlacedInCurrentRow + 1
 				currentItemSlotButtonNum = currentItemSlotButtonNum + 1
 
+				-- Find position of next item to be placed.
+				position = position + step
+
 				-- When we reach the end of a row, move to the next one.
-				if itemsPlacedInCurrentRow == groupWidthInItems then
+				if
+					itemsPlacedInCurrentRow == groupWidthInItems
+					-- Early shift to next row for remainder on bottom.
+					or (
+						rowNum == 1
+						and self.settings.windowContentAnchorYPoint == "TOP"
+						and itemsPlacedInCurrentRow == remainder
+						and remainder > 0
+					)
+				then
 					itemsPlacedInCurrentRow = 0
 					rowNum = rowNum + 1
+
+					-- Left alignment needs to work forwards through each row of items.
+					if self.settings.windowContentAnchorXPoint == "LEFT" then
+						if rowNum == numRows and remainder > 0 then
+							itemPositionOffset = groupWidthInItems + remainder
+						else
+							itemPositionOffset = groupWidthInItems * 2
+						end
+						position = position - itemPositionOffset
+					end
 				end
-			end
+			
+			until itemsPlaced >= groupItemCount
 		end
 	end
 
@@ -1367,7 +1471,7 @@ function Inventory:ResetEmptySlotStackCounts(resetBagsRepresented)
 	for _, emptySlotStack in pairs(self.emptySlotStacks) do
 		emptySlotStack.count = 0
 		emptySlotStack.displayed = false
-		if resetBagsRepresented then
+		if resetBagsRepresented and emptySlotStack._bagsRepresented then
 			BsUtil.TableClear(emptySlotStack._bagsRepresented)
 		end
 	end
@@ -1497,13 +1601,15 @@ end
 ---@param initialAnchorToFrame table Frame to which the first frame should be attached.
 ---@param initialXOffset number Horizontal space between initialAnchorToFrame and first frame.
 ---@param initialYOffset number Vertical space between initialAnchorToFrame and first frame.
+---@param anchorXPoint "LEFT"|"RIGHT"|nil Horizontal alignment (default is `settings.windowContentAnchorXPoint`).
 function Inventory:InitFramePositioningTable(
 	positioningTableName,
 	frameXSpacing,
 	frameYSpacing,
 	initialAnchorToFrame,
 	initialXOffset,
-	initialYOffset
+	initialYOffset,
+	anchorXPoint
 )
 	-- Set up positioning variable storage.
 	-- The table doesn't need to be cleared if it already exists because all its values will be reset below.
@@ -1513,10 +1619,10 @@ function Inventory:InitFramePositioningTable(
 	local positioningTable = self.positioningTables[positioningTableName]
 
 	-- Define anchor points and spacing.
-	positioningTable.anchorXPoint = self.settings.windowContentAlignment
+	positioningTable.anchorXPoint = anchorXPoint or self.settings.windowContentAnchorXPoint
 	positioningTable.anchorLeft = positioningTable.anchorXPoint == "LEFT"
-	positioningTable.anchorToPointXRowStart = "TOP" .. positioningTable.anchorXPoint
-	positioningTable.anchorToPointXSubsequent = "BOTTOM" .. BsUtil.FlipAnchorPoint(positioningTable.anchorXPoint)
+	positioningTable.anchorToPointRowStart = "TOP" .. positioningTable.anchorXPoint
+	positioningTable.anchorToPointSubsequent = "BOTTOM" .. BsUtil.FlipAnchorPoint(positioningTable.anchorXPoint)
 	positioningTable.frameXSpacing = frameXSpacing
 	positioningTable.frameYSpacing = frameYSpacing
 
@@ -1576,7 +1682,7 @@ function Inventory:ShowFrameInNextPosition(
 	if positioningTable.currentRow ~= nil and positioningTable.currentRow ~= rowNum then
 		-- Anchor to the first frame in the previous row.
 		positioningTable.anchorToFrame = positioningTable.firstVisibleFrameInPreviousRow
-		positioningTable.anchorToPoint = positioningTable.anchorToPointXRowStart
+		positioningTable.anchorToPoint = positioningTable.anchorToPointRowStart
 		positioningTable.anchorXOffset = 0
 		-- First frame in the row needs to be higher up.
 		positioningTable.anchorYOffset = positioningTable.frameYSpacing
@@ -1604,7 +1710,7 @@ function Inventory:ShowFrameInNextPosition(
 		-- Update the row number of the tracking variable so we know we've found the first visible element in this row.
 		positioningTable.currentRow = rowNum
 		-- Change the anchor point for subsequent frames.
-		positioningTable.anchorToPoint = positioningTable.anchorToPointXSubsequent
+		positioningTable.anchorToPoint = positioningTable.anchorToPointSubsequent
 		-- Subsequent frames in this row will be spaced using the frameXSpacing set by InitFramePositioningTable().
 		positioningTable.anchorXOffset = -positioningTable.frameXSpacing
 		-- Subsequent frames in this same row should be at the same vertical offset.
@@ -1998,8 +2104,6 @@ function Inventory:UpdateBagBar()
 		self.ui.frames.spaceSummary:SetAlpha(0)  -- Using SetAlpha() instead of Hide() so it's still responsive to mouseover.
 	end
 
-	
-
 	-- Set the Bag Bar to the correct width.
 	self.ui.frames.bagBar:SetWidth(
 		self.ui.frames.bagBar.bagshuiData.baseWidth
@@ -2014,10 +2118,30 @@ end
 function Inventory:UpdateToolbar()
 	local toolbarButtons = self.ui.buttons.toolbar
 
-	-- Resort icon.
-	self:SetToolbarButtonState(
+	-- Can only highlight changes if there's something to highlight.
+	self.highlightChangesEnabled = (
+		self.hasChanges
+		or (self.dockedInventory and self.dockedInventory:Visible() and self.dockedInventory.hasChanges)
+		or (self.dockedToInventory and self.dockedToInventory.hasChanges)
+	) or false
+
+	-- Safeguard: Turn off Highlight Changes if there's nothing to highlight.
+	if not self.highlightChangesEnabled then
+		self.highlightChanges = false
+	end
+
+
+	-- Search icon.
+	self:SetToolbarWidgetState(
 		toolbarButtons.resort,
-		nil,
+		true,
+		not self.editMode
+	)
+
+	-- Resort icon.
+	self:SetToolbarWidgetState(
+		toolbarButtons.resort,
+		true,
 		(
 			self.enableResortIcon
 			or (
@@ -2029,9 +2153,9 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Restack icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.restack,
-		nil,
+		true,
 		(
 			self.multiplePartialStacks
 			or (
@@ -2043,9 +2167,9 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Show/Hide icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.showHide,
-		nil,
+		true,
 		(self.hasHiddenGroups or self.hasHiddenItems) and not self.editMode,
 		self.showHidden,
 		L.Toolbar_Hide_TooltipTitle,
@@ -2053,9 +2177,9 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Highlight Changes icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.highlightChanges,
-		nil,
+		true,
 		self.highlightChangesEnabled and not self.editMode,
 		self.highlightChanges,
 		L.Toolbar_UnHighlightChanges_TooltipTitle,
@@ -2063,26 +2187,26 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Character icon.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.character,
-		nil,
+		true,
 		table.getn(BsCharacterData.characterIdList) > 1,  -- Only enable when there's more than one character.
 		self.activeCharacterId ~= Bagshui.currentCharacterId
 	)
 
 	-- Lock highlights for inventories when they're open.
 	for inventoryType, _ in self:OtherInventoryTypesInToolbarIconOrder(true) do
-		self:SetToolbarButtonState(
+		self:SetToolbarWidgetState(
 			toolbarButtons[inventoryType],
-			nil,
+			true,
 			true,
 			Bagshui.components[inventoryType]:Visible()
 		)
 	end
 	-- Catalog.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.catalog,
-		nil,
+		true,
 		true,
 		BsCatalog:Visible()
 	)
@@ -2093,9 +2217,9 @@ function Inventory:UpdateToolbar()
 	end
 
 	-- State buttons.
-	self:SetToolbarButtonState(toolbarButtons.offline, (not self.online))
-	self:SetToolbarButtonState(toolbarButtons.error, (string.len(self.errorText or "") > 0))
-	self:SetToolbarButtonState(toolbarButtons.editMode, self.editMode, nil, self.editMode)
+	self:SetToolbarWidgetState(toolbarButtons.offline, (not self.online))
+	self:SetToolbarWidgetState(toolbarButtons.error, (string.len(self.errorText or "") > 0))
+	self:SetToolbarWidgetState(toolbarButtons.editMode, self.editMode, nil, self.editMode)
 
 	-- Error button needs its tooltip updated.
 	toolbarButtons.error.bagshuiData.tooltipText = self.errorText
@@ -2107,30 +2231,34 @@ function Inventory:UpdateToolbar()
 			NORMAL_FONT_COLOR_CODE .. string.format(L.Symbol_Colon, L.Profile_Structure) .. FONT_COLOR_CODE_CLOSE
 			.. " " .. BsProfiles:GetName(self.settings.profileStructure)
 		)
-		self.ui.frames.status:Show()
+		self:SetToolbarWidgetState(self.ui.frames.status, true)  -- Show.
 		-- Move the offline character name into the tooltip in edit mode.
 		toolbarButtons.offline.bagshuiData.tooltipText = GRAY_FONT_COLOR_CODE .. self.activeCharacterId .. FONT_COLOR_CODE_CLOSE
 	else
 		self.ui.text.status:SetText(self.activeCharacterId)
 		if self.activeCharacterId ~= Bagshui.currentCharacterId then
-			self.ui.frames.status:Show()
+			self:SetToolbarWidgetState(self.ui.frames.status, true)  -- Show.
 		else
-			self.ui.frames.status:Hide()
+			self:SetToolbarWidgetState(self.ui.frames.status, false)  -- Hide.
 		end
 		-- Don't need the offline character name in the tooltip normally.
 		toolbarButtons.offline.bagshuiData.tooltipText = nil
 	end
+	-- Use text width instead of widget width for toolbar sizing.
+	if self.ui.frames.status:IsShown() then
+		self.ui.frames.status.bagshuiData.widthOverride = self.ui.text.status:GetStringWidth()
+	end
 
 	-- Money frame.
 	if self.settings.showMoney then
-		self.ui.frames.money:Show()
+		self:SetToolbarWidgetState(self.ui.frames.money, true)  -- Show.
 		self.ui.frames.money:SetAlpha(self.editMode and 0.2 or 1)
 		-- Use label colors for money text.
 		for _, text in pairs(self.ui.frames.money.bagshuiData.texts) do
 			text:SetTextColor(self.settings.groupLabelDefault[1], self.settings.groupLabelDefault[2], self.settings.groupLabelDefault[3], self.settings.groupLabelDefault[4])
 		end
 	else
-		self.ui.frames.money:Hide()
+		self:SetToolbarWidgetState(self.ui.frames.money, false)  -- Hide.
 	end
 
 	-- Hearthstone button.
@@ -2140,23 +2268,22 @@ function Inventory:UpdateToolbar()
 		and self.settings.showHearthstone
 		and self.hearthstoneItemRef
 	then
-		toolbarButtons.hearthstone:Show()
+		self:SetToolbarWidgetState(toolbarButtons.hearthstone, true, not self.editMode)  -- Show, disable in Edit Mode.
 
 		-- Display cooldown.
 		local cooldownStart, cooldownDuration, isOnCooldown = _G.GetContainerItemCooldown(self.hearthstoneItemRef.bagNum, self.hearthstoneItemRef.slotNum)
 		self.ui:SetIconButtonCooldown(toolbarButtons.hearthstone, cooldownStart, cooldownDuration, isOnCooldown)
 
 	else
-		toolbarButtons.hearthstone:Hide()
+		self:SetToolbarWidgetState(toolbarButtons.hearthstone, false)  -- Hide.
 	end
 
 	-- Clam (open container) button.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.clam,
 		(
 			self.clamButton
 			and self.settings.showClam
-			or false
 		),
 		(
 			self.hasOpenables
@@ -2170,25 +2297,23 @@ function Inventory:UpdateToolbar()
 	)
 
 	-- Disenchant button.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.disenchant,
 		(
 			self.disenchantButton
 			and BsCharacter.spellNamesToIds[toolbarButtons.disenchant.bagshuiData.spellName]
 			and self.settings.showDisenchant
-			or false
 		),
 		not self.editMode
 	)
 
 	-- Pick Lock button.
-	self:SetToolbarButtonState(
+	self:SetToolbarWidgetState(
 		toolbarButtons.pickLock,
 		(
 			self.pickLockButton
 			and BsCharacter.spellNamesToIds[toolbarButtons.pickLock.bagshuiData.spellName]
 			and self.settings.showPickLock
-			or false
 		),
 		not self.editMode
 	)
@@ -2205,30 +2330,21 @@ function Inventory:UpdateToolbar()
 		)
 	then
 		if self.settings.showFooter then
-			self.ui.frames.miniSpaceSummaryBottom:Show()
-			self.ui.frames.miniSpaceSummaryTop:Hide()
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryBottom, true)  -- Show.
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryTop, false)  -- Hide.
 		else
-			self.ui.frames.miniSpaceSummaryBottom:Hide()
-			self.ui.frames.miniSpaceSummaryTop:Show()
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryBottom, false)  -- Hide.
+			self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryTop, true)  -- Show.
 		end
 	else
-		self.ui.frames.miniSpaceSummaryBottom:Hide()
-		self.ui.frames.miniSpaceSummaryTop:Hide()
+		self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryBottom, false)  -- Hide.
+		self:SetToolbarWidgetState(self.ui.frames.miniSpaceSummaryTop, false)  -- Hide.
 	end
 
 	-- Re-anchor all toolbar widgets based on visibility.
-	self:UpdateToolbarAnchoring("topLeftToolbar", "LEFT")
-	self:UpdateToolbarAnchoring("topRightToolbar", "RIGHT")
-	self:UpdateToolbarAnchoring("bottomRightToolbar", "RIGHT")
-
-	-- Disable unusable stuff in Edit Mode.
-	local editModeState = (self.editMode) and "Disable" or "Enable"
-	-- Hearthstone
-	if self.hearthButton then
-		self.ui.buttons.toolbar.hearthstone[editModeState](self.ui.buttons.toolbar.hearthstone)
-	end
-	-- Search
-	self.ui.buttons.toolbar.search[editModeState](self.ui.buttons.toolbar.search)
+	self:UpdateToolbarItemAnchorsAndCalculateWidth("topLeftToolbar", "LEFT")
+	self:UpdateToolbarItemAnchorsAndCalculateWidth("topRightToolbar", "RIGHT")
+	self:UpdateToolbarItemAnchorsAndCalculateWidth("bottomRightToolbar", "RIGHT")
 
 	-- Parent toolbar needs to sync state.
 	if self.dockedToInventory then
@@ -2238,15 +2354,15 @@ end
 
 
 
---- Control the state and appearance of a toolbar button.
----@param button table Button object.
----@param visible boolean? Whether the button should be displayed.
----@param enable boolean? Whether the button should be enabled.
----@param lockHighlight boolean? Whether the button should be highlighted.
----@param lockedHighlightTooltip string? Tooltip title to display when the button highlight is locked.
----@param unlockedHighlightTooltip string? Tooltip title to display when the button highlight is unlocked.
-function Inventory:SetToolbarButtonState(
-	button,
+--- Control the state and appearance of a toolbar widget.
+---@param widget table Widget object (usually a button, but can be any UI object).
+---@param visible boolean? Whether the widget should be displayed.
+---@param enable boolean? Whether the widget should be enabled.
+---@param lockHighlight boolean? For buttons, whether the button should be highlighted.
+---@param lockedHighlightTooltip string? For buttons, tooltip title to display when the button highlight is locked.
+---@param unlockedHighlightTooltip string? For buttons, tooltip title to display when the button highlight is unlocked.
+function Inventory:SetToolbarWidgetState(
+	widget,
 	visible,
 	enable,
 	lockHighlight,
@@ -2257,50 +2373,60 @@ function Inventory:SetToolbarButtonState(
 	if visible == nil then
 		visible = true
 	end
-	button[visible and "Show" or "Hide"](button)
+	widget[visible and "Show" or "Hide"](widget)
 
-	if button.Enable then
+	if widget.Enable then
 		if enable == nil then
 			enable = true
 		end
-		button[enable and "Enable" or "Disable"](button)
+		widget[enable and "Enable" or "Disable"](widget)
 	end
 
-	if button.LockHighlight then
+	if widget.LockHighlight then
 		if lockHighlight then
 			if lockedHighlightTooltip then
-				button.bagshuiData.tooltipTitle = lockedHighlightTooltip
+				widget.bagshuiData.tooltipTitle = lockedHighlightTooltip
 			end
-			button:LockHighlight()
+			widget:LockHighlight()
 		else
 			if unlockedHighlightTooltip then
-				button.bagshuiData.tooltipTitle = unlockedHighlightTooltip
+				widget.bagshuiData.tooltipTitle = unlockedHighlightTooltip
 			end
-			button:UnlockHighlight()
+			widget:UnlockHighlight()
 		end
 	end
 
 	-- Update tooltip if it's visible so that text stays current.
 	if
-		button.bagshuiData.isIconButton
-		and button.bagshuiData.mouseIsOver
+		widget.bagshuiData.isIconButton
+		and widget.bagshuiData.mouseIsOver
 		and BsIconButtonTooltip:IsVisible()
-		and BsIconButtonTooltip:IsOwned(button)
+		and BsIconButtonTooltip:IsOwned(widget)
 	then
-		self.ui:ShowIconButtonTooltip(button, 0)
+		self.ui:ShowIconButtonTooltip(widget, 0)
 	end
 end
 
 
 
---- Toolbar icons need their anchors updated based on what's shown.
+--- Toolbar widgets need their anchors updated based on what's shown, and we need
+--- to calculate the width of the toolbar for use in determining minimum window width.
 ---@param widgetOrderTable string Name of table in `self.ui.ordering`, which is an array of WoW UI widgets, in display order. Can also include numbers as spacing directives that override the default.
 ---@param anchorPoint "LEFT"|"RIGHT" Place to anchor each widget. This point will be anchored to the opposing point of the previous widget.
-function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
+function Inventory:UpdateToolbarItemAnchorsAndCalculateWidth(widgetOrderTable, anchorPoint)
 	local widgetList = self.ui.ordering[widgetOrderTable]
 	local invert = (anchorPoint == "RIGHT" and -1 or 1)
 	local defaultOffset = invert * BsSkin.toolbarSpacing
 	local nextOffset
+
+	-- The easy way to calculate the width would be the same thing we do for inventory
+	-- contents: get the distance between the Left/Right points of the two edge widgets.
+	-- For some reason, that doesn't work well here -- the problem is that there seems to
+	-- be a 1 frame delay between showing/hiding items in the toolbar and the values
+	-- returned by GetLeft/Right().
+	-- So instead, we're going the slightly more annoying route of totaling up the widths of
+	-- all visible items, plus padding as we encounter them.
+	local toolbarWidth = widgetList[1]:GetWidth()
 
 	-- Go through the list of widgets in order, but skip the first one since
 	-- that's only there as the left/rightmost anchor.
@@ -2320,15 +2446,23 @@ function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
 					end
 				else
 					-- Check visibility and update anchoring.
-					local anchorButton = widgetList[anchorPosition]
-					if anchorButton:IsShown() then
+					local anchorWidget = widgetList[anchorPosition]
+					if not anchorWidget.bagshuiData then
+						anchorWidget.bagshuiData = {}
+					end
+					if anchorWidget:IsShown() then
 						widget:SetPoint(
 							anchorPoint,
-							anchorButton,
+							anchorWidget,
 							BsUtil.FlipAnchorPoint(anchorPoint),
 							nextOffset,
 							0
 						)
+						local widgetWidth =
+							(widget.bagshuiData and type(widget.bagshuiData.widthOverride) == "number")
+							and widget.bagshuiData.widthOverride
+							or widget:GetWidth()
+						toolbarWidth = toolbarWidth + widgetWidth + math.abs(nextOffset)
 						break
 					end
 				end
@@ -2337,7 +2471,11 @@ function Inventory:UpdateToolbarAnchoring(widgetOrderTable, anchorPoint)
 		end
 
 	end -- Widget iteration.
+
+	-- Store the toolbar width for use by `Inventory:SetWindowSize()`.
+	self[widgetOrderTable .. "Width"] = toolbarWidth
 end
+
 
 
 --- It seems like the client doesn't always catch situations where frames move out from

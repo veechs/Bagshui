@@ -226,6 +226,8 @@ end
 --- 	profileScope,
 --- 	---@type boolean Don't expose this setting in the UI.
 --- 	hidden,
+--- 	---@type boolean This isn't a real setting -- it's a front for one or more other settings and will manage values through custom `onGet`/`onSet` callbacks.
+--- 	virtual,
 --- 	---
 --- 	--- * Display Customization *
 --- 	---@type string? Display name of the setting when the setting does not have a localization.
@@ -254,7 +256,11 @@ end
 --- 	textDisplayFunc,
 --- 	---@type function(tooltipText, settingName, settings)? -> string Modify the tooltip text at display-time. The `tooltipText` string will contain `~1~` as a placeholder for insertion at the end, but before the reset text.
 --- 	tooltipTextDisplayFunc,
---- 	---@type function(settings, settingName, newValue)? -> nil Custom callback to execute after setting change..
+--- 	---@type function(settings, settingName)? -> boolean, any Custom callback to execute to retrieve the setting value. When first return value is `true`, the second value will be returned by :Get().
+--- 	onGet,
+--- 	---@type function(settings, settingName, newValue)? -> boolean Custom callback to set the new value. When return value is `true`, the normal set operation will not proceed.
+--- 	onSet,
+--- 	---@type function(settings, settingName, newValue)? -> nil Custom callback to execute after setting change.
 --- 	onChange,
 --- 	---@type boolean? Trigger the associated inventory class to refresh its item cache.
 --- 	inventoryCacheUpdateOnChange,
@@ -426,6 +432,23 @@ end
 ---@return integer? settingVersion
 function Settings:Get(settingName, includeVersion, noCache, noDefault)
 	local value
+	local settingInfo = self:GetSettingInfo(settingName)
+
+	-- onGet can short-circuit.
+	if
+		settingInfo.onGet
+		and self._initialized
+	then
+		local onGetSuccess, onGetValue = settingInfo.onGet(self, settingName)
+		if onGetSuccess then
+			return onGetValue
+		end
+	end
+
+	-- Virtual settings that don't have a successful onGet call can't have a value.
+	if settingInfo.virtual then
+		return
+	end
 
 	-- Cached value.
 	if not (includeVersion or noCache) then
@@ -474,6 +497,15 @@ function Settings:Set(settingName, value, skipValidation, force)
 		finalValue = self:Validate(settingInfo, value)
 	end
 
+	-- onSet can short-circuit.
+	if
+		settingInfo.onSet
+		and self._initialized
+		and settingInfo.onSet(self, settingName, finalValue)
+	then
+		return
+	end
+
 	-- Make sure there's a change.
 	if finalValue == previousValue and not force then
 		return
@@ -484,6 +516,8 @@ function Settings:Set(settingName, value, skipValidation, force)
 		settingTable
 		-- Trigger settings don't get changes saved since their only purpose is to raise the change event.
 		and settingInfo.type ~= BS_SETTING_TYPE.TRIGGER
+		-- Don't save virtual settings.
+		and not settingInfo.virtual
 	then
 		if not settingTable[SETTING_VERSION_KEY] then
 			settingTable[SETTING_VERSION_KEY] = {}
@@ -549,6 +583,8 @@ function Settings:SetDefaults(forceReset, scope, omitScope, limitToSetting, sile
 			-- Skip settings that don't have values.
 			and settingInfo.type ~= BS_SETTING_TYPE.TRIGGER
 			and settingInfo.type ~= BS_SETTING_TYPE.PLACEHOLDER
+			-- Virtual settings don't have actual stored values.
+			and not settingInfo.virtual
 		then
 
 			if not limitToSetting or limitToSetting == settingName then

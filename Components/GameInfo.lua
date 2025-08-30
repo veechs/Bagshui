@@ -103,6 +103,9 @@ local GameInfo = {
 	instanceType = "none",
 	lootMethod = "freeforall",
 	masterLooterPartyId = nil,
+
+	-- List of update functions to call after leaving combat.
+	combatDeferredUpdates = {}
 }
 Bagshui.environment.BsGameInfo = GameInfo
 Bagshui.components.GameInfo = GameInfo
@@ -288,6 +291,11 @@ local oldZone, oldRealZone, oldSubZone, oldMinimapZone, oldInInstance, oldInstan
 
 --- Store current location data.
 function GameInfo:UpdateLocation()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateLocation) then
+		return
+	end
+
 	oldZone = self.currentZone
 	oldRealZone = self.currentRealZone
 	oldSubZone = self.currentSubZone
@@ -324,6 +332,11 @@ local masterLooterPartyId
 
 --- Store current group (as in party/raid) data.
 function GameInfo:UpdateGroup()
+	-- Don't update while in combat.
+	if Bagshui:DeferUpdateInCombat(self, self.UpdateGroup) then
+		return
+	end
+
 	oldPlayerGroupType = self.playerGroupType
 	oldLootMethod = self.lootMethod
 	oldMasterLooter = self.isMasterLooter
@@ -373,11 +386,6 @@ end
 ---@param event string Event identifier.
 ---@param arg1 any? Argument 1 from the event.
 function GameInfo:OnEvent(event, arg1)
-	if event == "PLAYER_ENTERING_WORLD" then
-		self:UpdateLocation()
-		self:UpdateGroup()
-		return
-	end
 
 	if
 		string.find(event, "ZONE")
@@ -394,10 +402,26 @@ function GameInfo:OnEvent(event, arg1)
 		return
 	end
 
+	if event == "PLAYER_ENTERING_WORLD" then
+		self:UpdateLocation()
+		self:UpdateGroup()
+		return
+	end
+
 	if event == "BAGSHUI_LOCALIZATION_LOADED" then
 		self:PopulatePostLocalizationInfo()
 		return
 	end
+end
+
+
+
+-- Call any queued update functions.
+function GameInfo:ProcessCombatDeferredUpdates()
+	for func in pairs(self.combatDeferredUpdates) do
+		self[func](self)
+	end
+	BsUtil.TableClear(self.combatDeferredUpdates)
 end
 
 

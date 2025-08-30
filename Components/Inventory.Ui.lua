@@ -554,6 +554,7 @@ function Inventory:InitUi()
 				self:ForceUpdateWindow()
 			else
 				self:UpdateToolbar()
+				self:SetWindowSize()
 			end
 		end
 	end)
@@ -658,7 +659,7 @@ function Inventory:InitUi()
 	---@param justifyH string? FontString justification.
 	---@return table spaceSummary
 	local function CreateSpaceSummary(parent, justifyH)
-		local spaceSummary = _G.CreateFrame("Frame", nil, parent)
+		local spaceSummary = _G.CreateFrame("Frame", ui:CreateElementName("SpaceSummary"), parent)
 		spaceSummary:SetHitRectInsets(-(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2), -(BsSkin.bagBarSpacing / 2))
 		spaceSummary.bagshuiData = {
 			text = spaceSummary:CreateFontString(nil, nil, "NumberFontNormalSmall"),
@@ -715,7 +716,7 @@ function Inventory:InitUi()
 
 
 	-- Bottom right toolbar anchor.
-	frames.bottomRightToolbarAnchor = _G.CreateFrame("Frame", nil, footer)
+	frames.bottomRightToolbarAnchor = _G.CreateFrame("Frame", ui:CreateElementName("BottomRightToolbarAnchor"), footer)
 	frames.bottomRightToolbarAnchor:SetHeight(25)
 	frames.bottomRightToolbarAnchor:SetWidth(1)
 	frames.bottomRightToolbarAnchor:SetPoint("RIGHT", footer, "RIGHT", 5, 0)
@@ -994,6 +995,7 @@ function Inventory:PopulateToolbarAndMainMenuItems()
 				end
 				self.ui.frames.searchBox:Show()
 				self:UpdateToolbar()
+				self:SetWindowSize()
 				self.ui.frames.searchBox:SetFocus()
 			end,
 		},
@@ -1140,6 +1142,8 @@ end
 --- - Top toolbar hidden if it was temporarily visible.
 --- - Pending trade-with-another player item cleared.
 function Inventory:UiFrame_OnShow()
+	-- Make sure everything is up to date.
+	Bagshui:ProcessCombatDeferredEvents()
 
 	if self.dockTo then
 		-- Used by SetDockedToFrameVisibility() to decide whether the  frame to which this
@@ -1174,6 +1178,11 @@ function Inventory:UiFrame_OnShow()
 	self:NotifySkinOfPositionChange()
 	-- Do NOT use QueueUpdate() here.
 	self:Update()
+
+	-- Keep Highlight Changes toolbar button in sync.
+	if self.dockedToInventory then
+		self.dockedToInventory:UpdateToolbar()
+	end
 end
 
 
@@ -1199,6 +1208,15 @@ function Inventory:UiFrame_OnHide()
 		self.dockedInventory:Close()
 	end
 
+	-- Turn off Highlight Changes if it was only available because of the docked inventory.
+	if self.dockedToInventory then
+		if self.hasChanges and not self.dockedToInventory.hasChanges then
+			self.highlightChanges = false
+			self.dockedToInventory.highlightChanges = false
+			self.dockedToInventory.windowUpdateNeeded = true
+			self.dockedToInventory:Update()
+		end
+	end
 end
 
 

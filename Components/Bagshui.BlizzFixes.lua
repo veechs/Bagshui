@@ -38,8 +38,8 @@ function Bagshui:OpenStackSplitFrame(wowApiFunctionName, maxStack, parent, ancho
 	self.hooks:OriginalHook(wowApiFunctionName, maxStack, parent, anchor, anchorTo)
 	-- Reposition if needed.
 	if BsUtil.GetFrameOffscreenAmount(_G.StackSplitFrame, "y") < 0 then
-		self:PrintDebug(anchor)
-		self:PrintDebug(BsUtil.FlipAnchorPointComponent(anchor, 1))
+		--self:PrintDebug(anchor)
+		--self:PrintDebug(BsUtil.FlipAnchorPointComponent(anchor, 1))
 		_G.StackSplitFrame:ClearAllPoints()
 		_G.StackSplitFrame:SetPoint(
 			BsUtil.FlipAnchorPointComponent(anchor, 1),
