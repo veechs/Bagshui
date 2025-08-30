@@ -11,8 +11,6 @@
 </picture><br>
 <a href="https://github.com/veechs/Bagshui/wiki/Screenshots">More Screenshots</a></h4>
 
-<a href="https://www.buymeacoffee.com/veechs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" height="41" width="146"></a>
-
 
 ## Features
 
